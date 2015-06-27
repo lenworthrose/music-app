@@ -42,12 +42,12 @@ public class GridFragment extends Fragment {
 
         switch (type) {
             case Constants.TYPE_ARTISTS:
-                adapter = new ArtistsAdapter(getActivity());
+                adapter = new ArtistsAdapter(getActivity(), true);
                 callbacks = new ArtistLoaderCallbacks(getActivity(), adapter);
                 clickListener = new OnArtistClickListener(navListener);
                 break;
             case Constants.TYPE_ALBUMS:
-                adapter = new AlbumsAdapter(getActivity());
+                adapter = new AlbumsAdapter(getActivity(), true);
                 callbacks = new AlbumLoaderCallbacks(savedInstanceState.getLong(Constants.ID), getActivity(), adapter);
                 clickListener = new OnAlbumClickListener(navListener);
                 break;

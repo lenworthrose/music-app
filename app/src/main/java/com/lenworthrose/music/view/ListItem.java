@@ -2,11 +2,12 @@ package com.lenworthrose.music.view;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.helper.ListViewHelper;
 
 public class ListItem extends CheckableFrameLayout {
     private int position = -1;
@@ -16,11 +17,9 @@ public class ListItem extends CheckableFrameLayout {
     private TextView title, status;
     private boolean isEditModeEnabled;
     private boolean showCoverArt;
-    private ListViewHelper helper;
 
-    public ListItem(Context context, ListViewHelper helper) {
+    public ListItem(Context context) {
         super(context);
-        this.helper = helper;
 
         inflate(context, R.layout.list_item, this);
         title = (TextView)findViewById(R.id.list_item_title);
@@ -31,7 +30,6 @@ public class ListItem extends CheckableFrameLayout {
 
     public void setData(Cursor cursor) {
         position = cursor.getPosition();
-        helper.configure(this, cursor);
     }
 
     public void setTitle(String text) {
@@ -40,5 +38,14 @@ public class ListItem extends CheckableFrameLayout {
 
     public void setStatus(String text) {
         status.setText(text);
+    }
+
+    public void setImage(Bitmap bitmap) {
+        if (bitmap != null) {
+            image.setVisibility(View.VISIBLE);
+            image.setImageBitmap(bitmap);
+        } else {
+            image.setVisibility(View.GONE);
+        }
     }
 }

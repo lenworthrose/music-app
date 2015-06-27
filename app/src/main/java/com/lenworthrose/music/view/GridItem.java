@@ -1,7 +1,6 @@
 package com.lenworthrose.music.view;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
@@ -11,16 +10,13 @@ import android.graphics.drawable.shapes.RectShape;
 import android.widget.TextView;
 
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.helper.GridViewHelper;
 
 public class GridItem extends CheckableFrameLayout {
     private TextView label;
     private SquareImageView imgView;
-    private GridViewHelper helper;
 
-    public GridItem(Context context, GridViewHelper helper) {
+    public GridItem(Context context) {
         super(context);
-        this.helper = helper;
 
         inflate(getContext(), R.layout.grid_item, this);
         setPadding(5, 5, 5, 5);
@@ -52,10 +48,6 @@ public class GridItem extends CheckableFrameLayout {
 
 //        inflate(getContext(), R.layout.grid_item, this);
 //        setBackgroundResource(backgroundResourceId);
-    }
-
-    public void setData(Cursor cursor) {
-        helper.configure(this, cursor);
     }
 
     public void setText(String text) {
