@@ -20,7 +20,6 @@ public class AlbumLoaderCallbacks extends LoaderCallbacks {
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {
                 MediaStore.Audio.Albums._ID,
-                MediaStore.Audio.Albums.ALBUM_KEY,
                 MediaStore.Audio.Albums.ALBUM,
                 MediaStore.Audio.Albums.NUMBER_OF_SONGS,
                 MediaStore.Audio.Albums.FIRST_YEAR,
@@ -34,5 +33,25 @@ public class AlbumLoaderCallbacks extends LoaderCallbacks {
                 MediaStore.Audio.Media.ARTIST_ID + "=?",
                 whereVars,
                 MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
+    }
+
+    public static long getId(Cursor cursor) {
+        return cursor.getLong(0);
+    }
+
+    public static String getName(Cursor cursor) {
+        return cursor.getString(1);
+    }
+
+    public static int getSongCount(Cursor cursor) {
+        return cursor.getInt(2);
+    }
+
+    public static int getYear(Cursor cursor) {
+        return cursor.getInt(3);
+    }
+
+    public static String getAlbumArtPath(Cursor cursor) {
+        return cursor.getString(4);
     }
 }

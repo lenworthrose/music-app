@@ -35,4 +35,28 @@ public class SongLoaderCallbacks extends LoaderCallbacks {
                 whereVars,
                 MediaStore.Audio.Media.TRACK);
     }
+
+    public static long getId(Cursor cursor) {
+        return cursor.getLong(0);
+    }
+
+    public static String getName(Cursor cursor) {
+        return cursor.getString(1);
+    }
+
+    public static int getTrackNum(Cursor cursor) {
+        return cursor.getInt(2);
+    }
+
+    public static long getDuration(Cursor cursor) {
+        return cursor.getLong(3);
+    }
+
+    public static String getArtist(Cursor cursor) {
+        return cursor.getString(4);
+    }
+
+    public static String getAlbum(Cursor cursor) {
+        return cursor.getString(5);
+    }
 }

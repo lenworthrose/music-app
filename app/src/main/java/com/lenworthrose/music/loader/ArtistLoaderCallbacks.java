@@ -22,4 +22,16 @@ public class ArtistLoaderCallbacks extends LoaderCallbacks {
 
         return new CursorLoader(getContext(), MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, projection, null, null, MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
     }
+
+    public static long getId(Cursor cursor) {
+        return cursor.getLong(0);
+    }
+
+    public static String getName(Cursor cursor) {
+        return cursor.getString(1);
+    }
+
+    public static int getAlbumCount(Cursor cursor) {
+        return cursor.getInt(2);
+    }
 }
