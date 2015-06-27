@@ -32,7 +32,7 @@ public class ListFragment extends Fragment {
         if (!(getActivity() instanceof NavigationListener))
             throw new IllegalStateException("GridFragment's Activity must implement NavigationListener");
 
-        NavigationListener navListener = (NavigationListener)getActivity();
+//        NavigationListener navListener = (NavigationListener)getActivity();
 
         if (savedInstanceState == null) savedInstanceState = getArguments();
         type = savedInstanceState.getString(Constants.TYPE);
@@ -42,7 +42,7 @@ public class ListFragment extends Fragment {
             case Constants.TYPE_SONGS:
                 adapter = new SongsAdapter(getActivity(), false);
                 callbacks = new SongLoaderCallbacks(albumId, getActivity(), adapter);
-                clickListener = new OnSongClickListener(navListener);
+                clickListener = new OnSongClickListener(albumId);
                 break;
         }
 
@@ -63,8 +63,6 @@ public class ListFragment extends Fragment {
         listView.setOnItemClickListener(clickListener);
         listView.setMultiChoiceModeListener(new MultiSelectListener(type));
     }
-
-
 
     public static ListFragment songsInstance(long albumId) {
         Bundle b = new Bundle();

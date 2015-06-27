@@ -3,18 +3,17 @@ package com.lenworthrose.music.helper;
 import android.view.View;
 import android.widget.AdapterView;
 
-/**
- * Created by Lenny on 2015-06-26.
- */
-public class OnSongClickListener implements AdapterView.OnItemClickListener {
-    private NavigationListener listener;
+import com.lenworthrose.music.playback.PlaybackDelegator;
 
-    public OnSongClickListener(NavigationListener listener) {
-        this.listener = listener;
+public class OnSongClickListener implements AdapterView.OnItemClickListener {
+    private long albumId;
+
+    public OnSongClickListener(long albumId) {
+        this.albumId = albumId;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        PlaybackDelegator.playAlbum(parent.getContext(), albumId, position);
     }
 }
