@@ -32,7 +32,7 @@ public class AlbumLoaderCallbacks extends LoaderCallbacks {
                 projection,
                 MediaStore.Audio.Media.ARTIST_ID + "=?",
                 whereVars,
-                MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
+                MediaStore.Audio.Albums.FIRST_YEAR);
     }
 
     public static long getId(Cursor cursor) {
