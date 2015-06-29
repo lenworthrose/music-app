@@ -13,10 +13,8 @@ import com.lenworthrose.music.adapter.AlbumsAdapter;
 import com.lenworthrose.music.adapter.ArtistsAdapter;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.util.Constants;
-import com.lenworthrose.music.util.MultiSelectListener;
 
 public class GridFragment extends Fragment {
-    private String type;
     private BaseSwitchableAdapter adapter;
 
     @Override
@@ -24,7 +22,7 @@ public class GridFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) savedInstanceState = getArguments();
-        type = savedInstanceState.getString(Constants.TYPE);
+        String type = savedInstanceState.getString(Constants.TYPE);
 
         switch (type) {
             case Constants.TYPE_ARTISTS:
@@ -51,7 +49,7 @@ public class GridFragment extends Fragment {
         GridView grid = (GridView)view.findViewById(R.id.grid_view);
         grid.setAdapter(adapter);
         grid.setOnItemClickListener(adapter);
-        grid.setMultiChoiceModeListener(new MultiSelectListener(type));
+        grid.setMultiChoiceModeListener(adapter);
 
         getLoaderManager().initLoader(0, null, adapter);
     }

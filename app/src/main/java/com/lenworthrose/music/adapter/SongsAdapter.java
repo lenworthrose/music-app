@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -13,7 +14,14 @@ import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
+import java.util.ArrayList;
+
 public class SongsAdapter extends BaseSwitchableAdapter {
+    public enum Type {
+        ARTIST,
+        ALBUM
+    }
+
     private long parentId;
 
     public SongsAdapter(Context context, boolean isGrid) {
@@ -27,23 +35,9 @@ public class SongsAdapter extends BaseSwitchableAdapter {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = {
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.TRACK,
-                MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.ALBUM_ID
-        };
-
-        String[] whereVars = { String.valueOf(parentId) };
-
-        return new CursorLoader(getContext(), MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                parentId == Long.MIN_VALUE ? null : MediaStore.Audio.Media.ALBUM_ID + "=?",
-                parentId == Long.MIN_VALUE ? null : whereVars,
-                MediaStore.Audio.Media.TRACK);
+        ArrayList<Long> list = new ArrayList<>();
+        list.add(parentId);
+        return createSongsLoader(getContext(), Type.ALBUM, list );
     }
 
     @Override
@@ -66,5 +60,75 @@ public class SongsAdapter extends BaseSwitchableAdapter {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         getNavigationListener().playSongs(getCursor(), position);
+    }
+
+    public static CursorLoader createSongsLoader(Context context, Type type, ArrayList<Long> parentIds) {
+        String[] projection = {
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.TRACK,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ALBUM_ID
+        };
+
+        String where = null;
+        String[] whereVars = null;
+
+        if (parentIds != null) {
+            StringBuilder sb;
+
+            switch (type) {
+                case ARTIST:
+                    sb = new StringBuilder(MediaStore.Audio.Media.ARTIST_ID);
+                    break;
+                case ALBUM:
+                    sb = new StringBuilder(MediaStore.Audio.Media.ALBUM_ID);
+                    break;
+                default:
+                    return null;
+            }
+
+            whereVars = new String[parentIds.size()];
+
+            if (parentIds.size() > 1) {
+                sb.append(" IN (");
+
+                for (int i = 0; i < parentIds.size(); i++) {
+                    sb.append("?,");
+                    whereVars[i] = String.valueOf(parentIds.get(i));
+                }
+
+                sb.setLength(sb.length() - 1);
+                sb.append(')');
+            } else {
+                sb.append("= ?");
+                whereVars[0] = String.valueOf(parentIds.get(0));
+            }
+
+            where = sb.toString();
+        }
+
+        return new CursorLoader(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                where,
+                whereVars,
+                MediaStore.Audio.Media.ALBUM_ID + ',' + MediaStore.Audio.Media.TRACK);
+    }
+
+    @Override
+    protected void onPlayClicked(ArrayList<Long> ids) {
+
+    }
+
+    @Override
+    protected void onAddClicked(ArrayList<Long> ids) {
+
+    }
+
+    @Override
+    protected void onAddAsNextClicked(ArrayList<Long> ids) {
+
     }
 }

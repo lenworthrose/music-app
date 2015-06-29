@@ -12,10 +12,8 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.util.Constants;
-import com.lenworthrose.music.util.MultiSelectListener;
 
 public class ListFragment extends Fragment {
-    private String type;
     private BaseSwitchableAdapter adapter;
 
     @Override
@@ -23,7 +21,7 @@ public class ListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) savedInstanceState = getArguments();
-        type = savedInstanceState.getString(Constants.TYPE);
+        String type = savedInstanceState.getString(Constants.TYPE);
         long albumId = savedInstanceState.getLong(Constants.ID);
 
         switch (type) {
@@ -47,7 +45,7 @@ public class ListFragment extends Fragment {
         ListView listView = (ListView)view.findViewById(R.id.list_view);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(adapter);
-        listView.setMultiChoiceModeListener(new MultiSelectListener(type));
+        listView.setMultiChoiceModeListener(adapter);
     }
 
     public static ListFragment songsInstance(long albumId) {

@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
+import java.util.ArrayList;
+
 public class AlbumsAdapter extends BaseSwitchableAdapter {
     private long parentId;
 
@@ -59,5 +61,20 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         getNavigationListener().onNavigateToAlbum(id);
+    }
+
+    @Override
+    protected void onPlayClicked(ArrayList<Long> ids) {
+        getNavigationListener().playAlbums(ids);
+    }
+
+    @Override
+    protected void onAddClicked(ArrayList<Long> ids) {
+        getNavigationListener().addAlbums(ids);
+    }
+
+    @Override
+    protected void onAddAsNextClicked(ArrayList<Long> ids) {
+        getNavigationListener().addAlbumsAsNext(ids);
     }
 }

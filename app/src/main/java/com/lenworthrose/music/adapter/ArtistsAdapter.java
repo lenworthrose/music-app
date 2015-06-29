@@ -13,6 +13,8 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
+import java.util.ArrayList;
+
 public class ArtistsAdapter extends BaseSwitchableAdapter {
     public ArtistsAdapter(Context context, boolean isGrid) {
         super(context, isGrid);
@@ -44,5 +46,20 @@ public class ArtistsAdapter extends BaseSwitchableAdapter {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         getNavigationListener().onNavigateToArtist(id);
+    }
+
+    @Override
+    protected void onPlayClicked(ArrayList<Long> ids) {
+        getNavigationListener().playArtists(ids);
+    }
+
+    @Override
+    protected void onAddClicked(ArrayList<Long> ids) {
+        getNavigationListener().addArtists(ids);
+    }
+
+    @Override
+    protected void onAddAsNextClicked(ArrayList<Long> ids) {
+        getNavigationListener().addArtistsAsNext(ids);
     }
 }
