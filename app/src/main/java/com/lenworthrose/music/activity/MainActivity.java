@@ -1,4 +1,4 @@
-package com.lenworthrose.music;
+package com.lenworthrose.music.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.fragment.GridFragment;
 import com.lenworthrose.music.fragment.ListFragment;
