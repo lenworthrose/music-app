@@ -10,6 +10,7 @@ import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.fragment.GridFragment;
 import com.lenworthrose.music.fragment.ListFragment;
 import com.lenworthrose.music.helper.NavigationListener;
+import com.lenworthrose.music.playback.PlaybackService;
 
 public class MainActivity extends AppCompatActivity implements NavigationListener {
     @Override
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, GridFragment.artistsInstance()).commit();
+        startService(new Intent(this, PlaybackService.class));
     }
 
     @Override

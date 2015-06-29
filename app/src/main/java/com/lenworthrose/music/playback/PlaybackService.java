@@ -95,7 +95,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
+        if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
                 case Constants.CMD_PLAY_ALBUM: //TODO: Fix this hackery
                     long albumId = intent.getLongExtra(Constants.ID, -1);
