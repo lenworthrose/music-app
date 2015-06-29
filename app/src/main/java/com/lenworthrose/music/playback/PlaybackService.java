@@ -23,7 +23,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.lenworthrose.music.helper.Constants;
+import com.lenworthrose.music.util.Constants;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;

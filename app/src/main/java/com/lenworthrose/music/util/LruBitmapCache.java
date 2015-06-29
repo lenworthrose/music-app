@@ -1,4 +1,4 @@
-package com.lenworthrose.music.helper;
+package com.lenworthrose.music.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;

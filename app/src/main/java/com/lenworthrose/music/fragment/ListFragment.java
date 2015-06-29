@@ -11,8 +11,8 @@ import android.widget.ListView;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.adapter.SongsAdapter;
-import com.lenworthrose.music.helper.Constants;
-import com.lenworthrose.music.helper.MultiSelectListener;
+import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.MultiSelectListener;
 
 public class ListFragment extends Fragment {
     private String type;

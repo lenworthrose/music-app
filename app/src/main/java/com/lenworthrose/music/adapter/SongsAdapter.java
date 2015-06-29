@@ -9,7 +9,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.lenworthrose.music.helper.Utils;
+import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 

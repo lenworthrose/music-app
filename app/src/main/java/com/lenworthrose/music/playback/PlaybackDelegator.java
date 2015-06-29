@@ -3,7 +3,7 @@ package com.lenworthrose.music.playback;
 import android.content.Context;
 import android.content.Intent;
 
-import com.lenworthrose.music.helper.Constants;
+import com.lenworthrose.music.util.Constants;
 
 /**
  * Created by Lenny on 2015-06-26.

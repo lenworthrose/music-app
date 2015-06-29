@@ -12,8 +12,8 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AlbumsAdapter;
 import com.lenworthrose.music.adapter.ArtistsAdapter;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
-import com.lenworthrose.music.helper.Constants;
-import com.lenworthrose.music.helper.MultiSelectListener;
+import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.MultiSelectListener;
 
 public class GridFragment extends Fragment {
     private String type;

@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.fragment.GridFragment;
 import com.lenworthrose.music.fragment.ListFragment;
-import com.lenworthrose.music.helper.NavigationListener;
+import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.playback.PlaybackService;
 
 public class MainActivity extends AppCompatActivity implements NavigationListener {

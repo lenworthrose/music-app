@@ -1,4 +1,4 @@
-package com.lenworthrose.music.helper;
+package com.lenworthrose.music.util;
 
 public class Constants {
     public static final String CMD_PLAY_ALBUM = "com.lenworthrose.music.PlayAlbum";

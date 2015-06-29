@@ -38,9 +38,9 @@ import android.widget.TextView;
 
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
-import com.lenworthrose.music.helper.Constants;
-import com.lenworthrose.music.helper.Constants.PlaybackState;
-import com.lenworthrose.music.helper.Utils;
+import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.Constants.PlaybackState;
+import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.playback.PlayingItem;
 

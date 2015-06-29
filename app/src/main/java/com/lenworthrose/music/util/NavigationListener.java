@@ -1,4 +1,4 @@
-package com.lenworthrose.music.helper;
+package com.lenworthrose.music.util;
 
 /**
  * Created by Lenny on 2015-06-25.

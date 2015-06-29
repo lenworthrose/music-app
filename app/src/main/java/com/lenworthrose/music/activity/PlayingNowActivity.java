@@ -16,7 +16,7 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
-import com.lenworthrose.music.helper.Constants;
+import com.lenworthrose.music.util.Constants;
 
 public class PlayingNowActivity extends AppCompatActivity {
     private ImageView background;
