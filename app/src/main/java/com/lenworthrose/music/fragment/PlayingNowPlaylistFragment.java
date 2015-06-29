@@ -190,6 +190,7 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
         playbackService = binder.getService();
         adapter = new PlayingNowAdapter(getActivity(), playbackService.getPlaylist());
         listView.setAdapter(adapter);
+        playlistUpdated();
     }
 
     @Override
