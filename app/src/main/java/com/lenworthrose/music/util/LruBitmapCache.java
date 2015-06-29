@@ -6,7 +6,7 @@ import android.support.v4.util.LruCache;
 import android.util.DisplayMetrics;
 
 public class LruBitmapCache extends LruCache<String, Bitmap> {
-    protected LruBitmapCache(int maxSize) {
+    public LruBitmapCache(int maxSize) {
         super(maxSize);
     }
 
@@ -28,8 +28,8 @@ public class LruBitmapCache extends LruCache<String, Bitmap> {
     }
 
     // Returns a cache size equal to approximately two screens worth of images.
-    private static int getCacheSize(Context ctx) {
-        final DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
+    private static int getCacheSize(Context context) {
+        final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         final int screenWidth = displayMetrics.widthPixels;
         final int screenHeight = displayMetrics.heightPixels;
         final int screenBytes = screenWidth * screenHeight * 4; //4 bytes per pixel (ARGB)

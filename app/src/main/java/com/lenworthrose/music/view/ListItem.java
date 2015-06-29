@@ -3,13 +3,15 @@ package com.lenworthrose.music.view;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.util.ImageLoader;
 
-public class ListItem extends CheckableFrameLayout {
+public class ListItem extends CheckableFrameLayout implements ImageLoader.ImageLoadListener {
     private int position = -1;
     private String key;
     private ImageView dragHandle;
@@ -17,6 +19,7 @@ public class ListItem extends CheckableFrameLayout {
     private TextView title, subtitle, status;
     private boolean isEditModeEnabled;
     private boolean showCoverArt;
+    private AsyncTask<?, ?, ?> imgLoadTask;
 
     public ListItem(Context context) {
         super(context);
@@ -46,12 +49,25 @@ public class ListItem extends CheckableFrameLayout {
         status.setText(text);
     }
 
-    public void setImage(Bitmap bitmap) {
+    @Override
+    public void onStartingLoad(AsyncTask<?, ?, ?> task) {
+        if (imgLoadTask != null) imgLoadTask.cancel(true);
+        imgLoadTask = task;
+        image.setImageResource(android.R.color.transparent);
+    }
+
+    protected void setImage(Bitmap bitmap) {
         if (bitmap != null) {
             image.setVisibility(View.VISIBLE);
             image.setImageBitmap(bitmap);
         } else {
             image.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onImageLoaded(Bitmap image) {
+        setImage(image);
+        imgLoadTask = null;
     }
 }

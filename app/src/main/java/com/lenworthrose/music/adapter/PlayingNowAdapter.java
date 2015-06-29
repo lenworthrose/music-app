@@ -2,13 +2,12 @@ package com.lenworthrose.music.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.lenworthrose.music.util.LruBitmapCache;
-import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.playback.PlaylistAction;
+import com.lenworthrose.music.util.ImageLoader;
+import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.ListItem;
 import com.mobeta.android.dslv.DragSortCursorAdapter;
 
@@ -16,13 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayingNowAdapter extends DragSortCursorAdapter {
-    private LruBitmapCache artCache;
     private boolean isEditModeEnabled;
     private List<PlaylistAction> actions;
 
     public PlayingNowAdapter(Context context, Cursor cur) {
         super(context, cur, 0);
-        artCache = new LruBitmapCache(context);
         resetEditActions();
     }
 
@@ -47,22 +44,7 @@ public class PlayingNowAdapter extends DragSortCursorAdapter {
         item.setTitle((getListPosition(cursor.getPosition()) + 1) + ". " + cursor.getString(5));
         item.setSubtitle(cursor.getString(3));
         item.setStatus(Utils.longToTimeDisplay(cursor.getLong(7)));
-
-        String artPath = cursor.getString(8);
-        Bitmap art = artCache.getBitmap(artPath);
-
-        if (art == null) {
-            art = Utils.getBitmapForContentUri(context, artPath);
-
-            if (art != null) {
-                Bitmap scaledArt = Bitmap.createScaledBitmap(art, 200, 200, false);
-                art.recycle();
-                art = scaledArt;
-                artCache.putBitmap(artPath, art);
-            }
-        }
-
-        item.setImage(art);
+        ImageLoader.getInstance().loadThumbnail(context, cursor.getString(8), item);
     }
 
     public void setEditModeEnabled(boolean enabled) {

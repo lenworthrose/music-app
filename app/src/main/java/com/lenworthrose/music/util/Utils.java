@@ -10,9 +10,6 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 
-/**
- * Created by Lenny on 2015-06-26.
- */
 public class Utils {
     public static IntentFilter createPlaybackIntentFilter() {
         IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_PLAYLIST_CHANGED);
