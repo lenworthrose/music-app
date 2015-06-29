@@ -32,29 +32,39 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:layout_marginRight="6dp"
         android:layout_weight="1"
-        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
         android:paddingRight="4dp"
         tools:ignore="RtlHardcoded,RtlSymmetry">
 
         <TextView
             android:id="@+id/list_item_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="6dp"
-            android:layout_weight="1"
-            android:singleLine="true"
-            android:textColor="@color/textPrimary"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/list_item_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@color/textPrimary"
+            android:textSize="16sp"
+            tools:ignore="NestedWeights" />
+
+        <TextView
+            android:id="@+id/list_item_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:singleLine="true"
             android:textColor="@color/textSecondary"
-            android:textSize="13sp"
-            android:textStyle="italic" />
+            android:textSize="14sp"
+            android:visibility="gone" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/list_item_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:singleLine="true"
+        android:textColor="@color/textSecondary"
+        android:textSize="13sp"
+        android:textStyle="italic" />
 </LinearLayout>
