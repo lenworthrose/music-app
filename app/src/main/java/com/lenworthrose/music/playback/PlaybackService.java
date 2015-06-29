@@ -20,17 +20,18 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.lenworthrose.music.helper.Constants;
-import com.lenworthrose.music.loader.SongLoaderCallbacks;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener, MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener, AudioManager.OnAudioFocusChangeListener, SqlPlaylistStore.InitListener, Loader.OnLoadCompleteListener<Cursor> {
+public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
+        MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
+        AudioManager.OnAudioFocusChangeListener, SqlPlaylistStore.InitListener, Loader.OnLoadCompleteListener<Cursor> {
     private SqlPlaylistStore playlistStore;
     private MediaPlayer currentTrack;
     private MediaPlayer nextTrack;
@@ -45,6 +46,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     protected int playlistPosition;
     private Constants.RepeatMode repeatMode = Constants.RepeatMode.Off;
     private final IBinder binder = new LocalBinder();
+    private final LocalBroadcastManager broadcastMan = LocalBroadcastManager.getInstance(this);
 
     private MediaPlayer.OnPreparedListener nextTrackPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
@@ -246,7 +248,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
                 
                 notifyPlayingItemChanged();
                 notifyStateChanged(Constants.PlaybackState.Buffering);
-                notifyDurationChanged();
 
                 return;
             } else {
@@ -345,8 +346,24 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         return playlistPosition;
     }
 
+    public int getPlaylistPositionForDisplay() {
+        return getPlaylistPosition() + 1;
+    }
+
     public Constants.RepeatMode getRepeatMode() {
         return repeatMode;
+    }
+
+    public PlayingItem getPlayingItem() {
+        return new PlayingItem(playlistCursor, playlistPosition);
+    }
+
+    public Cursor getPlaylist() {
+        return playlistCursor;
+    }
+
+    public boolean isPlaylistEmpty() {
+        return getPlaylistSize() == 0;
     }
 
     public void shuffleAll() {
@@ -423,20 +440,16 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         return playlistPosition >= playlistCursor.getCount() - 1;
     }
 
+    private void notifyPlayingItemChanged() {
+        broadcastMan.sendBroadcast(new Intent(Constants.PLAYING_NOW_CHANGED));
+    }
+
     private void notifyPlaylistChanged() {
-        //TODO: send a Broadcast
+        broadcastMan.sendBroadcast(new Intent(Constants.PLAYING_NOW_PLAYLIST_CHANGED));
     }
 
     private void notifyStateChanged(Constants.PlaybackState newState) {
-        //TODO: send a Broadcast
-    }
-
-    private void notifyPlayingItemChanged() {
-        //TODO: send a Broadcast
-    }
-
-    private void notifyDurationChanged() {
-        //TODO: send a Broadcast
+        broadcastMan.sendBroadcast(new Intent(Constants.PLAYBACK_STATE_CHANGED));
     }
 
     @Override
@@ -461,7 +474,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
             nextTrack = null;
 
             notifyPlayingItemChanged();
-            notifyDurationChanged();
 
             scheduleNextTrack();
         } else {
@@ -488,7 +500,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         mp.start();
 
         notifyStateChanged(Constants.PlaybackState.Playing);
-        notifyDurationChanged();
 
         scheduleNextTrack();
     }

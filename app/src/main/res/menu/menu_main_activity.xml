@@ -2,8 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivty">
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+
+    <item
+        android:id="@+id/action_playing_now"
+        android:icon="@drawable/playing_now"
+        android:title="@string/playing_now"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+    <item
+        android:id="@+id/action_settings"
         android:orderInCategory="100"
+        android:title="@string/action_settings"
         app:showAsAction="never" />
 </menu>

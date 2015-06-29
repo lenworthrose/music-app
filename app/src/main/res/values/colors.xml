@@ -3,4 +3,6 @@
     <!-- Text colors -->
     <color name="textPrimary">#fff</color>
     <color name="textSecondary">#c3ffffff</color>
+
+    <color name="playing_now_content_background">#B6121212</color>
 </resources>

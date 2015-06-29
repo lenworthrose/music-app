@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/drag-sort-listview/drag-sort-listview.iml" filepath="$PROJECT_DIR$/drag-sort-listview/drag-sort-listview.iml" />
       <module fileurl="file://$PROJECT_DIR$/music-app.iml" filepath="$PROJECT_DIR$/music-app.iml" />
     </modules>
   </component>

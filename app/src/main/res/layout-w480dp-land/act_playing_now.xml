@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/pn_background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha=".75"
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/playing_now_content_background"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <fragment
+            android:id="@+id/playing_now_playlist"
+            android:name="com.lenworthrose.music.fragment.PlayingNowPlaylistFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/playing_item"
+            android:name="com.lenworthrose.music.fragment.PlayingItemFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+</FrameLayout>

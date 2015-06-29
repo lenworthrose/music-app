@@ -2,4 +2,10 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="pn_subtitle_text_size">15sp</dimen>
+    <dimen name="pn_title_text_size">18sp</dimen>
+    <dimen name="pn_footer_text_size">13sp</dimen>
+    <dimen name="pn_time_view_width">52dp</dimen>
+    <dimen name="playing_now_playback_control_margin">20dp</dimen>
 </resources>

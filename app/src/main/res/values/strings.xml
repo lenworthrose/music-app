@@ -11,4 +11,10 @@
         <item quantity="one">%1$d album</item>
         <item quantity="other">%1$d albums</item>
     </plurals>
+
+    <!-- Playing Now -->
+    <string name="blank_time">--:--</string>
+    <string name="empty_playlist">The playlist is empty.</string>
+    <string name="playing_now">Playing Now</string>
+    <string name="playlist">Playlist</string>
 </resources>

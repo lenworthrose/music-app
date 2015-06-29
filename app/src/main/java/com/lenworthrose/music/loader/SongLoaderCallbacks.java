@@ -24,7 +24,8 @@ public class SongLoaderCallbacks extends LoaderCallbacks {
                 MediaStore.Audio.Media.TRACK,
                 MediaStore.Audio.Media.DURATION,
                 MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.ALBUM
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ALBUM_ID
         };
 
         String[] whereVars = { String.valueOf(albumId) };
@@ -58,5 +59,9 @@ public class SongLoaderCallbacks extends LoaderCallbacks {
 
     public static String getAlbum(Cursor cursor) {
         return cursor.getString(5);
+    }
+
+    public static long getAlbumId(Cursor cursor) {
+        return cursor.getLong(6);
     }
 }

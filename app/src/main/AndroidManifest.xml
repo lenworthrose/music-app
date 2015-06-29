@@ -23,6 +23,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activity.PlayingNowActivity"
+            android:label="@string/playing_now" />
+
         <service
             android:name=".playback.PlaybackService"
             android:enabled="true" />

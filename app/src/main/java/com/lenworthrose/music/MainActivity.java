@@ -1,10 +1,12 @@
 package com.lenworthrose.music;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.fragment.GridFragment;
 import com.lenworthrose.music.fragment.ListFragment;
 import com.lenworthrose.music.helper.NavigationListener;
@@ -26,6 +28,9 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_playing_now:
+                startActivity(new Intent(this, PlayingNowActivity.class));
+                return true;
             case R.id.action_settings:
                 return true;
             default:
