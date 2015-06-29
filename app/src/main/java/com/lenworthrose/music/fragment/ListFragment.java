@@ -3,36 +3,24 @@ package com.lenworthrose.music.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.helper.Constants;
 import com.lenworthrose.music.helper.MultiSelectListener;
-import com.lenworthrose.music.helper.NavigationListener;
-import com.lenworthrose.music.helper.OnSongClickListener;
-import com.lenworthrose.music.loader.LoaderCallbacks;
-import com.lenworthrose.music.loader.SongLoaderCallbacks;
 
 public class ListFragment extends Fragment {
-    private CursorAdapter adapter;
-    private LoaderCallbacks callbacks;
-    private AdapterView.OnItemClickListener clickListener;
     private String type;
+    private BaseSwitchableAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (!(getActivity() instanceof NavigationListener))
-            throw new IllegalStateException("GridFragment's Activity must implement NavigationListener");
-
-//        NavigationListener navListener = (NavigationListener)getActivity();
 
         if (savedInstanceState == null) savedInstanceState = getArguments();
         type = savedInstanceState.getString(Constants.TYPE);
@@ -40,13 +28,11 @@ public class ListFragment extends Fragment {
 
         switch (type) {
             case Constants.TYPE_SONGS:
-                adapter = new SongsAdapter(getActivity(), false);
-                callbacks = new SongLoaderCallbacks(albumId, getActivity(), adapter);
-                clickListener = new OnSongClickListener(albumId);
+                adapter = new SongsAdapter(getActivity(), false, albumId);
                 break;
         }
 
-        getLoaderManager().initLoader(0, null, callbacks);
+        getLoaderManager().initLoader(0, null, adapter);
     }
 
     @Nullable
@@ -60,7 +46,7 @@ public class ListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ListView listView = (ListView)view.findViewById(R.id.list_view);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(clickListener);
+        listView.setOnItemClickListener(adapter);
         listView.setMultiChoiceModeListener(new MultiSelectListener(type));
     }
 

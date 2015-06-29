@@ -3,39 +3,25 @@ package com.lenworthrose.music.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AlbumsAdapter;
 import com.lenworthrose.music.adapter.ArtistsAdapter;
+import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.helper.Constants;
 import com.lenworthrose.music.helper.MultiSelectListener;
-import com.lenworthrose.music.helper.NavigationListener;
-import com.lenworthrose.music.helper.OnAlbumClickListener;
-import com.lenworthrose.music.helper.OnArtistClickListener;
-import com.lenworthrose.music.loader.AlbumLoaderCallbacks;
-import com.lenworthrose.music.loader.ArtistLoaderCallbacks;
-import com.lenworthrose.music.loader.LoaderCallbacks;
 
 public class GridFragment extends Fragment {
     private String type;
-    private CursorAdapter adapter;
-    private LoaderCallbacks callbacks;
-    private AdapterView.OnItemClickListener clickListener;
+    private BaseSwitchableAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (!(getActivity() instanceof NavigationListener))
-            throw new IllegalStateException("GridFragment's Activity must implement NavigationListener");
-
-        NavigationListener navListener = (NavigationListener)getActivity();
 
         if (savedInstanceState == null) savedInstanceState = getArguments();
         type = savedInstanceState.getString(Constants.TYPE);
@@ -43,13 +29,9 @@ public class GridFragment extends Fragment {
         switch (type) {
             case Constants.TYPE_ARTISTS:
                 adapter = new ArtistsAdapter(getActivity(), true);
-                callbacks = new ArtistLoaderCallbacks(getActivity(), adapter);
-                clickListener = new OnArtistClickListener(navListener);
                 break;
             case Constants.TYPE_ALBUMS:
-                adapter = new AlbumsAdapter(getActivity(), true);
-                callbacks = new AlbumLoaderCallbacks(savedInstanceState.getLong(Constants.ID), getActivity(), adapter);
-                clickListener = new OnAlbumClickListener(navListener);
+                adapter = new AlbumsAdapter(getActivity(), true, savedInstanceState.getLong(Constants.ID));
                 break;
             case Constants.TYPE_SONGS:
                 break;
@@ -68,10 +50,10 @@ public class GridFragment extends Fragment {
 
         GridView grid = (GridView)view.findViewById(R.id.grid_view);
         grid.setAdapter(adapter);
-        grid.setOnItemClickListener(clickListener);
+        grid.setOnItemClickListener(adapter);
         grid.setMultiChoiceModeListener(new MultiSelectListener(type));
 
-        getLoaderManager().initLoader(0, null, callbacks);
+        getLoaderManager().initLoader(0, null, adapter);
     }
 
     public static GridFragment artistsInstance() {
