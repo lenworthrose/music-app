@@ -1,7 +1,14 @@
 package com.lenworthrose.music.helper;
 
+import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+import android.util.Log;
+
+import java.io.FileNotFoundException;
 
 /**
  * Created by Lenny on 2015-06-26.
@@ -12,6 +19,16 @@ public class Utils {
         filter.addAction(Constants.PLAYING_NOW_CHANGED);
         filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
         return filter;
+    }
+
+    public static Bitmap getBitmapForContentUri(Context context, String uri) {
+        try {
+            ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(Uri.parse(uri), "r");
+            return BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
+        } catch (FileNotFoundException ex) {
+            Log.e("Utils", "FileNotFoundException occurred attempting to get Bitmap for uri=" + uri, ex);
+            return null;
+        }
     }
 
     /**

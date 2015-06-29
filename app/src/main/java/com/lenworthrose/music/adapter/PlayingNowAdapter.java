@@ -2,6 +2,10 @@ package com.lenworthrose.music.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -10,6 +14,7 @@ import com.lenworthrose.music.playback.PlaylistAction;
 import com.lenworthrose.music.view.ListItem;
 import com.mobeta.android.dslv.DragSortCursorAdapter;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +48,7 @@ public class PlayingNowAdapter extends DragSortCursorAdapter {
         item.setTitle((getListPosition(cursor.getPosition()) + 1) + ". " + cursor.getString(5));
         item.setSubtitle(cursor.getString(3));
         item.setStatus(Utils.longToTimeDisplay(cursor.getLong(7)));
+        item.setImage(Utils.getBitmapForContentUri(context, cursor.getString(8)));
     }
 
     public void setEditModeEnabled(boolean enabled) {

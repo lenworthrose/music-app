@@ -3,7 +3,6 @@ package com.lenworthrose.music.fragment;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -17,13 +16,11 @@ import android.graphics.Shader;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -47,7 +44,6 @@ import com.lenworthrose.music.helper.Utils;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.playback.PlayingItem;
 
-import java.io.FileNotFoundException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -309,15 +305,14 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             fadeListener.reset();
             coverArt.animate().alpha(0.08f).setDuration(200).withEndAction(fadeListener);
 
-            try {
-                ParcelFileDescriptor pfd = getActivity().getContentResolver().openFileDescriptor(Uri.parse(item.getAlbumArtUrl()), "r");
-                Bitmap art = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
+            Bitmap art = Utils.getBitmapForContentUri(getActivity(), item.getAlbumArtUrl());
+
+            if (art != null) {
                 fadeListener.setNewCoverArt(createDropShadowBitmap(art));
 
                 if (getActivity() instanceof PlayingNowActivity)
                     ((PlayingNowActivity)getActivity()).setBackgroundImage(createBlurredBitmap(art));
-            } catch (FileNotFoundException ex) {
-                Log.e("PlayingItemFragment", "FileNotFoundException occurred trying to load cover art", ex);
+            } else {
                 resetToLogo();
             }
         } else {
