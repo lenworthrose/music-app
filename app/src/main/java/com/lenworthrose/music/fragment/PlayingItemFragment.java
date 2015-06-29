@@ -251,12 +251,14 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
+        if (playbackService != null) playbackStateChanged();
     }
 
     @Override
     public void onPause() {
         cancelHideOverlays();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
+        handler.removeCallbacksAndMessages(null);
         super.onPause();
     }
 
@@ -372,7 +374,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                     durationDisplay.setText(Utils.longToTimeDisplay(duration));
                 }
 
-                handler.postDelayed(new UpdatePositionRunnable(), 1000);
+                handler.postDelayed(new UpdatePositionRunnable(), 333);
 
                 break;
             case Buffering:
