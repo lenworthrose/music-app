@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -178,7 +179,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         if (isPlaying()) {
             try {
                 currentTrack.seekTo(position);
-                notifyStateChanged(Constants.PlaybackState.Buffering);
+                notifyStateChanged();
             } catch (IllegalStateException ex) {
                 Log.e("DeviceMediaManager", "Error seeking.", ex);
             }
@@ -249,7 +250,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 //                if (mediaSessionManager != null) mediaSessionManager.register();
                 
                 notifyPlayingItemChanged();
-                notifyStateChanged(Constants.PlaybackState.Buffering);
+                notifyStateChanged();
 
                 return;
             } else {
@@ -267,12 +268,25 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         if (songsCursor == null) return;
         if (from > songsCursor.getCount() || from < 0) from = 0;
 
-        playlistStore.setPlaylist(songsCursor);
-        if (playlistCursor != null) playlistCursor.close();
-        playlistCursor = playlistStore.read();
-        notifyPlaylistChanged();
+        final int fromPos = from;
 
-        play(from);
+        AsyncTask<Cursor, Void, Void> playTask = new AsyncTask<Cursor, Void, Void>() {
+            @Override
+            protected Void doInBackground(Cursor... params) {
+                playlistStore.setPlaylist(params[0]);
+                if (playlistCursor != null) playlistCursor.close();
+                playlistCursor = playlistStore.read();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                notifyPlaylistChanged();
+                play(fromPos);
+            }
+        };
+
+        playTask.execute(songsCursor);
     }
 
     public void add(Cursor songsCursor) {
@@ -281,18 +295,29 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         if (playlistCursor == null || playlistCursor.getCount() == 0) {
             play(songsCursor, 0);
         } else {
-            boolean isNextTrackScheduleRequired = isEndOfPlaylist();
-            playlistStore.add(songsCursor);
-            if (playlistCursor != null) playlistCursor.close();
-            playlistCursor = playlistStore.read();
+            AsyncTask<Cursor, Void, Boolean> addTask = new AsyncTask<Cursor, Void, Boolean>() {
+                @Override
+                protected Boolean doInBackground(Cursor... params) {
+                    boolean isNextTrackScheduleRequired = isEndOfPlaylist();
+                    playlistStore.add(params[0]);
+                    if (playlistCursor != null) playlistCursor.close();
+                    playlistCursor = playlistStore.read();
+                    return isNextTrackScheduleRequired;
+                }
 
-            if (isNextTrackScheduleRequired) {
-                cancelNextTrack(); //Just in case!
-                scheduleNextTrack();
-            }
+                @Override
+                protected void onPostExecute(Boolean isNextTrackScheduleRequired) {
+                    if (isNextTrackScheduleRequired) {
+                        cancelNextTrack(); //Just in case!
+                        scheduleNextTrack();
+                    }
+
+                    notifyPlaylistChanged();
+                }
+            };
+
+            addTask.execute(songsCursor);
         }
-
-        notifyPlaylistChanged();
     }
 
     public void addAsNext(Cursor songsCursor) {
@@ -304,12 +329,24 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
             if (isEndOfPlaylist()) {
                 add(songsCursor);
             } else {
-                playlistStore.addAfter(playlistPosition + 1, songsCursor);
-                if (playlistCursor != null) playlistCursor.close();
-                playlistCursor = playlistStore.read();
+                AsyncTask<Cursor, Void, Void> addTask = new AsyncTask<Cursor, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Cursor... params) {
+                        playlistStore.addAfter(playlistPosition + 1, params[0]);
+                        if (playlistCursor != null) playlistCursor.close();
+                        playlistCursor = playlistStore.read();
+                        return null;
+                    }
 
-                cancelNextTrack();
-                scheduleNextTrack();
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        cancelNextTrack();
+                        scheduleNextTrack();
+                        notifyPlaylistChanged();
+                    }
+                };
+
+                addTask.execute(songsCursor);
             }
         }
     }
@@ -430,12 +467,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     private void pause() {
         currentTrack.pause();
-        notifyStateChanged(Constants.PlaybackState.Paused);
+        notifyStateChanged();
     }
 
     private void playFromPause() {
         currentTrack.start();
-        notifyStateChanged(Constants.PlaybackState.Playing);
+        notifyStateChanged();
     }
 
     private boolean isEndOfPlaylist() {
@@ -450,7 +487,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         broadcastMan.sendBroadcast(new Intent(Constants.PLAYING_NOW_PLAYLIST_CHANGED));
     }
 
-    private void notifyStateChanged(Constants.PlaybackState newState) {
+    private void notifyStateChanged() {
         broadcastMan.sendBroadcast(new Intent(Constants.PLAYBACK_STATE_CHANGED));
     }
 
@@ -487,11 +524,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     public boolean onInfo(MediaPlayer mp, int what, int extra) {
         Log.i("DeviceMediaManager", "Media player info: " + what);
 
-        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-            notifyStateChanged(Constants.PlaybackState.Buffering);
-        } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END && mp.isPlaying()) {
-            notifyStateChanged(Constants.PlaybackState.Playing);
-        }
+        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START || (what == MediaPlayer.MEDIA_INFO_BUFFERING_END && mp.isPlaying()))
+            notifyStateChanged();
 
         return true;
     }
@@ -500,15 +534,13 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     public void onPrepared(MediaPlayer mp) {
         isPrepared = true;
         mp.start();
-
-        notifyStateChanged(Constants.PlaybackState.Playing);
-
+        notifyStateChanged();
         scheduleNextTrack();
     }
 
     @Override
     public void onSeekComplete(MediaPlayer mp) {
-        notifyStateChanged(Constants.PlaybackState.Playing);
+        notifyStateChanged();
     }
 
     @Override
@@ -566,7 +598,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         }
 
         unregisterNoisyReceiver();
-        notifyStateChanged(Constants.PlaybackState.Stopped);
+        notifyStateChanged();
     }
 
     private void registerNoisyReceiver() {
