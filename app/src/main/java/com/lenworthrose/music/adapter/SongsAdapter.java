@@ -65,6 +65,6 @@ public class SongsAdapter extends BaseSwitchableAdapter {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        PlaybackDelegator.playAlbum(parent.getContext(), albumId, position);
+        getNavigationListener().playSongs(getCursor(), position);
     }
 }
