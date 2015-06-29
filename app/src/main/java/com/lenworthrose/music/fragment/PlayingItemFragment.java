@@ -170,6 +170,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         pauseBlinkAnimation.setStartOffset(250);
         pauseBlinkAnimation.setRepeatCount(Animation.INFINITE);
         pauseBlinkAnimation.setRepeatMode(Animation.REVERSE);
+
+        getActivity().bindService(new Intent(getActivity(), PlaybackService.class), this, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -242,7 +244,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     @Override
     public void onStart() {
         super.onStart();
-        getActivity().bindService(new Intent(getActivity(), PlaybackService.class), this, Context.BIND_AUTO_CREATE);
+
     }
 
     @Override
@@ -259,9 +261,9 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     @Override
-    public void onStop() {
+    public void onDestroy() {
         getActivity().unbindService(this);
-        super.onStop();
+        super.onDestroy();
     }
 
     public void positionChanged(final int position) {
@@ -381,6 +383,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 positionDisplay.clearAnimation();
                 break;
             case Paused:
+                positionDisplay.setText(Utils.longToTimeDisplay(playbackService.getPosition()));
                 positionDisplay.startAnimation(pauseBlinkAnimation);
                 break;
         }
