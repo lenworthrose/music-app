@@ -10,9 +10,11 @@ public class PlayingItem {
     private int playlistPosition;
 
     PlayingItem(Cursor cursor, int position) {
+        if (cursor == null || cursor.getCount() == 0) return;
+
         this.cursor = cursor;
         playlistPosition = position;
-        if (cursor != null) cursor.moveToPosition(position);
+        cursor.moveToPosition(position);
     }
 
     public String getArtist() {
@@ -35,7 +37,7 @@ public class PlayingItem {
         return playlistPosition + 1;
     }
 
-    public long getAlbumId() {
-        return cursor == null ? -1 : cursor.getLong(8);
+    public String getAlbumArtUrl() {
+        return cursor == null ? null : cursor.getString(8);
     }
 }

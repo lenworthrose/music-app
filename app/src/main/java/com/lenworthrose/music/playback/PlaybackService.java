@@ -45,8 +45,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     protected Cursor playlistCursor;
     protected int playlistPosition;
     private Constants.RepeatMode repeatMode = Constants.RepeatMode.Off;
+    private LocalBroadcastManager broadcastMan;
     private final IBinder binder = new LocalBinder();
-    private final LocalBroadcastManager broadcastMan = LocalBroadcastManager.getInstance(this);
 
     private MediaPlayer.OnPreparedListener nextTrackPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
@@ -84,6 +84,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     @Override
     public void onCreate() {
         super.onCreate();
+        broadcastMan = LocalBroadcastManager.getInstance(this);
         scheduler = Executors.newScheduledThreadPool(1);
         audioMan = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         playlistStore = new SqlPlaylistStore();
@@ -96,7 +97,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             switch (intent.getAction()) {
-                case Constants.CMD_PLAY_ALBUM:
+                case Constants.CMD_PLAY_ALBUM: //TODO: Fix this hackery
                     long albumId = intent.getLongExtra(Constants.ID, -1);
 
                     String[] projection = {
@@ -105,7 +106,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
                             MediaStore.Audio.Media.TRACK,
                             MediaStore.Audio.Media.DURATION,
                             MediaStore.Audio.Media.ARTIST,
-                            MediaStore.Audio.Media.ALBUM
+                            MediaStore.Audio.Media.ALBUM,
+                            MediaStore.Audio.Media.ALBUM_ID
                     };
 
                     String[] whereVars = { String.valueOf(albumId) };

@@ -1,9 +1,11 @@
 package com.lenworthrose.music.playback;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -47,7 +49,8 @@ public class SqlPlaylistStore {
                 PlaylistEntry.COLUMN_ALBUM,
                 PlaylistEntry.COLUMN_NAME,
                 PlaylistEntry.COLUMN_TRACK_NUM,
-                PlaylistEntry.COLUMN_DURATION
+                PlaylistEntry.COLUMN_DURATION,
+                PlaylistEntry.COLUMN_ALBUM_ART_URL
         };
 
         return db.query(TABLE_NAME, projection, null, null, null, null, PlaylistEntry.COLUMN_SEQUENCE + " ASC");
@@ -223,18 +226,24 @@ public class SqlPlaylistStore {
         values.put(PlaylistEntry.COLUMN_DURATION, cur.getLong(3));
         values.put(PlaylistEntry.COLUMN_ARTIST, cur.getString(4));
         values.put(PlaylistEntry.COLUMN_ALBUM, cur.getString(5));
+
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
+        albumArtUri = ContentUris.withAppendedId(albumArtUri, cur.getLong(6));
+        values.put(PlaylistEntry.COLUMN_ALBUM_ART_URL, albumArtUri.toString());
+
         return values;
     }
 
     private ContentValues createContentValuesFromPlaylistCursor(Cursor cur, int sequence) {
         ContentValues values = new ContentValues();
         values.put(PlaylistEntry.COLUMN_SEQUENCE, sequence);
-        values.put(PlaylistEntry.COLUMN_SONG_ID, cur.getString(2));
+        values.put(PlaylistEntry.COLUMN_SONG_ID, cur.getLong(2));
         values.put(PlaylistEntry.COLUMN_ARTIST, cur.getString(3));
         values.put(PlaylistEntry.COLUMN_ALBUM, cur.getString(4));
         values.put(PlaylistEntry.COLUMN_NAME, cur.getString(5));
-        values.put(PlaylistEntry.COLUMN_TRACK_NUM, cur.getString(6));
-        values.put(PlaylistEntry.COLUMN_DURATION, cur.getString(7));
+        values.put(PlaylistEntry.COLUMN_TRACK_NUM, cur.getLong(6));
+        values.put(PlaylistEntry.COLUMN_DURATION, cur.getLong(7));
+        values.put(PlaylistEntry.COLUMN_ALBUM_ART_URL, cur.getString(8));
         return values;
     }
 
@@ -246,7 +255,8 @@ public class SqlPlaylistStore {
                 PlaylistEntry.COLUMN_ALBUM + "," +
                 PlaylistEntry.COLUMN_NAME + "," +
                 PlaylistEntry.COLUMN_DURATION + "," +
-                PlaylistEntry.COLUMN_TRACK_NUM + ")"
+                PlaylistEntry.COLUMN_TRACK_NUM + "," +
+                PlaylistEntry.COLUMN_ALBUM_ART_URL + ")"
                 + " SELECT " +
                 PlaylistEntry.COLUMN_SEQUENCE + "," +
                 PlaylistEntry.COLUMN_SONG_ID + "," +
@@ -254,7 +264,8 @@ public class SqlPlaylistStore {
                 PlaylistEntry.COLUMN_ALBUM + "," +
                 PlaylistEntry.COLUMN_NAME + "," +
                 PlaylistEntry.COLUMN_DURATION + "," +
-                PlaylistEntry.COLUMN_TRACK_NUM
+                PlaylistEntry.COLUMN_TRACK_NUM + "," +
+                PlaylistEntry.COLUMN_ALBUM_ART_URL
                 + " FROM " + tempTableName;
     }
 

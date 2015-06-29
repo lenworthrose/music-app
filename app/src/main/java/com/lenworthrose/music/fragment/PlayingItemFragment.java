@@ -45,6 +45,7 @@ import com.lenworthrose.music.helper.Utils;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.playback.PlayingItem;
 
+import java.io.FileNotFoundException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -286,6 +287,21 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             playlistPosition.setText(String.valueOf(item.getPlaylistPosition()));
             playlistTracks.setText(String.valueOf(playbackService.getPlaylistSize()));
             positionDisplay.setText(R.string.blank_time);
+
+            fadeListener.reset();
+            coverArt.animate().alpha(0.08f).setDuration(200).withEndAction(fadeListener);
+
+            try {
+                ParcelFileDescriptor pfd = getActivity().getContentResolver().openFileDescriptor(Uri.parse(item.getAlbumArtUrl()), "r");
+                Bitmap art = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
+                fadeListener.setNewCoverArt(createDropShadowBitmap(art));
+
+                if (getActivity() instanceof PlayingNowActivity)
+                    ((PlayingNowActivity)getActivity()).setBackgroundImage(createBlurredBitmap(art));
+            } catch (FileNotFoundException ex) {
+                Log.e("PlayingItemFragment", "FileNotFoundException occurred trying to load cover art", ex);
+                resetToLogo();
+            }
         } else {
             resetToLogo();
             positionBar.setEnabled(false);
@@ -376,28 +392,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
         if (getActivity() instanceof PlayingNowActivity)
             ((PlayingNowActivity)getActivity()).setBackgroundImage(null);
-    }
-
-    private void getImage(int albumId) {
-        fadeListener.reset();
-        coverArt.animate().alpha(0.08f).setDuration(200).withEndAction(fadeListener);
-
-        Uri uri = Uri.parse("content://media/external/audio/albumart");
-        uri = ContentUris.withAppendedId(uri, albumId);
-
-        try {
-            ParcelFileDescriptor pfd = getActivity().getContentResolver().openFileDescriptor(uri, "r");
-            Bitmap art = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
-
-            if (art != null && art.getWidth() > 0 && art.getConfig() != null) {
-                if (getActivity() instanceof PlayingNowActivity)
-                    ((PlayingNowActivity)getActivity()).setBackgroundImage(createBlurredBitmap(art));
-
-                fadeListener.setNewCoverArt(createDropShadowBitmap(art));
-            }
-        } catch (Exception ex) {
-            resetToLogo();
-        }
     }
 
     private Bitmap createBlurredBitmap(Bitmap bitmap) {
