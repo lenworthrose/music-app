@@ -11,9 +11,10 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center_vertical"
+        android:layout_marginLeft="2dp"
         android:src="@drawable/drag"
         android:visibility="gone"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription,RtlHardcoded" />
 
     <com.lenworthrose.music.view.SquareImageView
         android:id="@+id/list_item_image"
@@ -63,6 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:layout_marginRight="3dp"
         android:singleLine="true"
         android:textColor="@color/textSecondary"
         android:textSize="13sp"
