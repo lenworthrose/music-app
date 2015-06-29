@@ -1,22 +1,19 @@
 package com.lenworthrose.music.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.AsyncTask;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.util.ImageLoader;
 
-public class GridItem extends CheckableFrameLayout implements ImageLoader.ImageLoadListener {
+public class GridItem extends CheckableFrameLayout {
     private TextView label;
     private SquareImageView imgView;
-    private AsyncTask<?, ?, ?> imgLoadTask;
 
     public GridItem(Context context) {
         super(context);
@@ -57,20 +54,7 @@ public class GridItem extends CheckableFrameLayout implements ImageLoader.ImageL
         label.setText(text);
     }
 
-    @Override
-    public void onStartingLoad(AsyncTask<?, ?, ?> task) {
-        if (imgLoadTask != null) imgLoadTask.cancel(true);
-        imgLoadTask = task;
-        imgView.setImageResource(android.R.color.transparent);
-    }
-
-    protected void setImage(Bitmap bitmap) {
-        imgView.setImageBitmap(bitmap);
-    }
-
-    @Override
-    public void onImageLoaded(Bitmap image) {
-        setImage(image);
-        imgLoadTask = null;
+    public ImageView getImageView() {
+        return imgView;
     }
 }

@@ -16,7 +16,6 @@ import android.graphics.Shader;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,22 +36,23 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
-import com.lenworthrose.music.util.Constants;
-import com.lenworthrose.music.util.Constants.PlaybackState;
-import com.lenworthrose.music.util.ImageLoader;
-import com.lenworthrose.music.util.ImageLoader.ImageLoadListener;
-import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.playback.PlayingItem;
+import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.Constants.PlaybackState;
+import com.lenworthrose.music.util.Utils;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class PlayingItemFragment extends Fragment implements ServiceConnection, ImageLoadListener {
+public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private SeekBar positionBar;
     private TextView artist, album, title, playlistPosition, playlistTracks, positionDisplay, durationDisplay;
     private ImageView coverArt, playPause;
@@ -308,7 +308,19 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection, 
             fadeListener.reset();
             coverArt.animate().alpha(0.08f).setDuration(200).withEndAction(fadeListener);
 
-            ImageLoader.getInstance().loadImage(getActivity(), item.getAlbumArtUrl(), this);
+            Glide.with(this).load(item.getAlbumArtUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(Bitmap art, GlideAnimation<? super Bitmap> glideAnimation) {
+                    if (art != null) {
+                        fadeListener.setNewCoverArt(createDropShadowBitmap(art));
+
+                        if (getActivity() instanceof PlayingNowActivity)
+                            ((PlayingNowActivity)getActivity()).setBackgroundImage(createBlurredBitmap(art));
+                    } else {
+                        resetToLogo();
+                    }
+                }
+            });
         } else {
             resetToLogo();
             positionBar.setEnabled(false);
@@ -431,7 +443,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection, 
     }
 
     protected Bitmap createDropShadowBitmap(Bitmap bitmap) {
-        if (bitmap.getByteCount() > 10 * 1024 * 1024) //Abort! Image is too big, this could explode the app's memory pool.
+        if (bitmap.getByteCount() > 10 * 1024 * 1024) //Abort! Image is too big, this could explode the app's memory.
             return bitmap;
 
         BlurMaskFilter blurFilter;
@@ -515,21 +527,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection, 
 
         areOverlaysVisible = visible;
     }
-
-    @Override
-    public void onImageLoaded(Bitmap art) {
-        if (art != null) {
-            fadeListener.setNewCoverArt(createDropShadowBitmap(art));
-
-            if (getActivity() instanceof PlayingNowActivity)
-                ((PlayingNowActivity)getActivity()).setBackgroundImage(createBlurredBitmap(art));
-        } else {
-            resetToLogo();
-        }
-    }
-
-    @Override
-    public void onStartingLoad(AsyncTask<?, ?, ?> task) { }
 
     private class HideOverlaysTask implements Runnable {
         @Override

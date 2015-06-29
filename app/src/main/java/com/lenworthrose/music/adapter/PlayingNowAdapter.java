@@ -5,8 +5,8 @@ import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
 import com.lenworthrose.music.playback.PlaylistAction;
-import com.lenworthrose.music.util.ImageLoader;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.ListItem;
 import com.mobeta.android.dslv.DragSortCursorAdapter;
@@ -44,7 +44,8 @@ public class PlayingNowAdapter extends DragSortCursorAdapter {
         item.setTitle((getListPosition(cursor.getPosition()) + 1) + ". " + cursor.getString(5));
         item.setSubtitle(cursor.getString(3));
         item.setStatus(Utils.longToTimeDisplay(cursor.getLong(7)));
-        ImageLoader.getInstance().loadThumbnail(context, cursor.getString(8), item);
+        item.setImageVisible(true);
+        Glide.with(context).load(cursor.getString(8)).into(item.getImageView());
     }
 
     public void setEditModeEnabled(boolean enabled) {

@@ -9,7 +9,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.lenworthrose.music.util.ImageLoader;
+import com.bumptech.glide.Glide;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
@@ -49,13 +49,13 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     @Override
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
         view.setTitle(cursor.getString(1));
-        ImageLoader.getInstance().loadImage(cursor.getString(4), view);
+        Glide.with(context).load(cursor.getString(4)).into(view.getImageView());
     }
 
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(1));
-        ImageLoader.getInstance().loadImage(cursor.getString(4), view);
+        Glide.with(context).load(cursor.getString(4)).into(view.getImageView());
     }
 
     @Override
