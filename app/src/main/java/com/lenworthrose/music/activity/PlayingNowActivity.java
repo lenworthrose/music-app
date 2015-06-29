@@ -40,12 +40,6 @@ public class PlayingNowActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (pager != null) pager.setCurrentItem(0, false);
-    }
-
     private class PlayingNowTabPagerAdapter extends FragmentPagerAdapter {
         public PlayingNowTabPagerAdapter(FragmentManager fm) {
             super(fm);
