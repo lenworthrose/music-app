@@ -20,7 +20,9 @@ import android.graphics.drawable.shapes.RectShape;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -63,6 +65,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private Animation pauseBlinkAnimation = new AlphaAnimation(0f, 1f);
     private CoverArtFadeListener fadeListener = new CoverArtFadeListener();
     private PlaybackService playbackService;
+    private Handler handler;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -136,16 +139,31 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         }
     };
 
-    @TargetApi(19)
-    private void setPremultiplied(Bitmap bitmap) {
-        if (Build.VERSION.SDK_INT >= 19 && !bitmap.isPremultiplied())
-            bitmap.setPremultiplied(true);
-    }
+    private View.OnLongClickListener searchLongClickListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View v) {
+            switch (v.getId()) {
+                case R.id.pn_artist:
+                    performSearch(artist.getText().toString(), null, null);
+                    break;
+                case R.id.pn_album:
+                case R.id.pn_coverArt:
+                    performSearch(artist.getText().toString(), album.getText().toString(), null);
+                    break;
+                case R.id.pn_name:
+                    performSearch(artist.getText().toString(), null, title.getText().toString());
+                    break;
+            }
+
+            return true;
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         autoHideOverlays = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(Constants.SETTING_AUTO_HIDE_PLAYING_NOW_OVERLAYS, false);
+        handler = new Handler(Looper.getMainLooper());
 
         if (autoHideOverlays) scheduleService = Executors.newSingleThreadScheduledExecutor();
         setHasOptionsMenu(true);
@@ -346,15 +364,12 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
                     durationDisplay.setText(R.string.blank_time);
                 } else {
-                    int position = playbackService.getPosition();
-
+                    updatePosition();
                     positionBar.setMax(duration);
-                    positionBar.setProgress(position);
-                    positionBar.setEnabled(true);
-
-                    positionDisplay.setText(Utils.longToTimeDisplay(position));
                     durationDisplay.setText(Utils.longToTimeDisplay(duration));
                 }
+
+                handler.postDelayed(new UpdatePositionRunnable(), 1000);
 
                 break;
             case Buffering:
@@ -392,6 +407,15 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
         if (getActivity() instanceof PlayingNowActivity)
             ((PlayingNowActivity)getActivity()).setBackgroundImage(null);
+    }
+
+    private void updatePosition() {
+        if (!isPositionBarTouched) {
+            int position = playbackService.getPosition();
+            positionBar.setProgress(position);
+            positionBar.setEnabled(true);
+            positionDisplay.setText(Utils.longToTimeDisplay(position));
+        }
     }
 
     private Bitmap createBlurredBitmap(Bitmap bitmap) {
@@ -445,28 +469,26 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         return shadowImage32;
     }
 
-    private View.OnLongClickListener searchLongClickListener = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            switch (v.getId()) {
-                case R.id.pn_artist:
-                    performSearch(artist.getText().toString(), null, null);
-                    break;
-                case R.id.pn_album:
-                case R.id.pn_coverArt:
-                    performSearch(artist.getText().toString(), album.getText().toString(), null);
-                    break;
-                case R.id.pn_name:
-                    performSearch(artist.getText().toString(), null, title.getText().toString());
-                    break;
-            }
-
-            return true;
-        }
-    };
+    @TargetApi(19)
+    private void setPremultiplied(Bitmap bitmap) {
+        if (Build.VERSION.SDK_INT >= 19 && !bitmap.isPremultiplied())
+            bitmap.setPremultiplied(true);
+    }
 
     private void performSearch(String artist, String album, String name) {
 
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        PlaybackService.LocalBinder binder = (PlaybackService.LocalBinder)service;
+        playbackService = binder.getService();
+        playingItemChanged();
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        playbackService = null;
     }
 
     private void scheduleHideOverlays() {
@@ -561,16 +583,14 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         }
     }
 
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        PlaybackService.LocalBinder binder = (PlaybackService.LocalBinder)service;
-        playbackService = binder.getService();
-        playingItemChanged();
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        playbackService = null;
+    private class UpdatePositionRunnable implements Runnable {
+        @Override
+        public void run() {
+            if (playbackService.getState() == PlaybackState.Playing) {
+                updatePosition();
+                handler.postDelayed(new UpdatePositionRunnable(), 1000);
+            }
+        }
     }
 }
 
