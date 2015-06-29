@@ -16,6 +16,7 @@ public class ListItem extends CheckableFrameLayout {
 
     public ListItem(Context context) {
         super(context);
+        setBackgroundResource(R.drawable.list_item_selector);
 
         inflate(context, R.layout.list_item, this);
         title = (TextView)findViewById(R.id.list_item_title);

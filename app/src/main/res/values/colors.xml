@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Theme colors -->
+    <color name="colorAccent">#039BE5</color>
+    <color name="colorAccentDark">#01579B</color>
+
     <!-- Text colors -->
     <color name="textPrimary">#fff</color>
     <color name="textSecondary">#c3ffffff</color>

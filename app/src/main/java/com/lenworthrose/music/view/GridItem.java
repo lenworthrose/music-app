@@ -17,6 +17,7 @@ public class GridItem extends CheckableFrameLayout {
 
     public GridItem(Context context) {
         super(context);
+        setBackgroundResource(R.drawable.list_item_selector);
 
         inflate(getContext(), R.layout.grid_item, this);
         setPadding(5, 5, 5, 5);

@@ -196,6 +196,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/playing_now_playback_control_margin"
+            android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
             android:src="@drawable/skip_previous" />
@@ -205,6 +206,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/playing_now_playback_control_margin"
+            android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
             android:src="@drawable/play" />
@@ -214,6 +216,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/playing_now_playback_control_margin"
+            android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
             android:src="@drawable/stop" />
@@ -222,6 +225,7 @@
             android:id="@+id/pn_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
             android:src="@drawable/skip_next" />

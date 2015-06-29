@@ -1,5 +1,5 @@
 <resources>
     <style name="AppTheme" parent="Theme.AppCompat">
-
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 </resources>
