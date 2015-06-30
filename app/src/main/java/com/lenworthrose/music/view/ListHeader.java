@@ -82,6 +82,7 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
                             @Override
                             public void onBitmapReady(Bitmap bitmap) {
                                 background.setImageBitmap(bitmap);
+                                background.animate().alpha(.25f).setDuration(300).start();
                             }
                         });
                     }
