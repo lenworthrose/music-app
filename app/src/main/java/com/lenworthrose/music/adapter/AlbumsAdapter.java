@@ -17,6 +17,15 @@ import com.lenworthrose.music.view.ListItem;
 import java.util.ArrayList;
 
 public class AlbumsAdapter extends BaseSwitchableAdapter {
+    private static String[] PROJECTION = {
+            MediaStore.Audio.Albums._ID,
+            MediaStore.Audio.Albums.ALBUM,
+            MediaStore.Audio.Albums.NUMBER_OF_SONGS,
+            MediaStore.Audio.Albums.FIRST_YEAR,
+            MediaStore.Audio.Albums.ALBUM_ART,
+            MediaStore.Audio.Albums.ARTIST
+    };
+
     private IdType type;
     private long parentId;
 
@@ -28,6 +37,17 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
         super(context, isGrid);
         this.type = type;
         this.parentId = parentId;
+    }
+
+    public static CursorLoader getAlbumInfo(Context context, long id) {
+        String where = MediaStore.Audio.Albums._ID+ "=?";
+        String[] whereVars = { String.valueOf(id) };
+
+        return new CursorLoader(context, MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                PROJECTION,
+                where,
+                whereVars,
+                MediaStore.Audio.Albums.FIRST_YEAR);
     }
 
     @Override

@@ -12,6 +12,11 @@
         <item quantity="other">%1$d albums</item>
     </plurals>
 
+    <plurals name="num_of_tracks">
+        <item quantity="one">%1$d track</item>
+        <item quantity="other">%1$d tracks</item>
+    </plurals>
+
     <string name="num_selected">%1$d selected</string>
 
     <!-- Playing Now -->

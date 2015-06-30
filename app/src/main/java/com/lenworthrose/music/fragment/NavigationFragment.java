@@ -7,12 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ListView;
 
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AdapterFactory;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.view.ListHeader;
 
 public class NavigationFragment extends Fragment {
     private BaseSwitchableAdapter adapter;
@@ -41,6 +43,12 @@ public class NavigationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         AbsListView listView = (AbsListView)view.findViewById(R.id.abs_list_view);
+
+        if (idType != null && !isGridView()) {
+            ListHeader header = new ListHeader(getActivity(), idType, id);
+            ((ListView)listView).addHeaderView(header);
+        }
+
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(adapter);
         listView.setMultiChoiceModeListener(adapter);
