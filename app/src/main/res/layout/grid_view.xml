@@ -2,13 +2,14 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="3dp">
+    android:orientation="vertical">
 
     <GridView
         android:id="@+id/abs_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:choiceMode="multipleChoiceModal"
         android:columnWidth="115dp"
         android:drawSelectorOnTop="true"
