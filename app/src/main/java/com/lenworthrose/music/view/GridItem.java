@@ -11,6 +11,10 @@ import android.widget.TextView;
 
 import com.lenworthrose.music.R;
 
+/**
+ * A {@link android.view.View} displayed in a {@link android.widget.GridView}. Contains a
+ * 2-line {@link TextView} overlaid atop a {@link SquareImageView}.
+ */
 public class GridItem extends CheckableFrameLayout {
     private TextView label;
     private SquareImageView imgView;

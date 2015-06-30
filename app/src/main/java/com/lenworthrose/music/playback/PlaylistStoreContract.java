@@ -2,6 +2,9 @@ package com.lenworthrose.music.playback;
 
 import android.provider.BaseColumns;
 
+/**
+ * Defines the database table for the Playing Now Playlist.
+ */
 public final class PlaylistStoreContract {
     public PlaylistStoreContract() { }
 

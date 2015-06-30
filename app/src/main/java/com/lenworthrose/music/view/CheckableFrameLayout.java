@@ -5,6 +5,11 @@ import android.util.AttributeSet;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
 
+/**
+ * A {@link FrameLayout} that handles the Checked state. Used by views that need to show this state,
+ * e.g. during multi-select, or to show the currently playing track in
+ * {@link com.lenworthrose.music.fragment.PlayingNowPlaylistFragment}.
+ */
 public class CheckableFrameLayout extends FrameLayout implements Checkable {
     public static final int[] CHECKED_STATE = { android.R.attr.state_checked };
     private boolean isChecked;

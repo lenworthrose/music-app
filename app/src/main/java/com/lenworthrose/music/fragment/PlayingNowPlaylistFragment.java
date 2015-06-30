@@ -17,15 +17,18 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.adapter.PlayingNowAdapter;
+import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.mobeta.android.dslv.DragSortListView;
 
+/**
+ * This Fragment displays the current Playing Now Playlist.
+ */
 public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.OnItemClickListener, ServiceConnection {
     private DragSortListView listView;
-    private PlayingNowAdapter adapter;
+    private PlayingNowPlaylistAdapter adapter;
     private PlaybackService playbackService;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -188,7 +191,7 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
     public void onServiceConnected(ComponentName name, IBinder service) {
         PlaybackService.LocalBinder binder = (PlaybackService.LocalBinder)service;
         playbackService = binder.getService();
-        adapter = new PlayingNowAdapter(getActivity(), playbackService.getPlaylist());
+        adapter = new PlayingNowPlaylistAdapter(getActivity(), playbackService.getPlaylist());
         listView.setAdapter(adapter);
         playlistUpdated();
     }

@@ -6,6 +6,10 @@ import com.lenworthrose.music.IdType;
 
 import java.util.ArrayList;
 
+/**
+ * Defines an interface (used by {@link com.lenworthrose.music.activity.MainActivity})
+ * to handle navigation and playback control events.
+ */
 public interface NavigationListener {
     void onNavigate(IdType type, long id);
 

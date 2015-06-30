@@ -16,6 +16,9 @@ import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
 
+/**
+ * A {@link BaseSwitchableAdapter} that manages lists of Songs.
+ */
 public class SongsAdapter extends BaseSwitchableAdapter {
     private long parentId;
     private IdType type;

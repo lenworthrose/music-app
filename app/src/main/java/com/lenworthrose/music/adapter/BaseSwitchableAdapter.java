@@ -20,8 +20,16 @@ import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
 
-public abstract class BaseSwitchableAdapter extends CursorAdapter implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>,
-        AbsListView.MultiChoiceModeListener {
+/**
+ * The abstract BaseSwitchableAdapter is responsible for managing multi-select and handling item clicks.
+ * The "switchable" moniker comes from its ability to be used in both {@link android.widget.ListView}s and
+ * {@link android.widget.GridView}s.
+ *
+ * Concrete subclasses determine how {@link GridItem} and {@link ListItem}s are populated, as well as how
+ * the multi-select {@link ActionMode}s are handled.
+ */
+public abstract class BaseSwitchableAdapter extends CursorAdapter implements AdapterView.OnItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor>, AbsListView.MultiChoiceModeListener {
     private boolean isGrid;
     private Context context;
     private NavigationListener navListener;

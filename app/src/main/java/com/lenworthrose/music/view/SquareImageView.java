@@ -4,6 +4,10 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+/**
+ * An {@link ImageView} that lays itself out as a square, setting its height to be the same
+ * as its width.
+ */
 public class SquareImageView extends ImageView {
     public SquareImageView(Context context) {
         super(context);

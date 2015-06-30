@@ -20,6 +20,11 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AlbumsAdapter;
 import com.lenworthrose.music.util.Utils;
 
+/**
+ * A {@link View} that is meant to be added as the header to a list. Contains information about the list (e.g.
+ * Artist, Album names) as well as an image, which is shown twice: once in it's unadultered form as a thumbnail,
+ * and also as a blurred background for this view.
+ */
 public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteListener<Cursor> {
     private IdType type;
     private ImageView background, coverArt;

@@ -16,7 +16,15 @@ import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.view.ListHeader;
 
-public class NavigationFragment extends Fragment {
+/**
+ * This Fragment handles the display of information from the media library. It can be configured
+ * to display content as either a list or a grid.
+ *
+ * The {@code isGridView()} method is currently used to determine whether the current list should
+ * be displayed as a grid or a list. Eventually, this should be determined by user preference, but
+ * for now it's hardcoded.
+ */
+public class LibraryFragment extends Fragment {
     private BaseSwitchableAdapter adapter;
     private IdType idType;
     private long id;
@@ -70,16 +78,16 @@ public class NavigationFragment extends Fragment {
         }
     }
 
-    public static NavigationFragment createRootInstance() {
+    public static LibraryFragment createRootInstance() {
         return createInstance(null, -1);
     }
 
-    public static NavigationFragment createInstance(IdType type, long id) {
+    public static LibraryFragment createInstance(IdType type, long id) {
         Bundle b = new Bundle();
         b.putSerializable(Constants.TYPE, type);
         b.putLong(Constants.ID, id);
 
-        NavigationFragment fragment = new NavigationFragment();
+        LibraryFragment fragment = new LibraryFragment();
         fragment.setArguments(b);
         return fragment;
     }

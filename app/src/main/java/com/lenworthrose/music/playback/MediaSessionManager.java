@@ -26,6 +26,12 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.util.Constants;
 
+/**
+ * The MediaSessionManager listens on {@link PlaybackService} Broadcasts, pushing
+ * metadata changes to {@link MediaSessionCompat} and a {@link Notification}. It
+ * also contains {@link com.lenworthrose.music.playback.MediaSessionManager.MediaKeyReceiver},
+ * which is responsible for listening on media key presses.
+ */
 public class MediaSessionManager extends BroadcastReceiver {
     private static final int NOTIFICATION_ID = 666;
 

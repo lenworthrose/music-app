@@ -4,6 +4,9 @@ import android.content.Context;
 
 import com.lenworthrose.music.IdType;
 
+/**
+ * Factory to create {@link BaseSwitchableAdapter} instances based on the supplied {@link IdType}.
+ */
 public class AdapterFactory {
     public static BaseSwitchableAdapter createAdapter(Context context, boolean isGrid, IdType type, long id) {
         if (type == null) return new ArtistsAdapter(context, isGrid);

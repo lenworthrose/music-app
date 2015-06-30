@@ -14,11 +14,15 @@ import com.mobeta.android.dslv.DragSortCursorAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayingNowAdapter extends DragSortCursorAdapter {
+/**
+ * Handles rendering the Playing Now Playlist. Extends {@link DragSortCursorAdapter} because
+ * it will eventually be used to handle playlist editing.
+ */
+public class PlayingNowPlaylistAdapter extends DragSortCursorAdapter {
     private boolean isEditModeEnabled;
     private List<PlaylistAction> actions;
 
-    public PlayingNowAdapter(Context context, Cursor cur) {
+    public PlayingNowPlaylistAdapter(Context context, Cursor cur) {
         super(context, cur, 0);
         resetEditActions();
     }

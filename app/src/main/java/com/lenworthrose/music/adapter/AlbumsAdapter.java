@@ -16,6 +16,9 @@ import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
 
+/**
+ * A {@link BaseSwitchableAdapter} that manages lists of Albums.
+ */
 public class AlbumsAdapter extends BaseSwitchableAdapter {
     private static String[] PROJECTION = {
             MediaStore.Audio.Albums._ID,

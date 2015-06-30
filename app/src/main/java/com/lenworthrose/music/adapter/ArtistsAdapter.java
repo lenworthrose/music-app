@@ -16,6 +16,9 @@ import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
 
+/**
+ * A {@link BaseSwitchableAdapter} that manages lists of Artists.
+ */
 public class ArtistsAdapter extends BaseSwitchableAdapter {
     public ArtistsAdapter(Context context, boolean isGrid) {
         super(context, isGrid);

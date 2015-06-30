@@ -3,6 +3,9 @@ package com.lenworthrose.music.playback;
 import android.database.Cursor;
 
 /**
+ * A wrapper around {@link PlaybackService}'s database {@link Cursor}, providing a way
+ * to get information about the item without needing to know the cursor's column indices.
+ *
  * See {@link SqlPlaylistStore} for the projection used in this query.
  */
 public class PlayingItem {

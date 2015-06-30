@@ -46,6 +46,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This Fragment displays information about the currently playing track (Artist, Album, Title, Cover
+ * Art, etc). It also provides playback controls (Play/Pause, Next, Previous, Stop).
+ */
 public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private SeekBar positionBar;
     private TextView artist, album, title, playlistPosition, playlistTracks, positionDisplay, durationDisplay;

@@ -16,12 +16,18 @@ import android.view.MenuItem;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.SongsAdapter;
-import com.lenworthrose.music.fragment.NavigationFragment;
+import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.NavigationListener;
 
 import java.util.ArrayList;
 
+/**
+ * The main Activity for the application. Implements {@link NavigationListener} so it can handle navigation
+ * events. Manages the {@link LibraryFragment}s that display the media library.
+ *
+ * Responsible for starting the {@link PlaybackService}. Also binds to the Service so it can modify the Playing Now playlist.
+ */
 public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection {
     private PlaybackService playbackService;
 
@@ -29,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createRootInstance()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance()).commit();
         startService(new Intent(this, PlaybackService.class));
     }
 
@@ -66,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void onNavigate(IdType type, long id) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createInstance(type, id))
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id))
                 .addToBackStack(String.valueOf(id)).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
     }
 

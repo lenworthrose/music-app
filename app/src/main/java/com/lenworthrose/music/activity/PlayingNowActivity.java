@@ -18,6 +18,11 @@ import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
 import com.lenworthrose.music.util.Constants;
 
+/**
+ * The Playing Now page for the application. Displays the {@link PlayingItemFragment} and {@link PlayingNowPlaylistFragment}.
+ *
+ * Contains an ImageView for displaying a shared background, which is used when displaying the two Fragments in a ViewPager.
+ */
 public class PlayingNowActivity extends AppCompatActivity {
     private ImageView background;
     private ViewPager pager;

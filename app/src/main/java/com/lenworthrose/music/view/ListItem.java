@@ -7,6 +7,10 @@ import android.widget.TextView;
 
 import com.lenworthrose.music.R;
 
+/**
+ * A {@link android.view.View} displayed in a {@link android.widget.ListView}. Contains
+ * an optional small thumbnail, a title, subtitle, and status text.
+ */
 public class ListItem extends CheckableFrameLayout {
     private String key;
     private ImageView dragHandle;

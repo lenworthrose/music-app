@@ -1,5 +1,8 @@
 package com.lenworthrose.music.playback;
 
+/**
+ * PlaylistAction represents an action taken when editing the playlist.
+ */
 public class PlaylistAction {
     public PlaylistAction(int toRemove) {
         action = Action.REMOVE;

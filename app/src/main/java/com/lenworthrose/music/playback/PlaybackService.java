@@ -28,6 +28,16 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * The PlaybackService is responsible for all things playback. It handles scheduling the {@link MediaPlayer}
+ * instances that play music based on the current Playing Now Playlist, and provides the interface for modifying
+ * the playlist and controlling playback.
+ *
+ * The Service is bind-able, which is the preferred way of interacting with it.
+ *
+ * It sends out Broadcasts using a {@link LocalBroadcastManager} when playback state or the current item changes.
+ * See {@link Constants} for the action strings used.
+ */
 public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         AudioManager.OnAudioFocusChangeListener, SqlPlaylistStore.InitListener, Loader.OnLoadCompleteListener<Cursor> {

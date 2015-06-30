@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Manages the Playing Now Playlist database. Contains methods to add tracks from
+ * a {@link Cursor} containing Song data from the {@link android.provider.MediaStore}.
+ */
 public class SqlPlaylistStore {
     public static final String TABLE_NAME = "playlist";
 
@@ -180,7 +184,7 @@ public class SqlPlaylistStore {
         }
     }
 
-//    public void performPlaylistActions(PlayingNowAdapter adapter) {
+//    public void performPlaylistActions(PlayingNowPlaylistAdapter adapter) {
 //        Cursor cur = adapter.getCursor();
 //        cur.moveToPosition(-1);
 //
