@@ -46,7 +46,7 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
 
         switch (type) {
             case ALBUM:
-                loader = AlbumsAdapter.getAlbumInfo(getContext(), id);
+                loader = AlbumsAdapter.getAlbums(getContext(), IdType.ALBUM, id);
                 break;
             default:
                 loader = null;

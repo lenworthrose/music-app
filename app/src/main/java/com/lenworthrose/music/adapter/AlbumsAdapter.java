@@ -39,29 +39,9 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
         this.parentId = parentId;
     }
 
-    public static CursorLoader getAlbumInfo(Context context, long id) {
-        String where = MediaStore.Audio.Albums._ID+ "=?";
-        String[] whereVars = { String.valueOf(id) };
-
-        return new CursorLoader(context, MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                PROJECTION,
-                where,
-                whereVars,
-                MediaStore.Audio.Albums.FIRST_YEAR);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = {
-                MediaStore.Audio.Albums._ID,
-                MediaStore.Audio.Albums.ALBUM,
-                MediaStore.Audio.Albums.NUMBER_OF_SONGS,
-                MediaStore.Audio.Albums.FIRST_YEAR,
-                MediaStore.Audio.Albums.ALBUM_ART
-        };
-
+    public static CursorLoader getAlbums(Context context, IdType type, long id) {
         String where;
-        String[] whereVars = { String.valueOf(parentId) };
+        String[] whereVars = { String.valueOf(id) };
 
         switch (type) {
             case ARTIST:
@@ -72,6 +52,9 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
                 where = null;
                 whereVars = null;
                 break;
+            case ALBUM:
+                where = MediaStore.Audio.Media._ID;
+                break;
             default:
                 where = null;
                 whereVars = null;
@@ -80,11 +63,16 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
 
         if (where != null) where += "= ?";
 
-        return new CursorLoader(getContext(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                projection,
+        return new CursorLoader(context, MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                PROJECTION,
                 where,
                 whereVars,
                 MediaStore.Audio.Albums.FIRST_YEAR);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return getAlbums(getContext(), type, parentId);
     }
 
     @Override
