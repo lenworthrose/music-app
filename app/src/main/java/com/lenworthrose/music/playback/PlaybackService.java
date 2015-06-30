@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -19,7 +18,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -91,6 +89,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         playlistStore = new SqlPlaylistStore();
         playlistStore.setListener(this);
         playlistStore.init(this);
+
+        mediaSessionManager = new MediaSessionManager(this);
+        IntentFilter intentFilter = new IntentFilter(Constants.PLAYBACK_STATE_CHANGED);
+        intentFilter.addAction(Constants.PLAYING_NOW_CHANGED);
+        broadcastMan.registerReceiver(mediaSessionManager, intentFilter);
+
 //        notificationManager = new NotificationManager(this, mediaSessionManager);
     }
 
@@ -98,31 +102,17 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
-                case Constants.CMD_PLAY_ALBUM: //TODO: Fix this hackery
-                    long albumId = intent.getLongExtra(Constants.ID, -1);
-
-                    String[] projection = {
-                            MediaStore.Audio.Media._ID,
-                            MediaStore.Audio.Media.TITLE,
-                            MediaStore.Audio.Media.TRACK,
-                            MediaStore.Audio.Media.DURATION,
-                            MediaStore.Audio.Media.ARTIST,
-                            MediaStore.Audio.Media.ALBUM,
-                            MediaStore.Audio.Media.ALBUM_ID
-                    };
-
-                    String[] whereVars = { String.valueOf(albumId) };
-
-                    CursorLoader cLoader = new CursorLoader(this, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                            projection,
-                            MediaStore.Audio.Media.ALBUM_ID + "=?",
-                            whereVars,
-                            MediaStore.Audio.Media.TRACK);
-
-                    cLoader.registerListener(0, this);
-                    cLoader.startLoading();
+                case Constants.CMD_PLAY_PAUSE:
+                    playPause();
                     break;
-                default:
+                case Constants.CMD_STOP:
+                    stop();
+                    break;
+                case Constants.CMD_PREVIOUS:
+                    previous();
+                    break;
+                case Constants.CMD_NEXT:
+                    next();
                     break;
             }
         }
@@ -247,7 +237,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
                 acquireWifiLock();
                 registerNoisyReceiver();
-//                if (mediaSessionManager != null) mediaSessionManager.register();
+                if (mediaSessionManager != null) mediaSessionManager.register();
                 
                 notifyPlayingItemChanged();
                 notifyStateChanged();
@@ -587,7 +577,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         isPrepared = false;
 
         if (shouldUnregisterRemote) {
-//            if (mediaSessionManager != null) mediaSessionManager.unregister();
+            if (mediaSessionManager != null) mediaSessionManager.unregister();
             audioMan.abandonAudioFocus(this);
             stopForeground(true);
         }

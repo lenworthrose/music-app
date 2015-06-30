@@ -30,5 +30,11 @@
         <service
             android:name=".playback.PlaybackService"
             android:enabled="true" />
+
+        <receiver android:name=".playback.MediaSessionManager$MediaKeyReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

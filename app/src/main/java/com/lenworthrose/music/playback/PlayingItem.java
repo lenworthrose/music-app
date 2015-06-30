@@ -40,4 +40,8 @@ public class PlayingItem {
     public String getAlbumArtUrl() {
         return cursor == null ? null : cursor.getString(8);
     }
+
+    public int getTrackNum() {
+        return cursor == null ? -1 : cursor.getInt(6);
+    }
 }

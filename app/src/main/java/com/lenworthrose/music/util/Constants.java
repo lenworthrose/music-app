@@ -1,7 +1,10 @@
 package com.lenworthrose.music.util;
 
 public class Constants {
-    public static final String CMD_PLAY_ALBUM = "com.lenworthrose.music.PlayAlbum";
+    public static final String CMD_PLAY_PAUSE = "com.lenworthrose.music.PlayPause";
+    public static final String CMD_STOP = "com.lenworthrose.music.Stop";
+    public static final String CMD_NEXT = "com.lenworthrose.music.Next";
+    public static final String CMD_PREVIOUS = "com.lenworthrose.music.Previous";
 
     public static final String PLAYING_NOW_CHANGED = "com.lenworthrose.music.PlayingNowChanged";
     public static final String PLAYING_NOW_PLAYLIST_CHANGED = "com.lenworthrose.music.PlayingNowPlaylistChanged";

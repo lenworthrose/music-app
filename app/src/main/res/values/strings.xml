@@ -17,4 +17,7 @@
     <string name="empty_playlist">The playlist is empty.</string>
     <string name="playing_now">Playing Now</string>
     <string name="playlist">Playlist</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="pause">Pause</string>
 </resources>
