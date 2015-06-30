@@ -56,7 +56,8 @@ public class SongsAdapter extends BaseSwitchableAdapter {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        getNavigationListener().playSongs(getCursor(), position);
+        //Subtract difference of counts to account for ListView headers
+        getNavigationListener().playSongs(getCursor(), position - (parent.getCount() - getCount()));
     }
 
     public static CursorLoader createSongsLoader(Context context, IdType type, ArrayList<Long> parentIds) {
