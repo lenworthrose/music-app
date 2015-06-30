@@ -2,6 +2,8 @@ package com.lenworthrose.music.playback;
 
 import android.database.Cursor;
 
+import com.lenworthrose.music.sql.SqlPlaylistStore;
+
 /**
  * A wrapper around {@link PlaybackService}'s database {@link Cursor}, providing a way
  * to get information about the item without needing to know the cursor's column indices.

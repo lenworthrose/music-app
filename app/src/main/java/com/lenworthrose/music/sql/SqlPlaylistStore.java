@@ -1,4 +1,4 @@
-package com.lenworthrose.music.playback;
+package com.lenworthrose.music.sql;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.lenworthrose.music.playback.PlaylistStoreContract.PlaylistEntry;
+import com.lenworthrose.music.sql.PlaylistStoreContract.PlaylistEntry;
 
 import java.util.ArrayList;
 import java.util.List;

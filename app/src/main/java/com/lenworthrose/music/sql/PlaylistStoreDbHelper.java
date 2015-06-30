@@ -1,4 +1,4 @@
-package com.lenworthrose.music.playback;
+package com.lenworthrose.music.sql;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,14 +15,12 @@ public class PlaylistStoreDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(PlaylistStoreContract.SQL_CREATE_DEVICE_PLAYLIST);
-        db.execSQL(ArtistsStoreContract.SQL_CREATE_ARTISTS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //Might be better to check the version to see if the list is compatible. But this isn't a huge deal.
         db.execSQL(PlaylistStoreContract.SQL_DELETE_DEVICE_PLAYLIST);
-        db.execSQL(ArtistsStoreContract.SQL_DELETE_ARTISTS);
         onCreate(db);
     }
 }

@@ -1,4 +1,4 @@
-package com.lenworthrose.music.playback;
+package com.lenworthrose.music.sql;
 
 import android.provider.BaseColumns;
 

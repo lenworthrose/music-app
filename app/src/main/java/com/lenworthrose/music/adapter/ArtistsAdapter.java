@@ -29,7 +29,9 @@ public class ArtistsAdapter extends BaseSwitchableAdapter {
         String[] projection = {
                 MediaStore.Audio.Artists._ID,
                 MediaStore.Audio.Artists.ARTIST,
-                MediaStore.Audio.Artists.NUMBER_OF_ALBUMS };
+                MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
+                MediaStore.Audio.Artists.ARTIST_KEY
+        };
 
         return new CursorLoader(getContext(), MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, projection, null, null, MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
     }

@@ -22,6 +22,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.lenworthrose.music.sql.SqlPlaylistStore;
 import com.lenworthrose.music.util.Constants;
 
 import java.io.IOException;
