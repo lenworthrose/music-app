@@ -12,15 +12,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.SongsAdapter;
-import com.lenworthrose.music.fragment.GridFragment;
-import com.lenworthrose.music.fragment.ListFragment;
+import com.lenworthrose.music.fragment.NavigationFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.NavigationListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection {
     private PlaybackService playbackService;
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, GridFragment.artistsInstance()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createRootInstance()).commit();
         startService(new Intent(this, PlaybackService.class));
     }
 
@@ -66,12 +65,12 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void onNavigateToArtist(long artistId) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, GridFragment.albumsInstance(artistId)).addToBackStack(String.valueOf(artistId)).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createInstance(IdType.ARTIST, artistId)).addToBackStack(String.valueOf(artistId)).commit();
     }
 
     @Override
     public void onNavigateToAlbum(long albumId) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, ListFragment.songsInstance(albumId)).addToBackStack(String.valueOf(albumId)).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createInstance(IdType.ALBUM, albumId)).addToBackStack(String.valueOf(albumId)).commit();
     }
 
     @Override
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     public void playAlbums(ArrayList<Long> albumIds) {
         Bundle b = new Bundle();
         b.putSerializable(PlaybackLoaderCallbacks.IDS, albumIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, SongsAdapter.Type.ALBUM);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ALBUM);
         getSupportLoaderManager().restartLoader(0, b, new PlayLoaderCallbacks());
     }
 
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     public void playArtists(ArrayList<Long> artistIds) {
         Bundle b = new Bundle();
         b.putSerializable(PlaybackLoaderCallbacks.IDS, artistIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, SongsAdapter.Type.ARTIST);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ARTIST);
         getSupportLoaderManager().restartLoader(0, b, new PlayLoaderCallbacks());
     }
 
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     public void addAlbums(ArrayList<Long> albumIds) {
         Bundle b = new Bundle();
         b.putSerializable(PlaybackLoaderCallbacks.IDS, albumIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, SongsAdapter.Type.ALBUM);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ALBUM);
         getSupportLoaderManager().restartLoader(0, b, new AddLoaderCallbacks());
     }
 
@@ -107,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     public void addArtists(ArrayList<Long> artistIds) {
         Bundle b = new Bundle();
         b.putSerializable(PlaybackLoaderCallbacks.IDS, artistIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, SongsAdapter.Type.ARTIST);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ARTIST);
         getSupportLoaderManager().restartLoader(0, b, new AddLoaderCallbacks());
     }
 
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     public void addAlbumsAsNext(ArrayList<Long> albumIds) {
         Bundle b = new Bundle();
         b.putSerializable(PlaybackLoaderCallbacks.IDS, albumIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, SongsAdapter.Type.ALBUM);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ALBUM);
         getSupportLoaderManager().restartLoader(0, b, new AddAsNextLoaderCallbacks());
     }
 
@@ -123,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     public void addArtistsAsNext(ArrayList<Long> artistIds) {
         Bundle b = new Bundle();
         b.putSerializable(PlaybackLoaderCallbacks.IDS, artistIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, SongsAdapter.Type.ARTIST);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ARTIST);
         getSupportLoaderManager().restartLoader(0, b, new AddAsNextLoaderCallbacks());
     }
 
@@ -143,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return SongsAdapter.createSongsLoader(MainActivity.this, (SongsAdapter.Type)args.get(TYPE), (ArrayList<Long>)args.getSerializable(IDS));
+            return SongsAdapter.createSongsLoader(MainActivity.this, (IdType)args.get(TYPE), (ArrayList<Long>)args.getSerializable(IDS));
         }
 
         @Override

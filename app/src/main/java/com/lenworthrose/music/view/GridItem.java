@@ -40,17 +40,6 @@ public class GridItem extends CheckableFrameLayout {
         label.setBackground(bgDrawable);
     }
 
-    private void init() {
-//        if (backgroundResourceId == 0) {
-//            TypedValue value = new TypedValue();
-//            getContext().getTheme().resolveAttribute(R.attr.listItemSelector, value, true);
-//            backgroundResourceId = value.resourceId;
-//        }
-
-//        inflate(getContext(), R.layout.grid_item, this);
-//        setBackgroundResource(backgroundResourceId);
-    }
-
     public void setText(String text) {
         label.setText(text);
     }

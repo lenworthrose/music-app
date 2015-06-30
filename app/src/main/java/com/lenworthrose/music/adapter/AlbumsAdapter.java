@@ -10,20 +10,23 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.bumptech.glide.Glide;
+import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
 
 public class AlbumsAdapter extends BaseSwitchableAdapter {
+    private IdType type;
     private long parentId;
 
     public AlbumsAdapter(Context context, boolean isGrid) {
-        this(context, isGrid, Long.MIN_VALUE);
+        this(context, isGrid, null, Long.MIN_VALUE);
     }
 
-    public AlbumsAdapter(Context context, boolean isGrid, long parentId) {
+    public AlbumsAdapter(Context context, boolean isGrid, IdType type, long parentId) {
         super(context, isGrid);
+        this.type = type;
         this.parentId = parentId;
     }
 
@@ -37,12 +40,30 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
                 MediaStore.Audio.Albums.ALBUM_ART
         };
 
+        String where;
         String[] whereVars = { String.valueOf(parentId) };
+
+        switch (type) {
+            case ARTIST:
+                where = MediaStore.Audio.Media.ARTIST_ID;
+                break;
+            case GENRE:
+                //TODO: How do I get a list of albums from a genre? MediaStore maps individual files to genres...
+                where = null;
+                whereVars = null;
+                break;
+            default:
+                where = null;
+                whereVars = null;
+                break;
+        }
+
+        if (where != null) where += "= ?";
 
         return new CursorLoader(getContext(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 projection,
-                parentId == Long.MIN_VALUE ? null : MediaStore.Audio.Media.ARTIST_ID + "=?",
-                parentId == Long.MIN_VALUE ? null : whereVars,
+                where,
+                whereVars,
                 MediaStore.Audio.Albums.FIRST_YEAR);
     }
 

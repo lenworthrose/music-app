@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
@@ -17,19 +17,16 @@ import com.lenworthrose.music.view.ListItem;
 import java.util.ArrayList;
 
 public class SongsAdapter extends BaseSwitchableAdapter {
-    public enum Type {
-        ARTIST,
-        ALBUM
-    }
-
     private long parentId;
+    private IdType type;
 
     public SongsAdapter(Context context, boolean isGrid) {
-        this(context, isGrid, Long.MIN_VALUE);
+        this(context, isGrid, null, Long.MIN_VALUE);
     }
 
-    public SongsAdapter(Context context, boolean isGrid, long parentId) {
+    public SongsAdapter(Context context, boolean isGrid, IdType type, long parentId) {
         super(context, isGrid);
+        this.type = type;
         this.parentId = parentId;
     }
 
@@ -37,7 +34,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         ArrayList<Long> list = new ArrayList<>();
         list.add(parentId);
-        return createSongsLoader(getContext(), Type.ALBUM, list );
+        return createSongsLoader(getContext(), type, list );
     }
 
     @Override
@@ -62,7 +59,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
         getNavigationListener().playSongs(getCursor(), position);
     }
 
-    public static CursorLoader createSongsLoader(Context context, Type type, ArrayList<Long> parentIds) {
+    public static CursorLoader createSongsLoader(Context context, IdType type, ArrayList<Long> parentIds) {
         String[] projection = {
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.TITLE,
