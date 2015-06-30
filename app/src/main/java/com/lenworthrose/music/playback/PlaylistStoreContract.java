@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
  * Defines the database table for the Playing Now Playlist.
  */
 public final class PlaylistStoreContract {
-    public PlaylistStoreContract() { }
+    private PlaylistStoreContract() { }
 
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
