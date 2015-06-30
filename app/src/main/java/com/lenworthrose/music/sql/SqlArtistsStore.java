@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,18 @@ import java.util.List;
  * Manages the Artists database.
  */
 public class SqlArtistsStore {
+    public interface ArtistsStoreListener {
+        void onMediaStoreSyncComplete(List<ArtistModel> newArtists);
+    }
+
+    public static SqlArtistsStore getInstance() {
+        return LazyHolder.INSTANCE;
+    }
+
+    private static final class LazyHolder {
+        static SqlArtistsStore INSTANCE = new SqlArtistsStore();
+    }
+
     private static final String TABLE_NAME = "artists";
 
     private static final String[] PROJECTION_ALL = {
@@ -39,6 +52,20 @@ public class SqlArtistsStore {
     };
 
     private SQLiteDatabase db;
+    private List<WeakReference<ArtistsStoreListener>> artistsStoreListeners = new ArrayList<>(3);
+
+    public void addListener(ArtistsStoreListener listener) {
+        artistsStoreListeners.add(new WeakReference<>(listener));
+    }
+
+    public void removeListener(ArtistsStoreListener artistsStoreListener) {
+        for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
+            WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
+
+            if (listener.get() == null || listener.get() == artistsStoreListener)
+                artistsStoreListeners.remove(i);
+        }
+    }
 
     public Cursor getArtists() {
         return db.query(TABLE_NAME, PROJECTION_ALL, null, null, null, null, ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
@@ -67,7 +94,7 @@ public class SqlArtistsStore {
         db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
     }
 
-    public void populateFromMediaStore(Cursor artistsCursor) {
+    public void syncFromMediaStore(Cursor artistsCursor) {
         MediaStoreMigrationTask task = new MediaStoreMigrationTask();
         task.execute(artistsCursor);
     }
@@ -83,7 +110,7 @@ public class SqlArtistsStore {
 
                 try {
                     do {
-                        long id = db.insertWithOnConflict(TABLE_NAME, null, createContentValuesFrom(artistsCursor), SQLiteDatabase.CONFLICT_ABORT);
+                        long id = db.insertWithOnConflict(TABLE_NAME, null, createContentValuesFrom(artistsCursor), SQLiteDatabase.CONFLICT_IGNORE);
                         if (id != -1) newArtists.add(new ArtistModel(id, artistsCursor.getString(1)));
                     } while (artistsCursor.moveToNext());
 
@@ -98,19 +125,25 @@ public class SqlArtistsStore {
 
         @Override
         protected void onPostExecute(List<ArtistModel> newArtists) {
+            for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
+                WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
 
+                if (listener.get() != null)
+                    listener.get().onMediaStoreSyncComplete(newArtists);
+            }
         }
     }
 
     private static ContentValues createContentValuesFrom(Cursor artistsCursor) {
         ContentValues values = new ContentValues();
+        values.put(ArtistsStoreContract.ArtistEntry._ID, artistsCursor.getLong(0));
         values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY, artistsCursor.getString(3));
         values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NAME, artistsCursor.getString(1));
         values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NUM_ALBUMS, artistsCursor.getInt(2));
         return values;
     }
 
-    private class ArtistModel {
+    public static class ArtistModel {
         private String name;
         private long id;
 
@@ -135,12 +168,21 @@ public class SqlArtistsStore {
     }
 
     private InitTask initTask;
-    private InitListener initListener;
+    private boolean isInitializing, isInitialized;
+    private List<InitListener> initListeners = new ArrayList<>(3);
 
     public void init(Context context, InitListener listener) {
-        initListener = listener;
-        initTask = new InitTask();
-        initTask.execute(context);
+        if (isInitialized) {
+            listener.onArtistsDbInitialized();
+        } else {
+            initListeners.add(listener);
+
+            if (!isInitializing) {
+                isInitializing = true;
+                initTask = new InitTask();
+                initTask.execute(context);
+            }
+        }
     }
 
     private class InitTask extends AsyncTask<Context, Void, Void> {
@@ -153,12 +195,13 @@ public class SqlArtistsStore {
 
         @Override
         protected void onPostExecute(Void result) {
+            isInitialized = true;
             initTask = null;
 
-            if (initListener != null) {
-                initListener.onArtistsDbInitialized();
-                initListener = null;
-            }
+            for (int i = initListeners.size() - 1; i >= 0; i--)
+                initListeners.get(i).onArtistsDbInitialized();
+
+            initListeners.clear();
         }
     }
 }

@@ -14,10 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.lenworthrose.music.IdType;
+import com.lenworthrose.music.MediaStoreService;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.playback.PlaybackService;
+import com.lenworthrose.music.sql.SqlArtistsStore;
 import com.lenworthrose.music.util.NavigationListener;
 
 import java.util.ArrayList;
@@ -27,16 +29,19 @@ import java.util.ArrayList;
  * events. Manages the {@link LibraryFragment}s that display the media library.
  *
  * Responsible for starting the {@link PlaybackService}. Also binds to the Service so it can modify the Playing Now playlist.
+ *
+ * Responsible for starting the {@link MediaStoreService}.
  */
-public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection {
+public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, SqlArtistsStore.InitListener {
     private PlaybackService playbackService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance()).commit();
         startService(new Intent(this, PlaybackService.class));
+        SqlArtistsStore.getInstance().init(this, this);
+        startService(new Intent(this, MediaStoreService.class));
     }
 
     @Override
@@ -113,6 +118,11 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void onServiceDisconnected(ComponentName name) {
         playbackService = null;
+    }
+
+    @Override
+    public void onArtistsDbInitialized() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance()).commit();
     }
 
     private abstract class PlaybackLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {

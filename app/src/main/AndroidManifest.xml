@@ -31,6 +31,10 @@
             android:name=".playback.PlaybackService"
             android:enabled="true" />
 
+        <service
+            android:name=".MediaStoreService"
+            android:enabled="true" />
+
         <receiver android:name=".playback.MediaSessionManager$MediaKeyReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />

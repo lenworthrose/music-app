@@ -27,4 +27,7 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="pause">Pause</string>
+
+    <!-- Media Sync -->
+    <string name="syncing_with_media_store">Syncing with media store...</string>
 </resources>

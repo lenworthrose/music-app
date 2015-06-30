@@ -3,7 +3,6 @@ package com.lenworthrose.music.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -11,42 +10,48 @@ import android.widget.AdapterView;
 
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.sql.SqlArtistsStore;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Artists.
  */
-public class ArtistsAdapter extends BaseSwitchableAdapter {
+public class ArtistsAdapter extends BaseSwitchableAdapter implements SqlArtistsStore.ArtistsStoreListener {
     public ArtistsAdapter(Context context, boolean isGrid) {
         super(context, isGrid);
+        SqlArtistsStore.getInstance().addListener(this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = {
-                MediaStore.Audio.Artists._ID,
-                MediaStore.Audio.Artists.ARTIST,
-                MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
-                MediaStore.Audio.Artists.ARTIST_KEY
+        return new CursorLoader(getContext()) {
+            @Override
+            public Cursor loadInBackground() {
+                return SqlArtistsStore.getInstance().getArtists();
+            }
         };
+    }
 
-        return new CursorLoader(getContext(), MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, projection, null, null, MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
+    @Override
+    public void onMediaStoreSyncComplete(List<SqlArtistsStore.ArtistModel> newArtists) {
+        swapCursor(SqlArtistsStore.getInstance().getArtists());
     }
 
     @Override
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
-        view.setTitle(cursor.getString(1));
+        view.setTitle(cursor.getString(2));
 
-        int albumCount = cursor.getInt(2);
+        int albumCount = cursor.getInt(3);
         view.setStatus(context.getResources().getQuantityString(R.plurals.num_of_albums, albumCount, albumCount));
     }
 
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
-        view.setText(cursor.getString(1));
+        view.setText(cursor.getString(2));
     }
 
     @Override
