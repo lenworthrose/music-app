@@ -2,16 +2,16 @@ package com.lenworthrose.music.util;
 
 import android.database.Cursor;
 
+import com.lenworthrose.music.IdType;
+
 import java.util.ArrayList;
 
 public interface NavigationListener {
-    void onNavigateToArtist(long artistId);
-    void onNavigateToAlbum(long albumId);
+    void onNavigate(IdType type, long id);
+
     void playSongs(Cursor songsCursor, int from);
-    void playAlbums(ArrayList<Long> albumId);
-    void playArtists(ArrayList<Long> artistId);
-    void addAlbums(ArrayList<Long> albumId);
-    void addArtists(ArrayList<Long> artistId);
-    void addAlbumsAsNext(ArrayList<Long> albumId);
-    void addArtistsAsNext(ArrayList<Long> artistId);
+
+    void play(IdType type, ArrayList<Long> ids);
+    void add(IdType type, ArrayList<Long> ids);
+    void addAsNext(IdType type, ArrayList<Long> ids);
 }

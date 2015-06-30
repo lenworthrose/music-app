@@ -64,13 +64,9 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
-    public void onNavigateToArtist(long artistId) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createInstance(IdType.ARTIST, artistId)).addToBackStack(String.valueOf(artistId)).commit();
-    }
-
-    @Override
-    public void onNavigateToAlbum(long albumId) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createInstance(IdType.ALBUM, albumId)).addToBackStack(String.valueOf(albumId)).commit();
+    public void onNavigate(IdType type, long id) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createInstance(type, id))
+                .addToBackStack(String.valueOf(id)).commit();
     }
 
     @Override
@@ -79,50 +75,26 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
-    public void playAlbums(ArrayList<Long> albumIds) {
+    public void play(IdType type, ArrayList<Long> ids) {
         Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, albumIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ALBUM);
+        b.putSerializable(PlaybackLoaderCallbacks.IDS, ids);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, type);
         getSupportLoaderManager().restartLoader(0, b, new PlayLoaderCallbacks());
     }
 
     @Override
-    public void playArtists(ArrayList<Long> artistIds) {
+    public void add(IdType type, ArrayList<Long> ids) {
         Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, artistIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ARTIST);
-        getSupportLoaderManager().restartLoader(0, b, new PlayLoaderCallbacks());
-    }
-
-    @Override
-    public void addAlbums(ArrayList<Long> albumIds) {
-        Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, albumIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ALBUM);
+        b.putSerializable(PlaybackLoaderCallbacks.IDS, ids);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, type);
         getSupportLoaderManager().restartLoader(0, b, new AddLoaderCallbacks());
     }
 
     @Override
-    public void addArtists(ArrayList<Long> artistIds) {
+    public void addAsNext(IdType type, ArrayList<Long> ids) {
         Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, artistIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ARTIST);
-        getSupportLoaderManager().restartLoader(0, b, new AddLoaderCallbacks());
-    }
-
-    @Override
-    public void addAlbumsAsNext(ArrayList<Long> albumIds) {
-        Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, albumIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ALBUM);
-        getSupportLoaderManager().restartLoader(0, b, new AddAsNextLoaderCallbacks());
-    }
-
-    @Override
-    public void addArtistsAsNext(ArrayList<Long> artistIds) {
-        Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, artistIds);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, IdType.ARTIST);
+        b.putSerializable(PlaybackLoaderCallbacks.IDS, ids);
+        b.putSerializable(PlaybackLoaderCallbacks.TYPE, type);
         getSupportLoaderManager().restartLoader(0, b, new AddAsNextLoaderCallbacks());
     }
 

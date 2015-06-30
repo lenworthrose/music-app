@@ -81,21 +81,21 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        getNavigationListener().onNavigateToAlbum(id);
+        getNavigationListener().onNavigate(IdType.ALBUM, id);
     }
 
     @Override
     protected void onPlayClicked(ArrayList<Long> ids) {
-        getNavigationListener().playAlbums(ids);
+        getNavigationListener().play(IdType.ALBUM, ids);
     }
 
     @Override
     protected void onAddClicked(ArrayList<Long> ids) {
-        getNavigationListener().addAlbums(ids);
+        getNavigationListener().add(IdType.ALBUM, ids);
     }
 
     @Override
     protected void onAddAsNextClicked(ArrayList<Long> ids) {
-        getNavigationListener().addAlbumsAsNext(ids);
+        getNavigationListener().addAsNext(IdType.ALBUM, ids);
     }
 }

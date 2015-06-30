@@ -9,6 +9,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
@@ -45,21 +46,21 @@ public class ArtistsAdapter extends BaseSwitchableAdapter {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        getNavigationListener().onNavigateToArtist(id);
+        getNavigationListener().onNavigate(IdType.ARTIST, id);
     }
 
     @Override
     protected void onPlayClicked(ArrayList<Long> ids) {
-        getNavigationListener().playArtists(ids);
+        getNavigationListener().play(IdType.ARTIST, ids);
     }
 
     @Override
     protected void onAddClicked(ArrayList<Long> ids) {
-        getNavigationListener().addArtists(ids);
+        getNavigationListener().add(IdType.ARTIST, ids);
     }
 
     @Override
     protected void onAddAsNextClicked(ArrayList<Long> ids) {
-        getNavigationListener().addArtistsAsNext(ids);
+        getNavigationListener().addAsNext(IdType.ARTIST, ids);
     }
 }
