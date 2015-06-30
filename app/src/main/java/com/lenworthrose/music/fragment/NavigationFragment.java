@@ -44,14 +44,18 @@ public class NavigationFragment extends Fragment {
 
         AbsListView listView = (AbsListView)view.findViewById(R.id.abs_list_view);
 
-        if (idType != null && !isGridView()) {
-            ListHeader header = new ListHeader(getActivity(), idType, id);
-            ((ListView)listView).addHeaderView(header);
-        }
+        if (idType != null && !isGridView())
+            ((ListView)listView).addHeaderView(new ListHeader(getActivity(), idType, id), null, false);
 
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(adapter);
         listView.setMultiChoiceModeListener(adapter);
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (!isGridView()) ((AbsListView)getView().findViewById(R.id.abs_list_view)).setAdapter(null);
+        super.onDestroyView();
     }
 
     private boolean isGridView() {

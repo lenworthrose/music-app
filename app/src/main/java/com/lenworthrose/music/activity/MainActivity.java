@@ -6,6 +6,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void onNavigate(IdType type, long id) {
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, NavigationFragment.createInstance(type, id))
-                .addToBackStack(String.valueOf(id)).commit();
+                .addToBackStack(String.valueOf(id)).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
     }
 
     @Override

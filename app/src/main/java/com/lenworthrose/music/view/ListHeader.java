@@ -86,6 +86,8 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
                         });
                     }
                 });
+
+                data.close();
         }
     }
 
