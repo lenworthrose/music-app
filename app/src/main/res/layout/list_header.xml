@@ -15,6 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/playing_now_content_background"
         android:paddingBottom="6dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
@@ -64,31 +65,17 @@
                 android:textSize="@dimen/file_list_header_subtitle_text_size"
                 android:textStyle="italic" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/fvh_tracks_duration"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:id="@+id/fvh_tracks_duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="5dp"
-                    android:singleLine="true"
-                    android:textColor="@android:color/white"
-                    android:textSize="@dimen/file_list_header_subtitle_text_size"
-                    tools:ignore="RtlHardcoded" />
-
-                <TextView
-                    android:id="@+id/fvh_format"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:singleLine="true"
-                    android:textSize="@dimen/file_list_header_subtitle_text_size"
-                    tools:ignore="RtlHardcoded" />
-            </LinearLayout>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="8dp"
+                android:singleLine="true"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/file_list_header_subtitle_text_size"
+                tools:ignore="RtlHardcoded" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

@@ -23,7 +23,7 @@ import com.lenworthrose.music.util.Utils;
 public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteListener<Cursor> {
     private IdType type;
     private ImageView background, coverArt;
-    private TextView artist, album, year, tracksDuration, format;
+    private TextView artist, album, year, tracksDuration;
 
     public ListHeader(Context context, IdType type, long id) {
         super(context);
@@ -36,7 +36,6 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
         album = (TextView)root.findViewById(R.id.fvh_album);
         year = (TextView)root.findViewById(R.id.fvh_year);
         tracksDuration = (TextView)root.findViewById(R.id.fvh_tracks_duration);
-        format = (TextView)root.findViewById(R.id.fvh_format);
         getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
 
         populate(id);
@@ -82,7 +81,7 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
                             @Override
                             public void onBitmapReady(Bitmap bitmap) {
                                 background.setImageBitmap(bitmap);
-                                background.animate().alpha(.25f).setDuration(300).start();
+                                background.animate().alpha(1f).setDuration(300).start();
                             }
                         });
                     }
