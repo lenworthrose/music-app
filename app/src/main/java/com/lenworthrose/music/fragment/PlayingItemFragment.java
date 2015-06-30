@@ -1,6 +1,5 @@
 package com.lenworthrose.music.fragment;
 
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,15 +7,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BlurMaskFilter;
-import android.graphics.Canvas;
 import android.graphics.LinearGradient;
-import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -25,7 +20,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -244,7 +238,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     @Override
     public void onStart() {
         super.onStart();
-
     }
 
     @Override
@@ -268,33 +261,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         super.onDestroy();
     }
 
-    public void positionChanged(final int position) {
-        if (isDetached()) return;
-
-        final int duration = playbackService.getDuration();
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (duration > 0 && !isPositionBarTouched) {
-                    positionBar.setProgress(position);
-                    positionDisplay.setText(Utils.longToTimeDisplay(duration > 0 ? Math.min(position, duration) : position));
-                }
-            }
-        });
-    }
-
-    public void durationChanged(final int duration, final String totalTimeDisplay) {
-        if (isDetached()) return;
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
-    }
-
     public void playingItemChanged() {
         if (isDetached()) return;
         if (autoHideOverlays) setOverlaysVisible(true);
@@ -316,10 +282,20 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 @Override
                 public void onResourceReady(Bitmap art, GlideAnimation<? super Bitmap> glideAnimation) {
                     if (art != null) {
-                        fadeListener.setNewCoverArt(createDropShadowBitmap(art));
+                        Utils.createDropShadowBitmap(art, new Utils.BitmapCallback() {
+                            @Override
+                            public void onBitmapReady(Bitmap bitmap) {
+                                fadeListener.setNewCoverArt(bitmap);
+                            }
+                        });
 
                         if (getActivity() instanceof PlayingNowActivity)
-                            ((PlayingNowActivity)getActivity()).setBackgroundImage(createBlurredBitmap(art));
+                            Utils.createBlurredBitmap(art, new Utils.BitmapCallback() {
+                                @Override
+                                public void onBitmapReady(Bitmap bitmap) {
+                                    ((PlayingNowActivity)getActivity()).setBackgroundImage(bitmap);
+                                }
+                            });
                     } else {
                         resetToLogo();
                     }
@@ -424,63 +400,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         }
     }
 
-    private Bitmap createBlurredBitmap(Bitmap bitmap) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        boolean didScale = false;
-
-        if (width > 400) { //always create a 400px wide image
-            double ratio = (double)400 / (double)width;
-            width = 400;
-            height *= ratio;
-            didScale = true;
-        }
-
-        Bitmap in = Bitmap.createScaledBitmap(bitmap, width, height, false);
-
-        if (in == null)
-            return bitmap;
-
-        Bitmap retVal = Utils.fastblur(in, 14);
-        if (didScale) in.recycle();
-
-        return retVal;
-    }
-
-    protected Bitmap createDropShadowBitmap(Bitmap bitmap) {
-        if (bitmap.getByteCount() > 10 * 1024 * 1024) //Abort! Image is too big, this could explode the app's memory.
-            return bitmap;
-
-        BlurMaskFilter blurFilter;
-
-        try {
-            blurFilter = new BlurMaskFilter(bitmap.getWidth() / 80, BlurMaskFilter.Blur.OUTER);
-        } catch (IllegalArgumentException ex) {
-            Log.w("PlayingItemFragment", "IllegalArgumentException occurred creating BlurMaskFilter: " + ex.getMessage(), ex);
-            return bitmap;
-        }
-
-        Paint shadowPaint = new Paint();
-        shadowPaint.setMaskFilter(blurFilter);
-
-        int[] offsetXY = new int[2];
-        Bitmap shadowImage = bitmap.extractAlpha(shadowPaint, offsetXY);
-        Bitmap shadowImage32 = shadowImage.copy(Bitmap.Config.ARGB_8888, true);
-        shadowImage.recycle();
-        setPremultiplied(shadowImage32);
-
-        Canvas c = new Canvas(shadowImage32);
-        c.drawBitmap(bitmap, -offsetXY[0], -offsetXY[1], null);
-
-        return shadowImage32;
-    }
-
-    @TargetApi(19)
-    private void setPremultiplied(Bitmap bitmap) {
-        if (Build.VERSION.SDK_INT >= 19 && !bitmap.isPremultiplied())
-            bitmap.setPremultiplied(true);
-    }
-
     private void performSearch(String artist, String album, String name) {
 
     }
@@ -583,7 +502,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
         private void setImageAndStartFadeIn() {
             if (isFadeOutDone && newCoverArt != null) {
-                coverArt.setImageBitmap(createDropShadowBitmap(newCoverArt));
+                coverArt.setImageBitmap(newCoverArt);
                 coverArt.animate().alpha(1f).setDuration(300);
             }
         }

@@ -1,10 +1,16 @@
 package com.lenworthrose.music.util;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
@@ -68,7 +74,97 @@ public class Utils {
         return sb.toString();
     }
 
-    public static Bitmap fastblur(Bitmap sentBitmap, int radius) {
+    public interface BitmapCallback {
+        void onBitmapReady(Bitmap bitmap);
+    }
+
+    public static void createDropShadowBitmap(Bitmap bitmap, final BitmapCallback callback) {
+        AsyncTask<Bitmap, Void, Bitmap> task = new AsyncTask<Bitmap, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Bitmap... params) {
+                Bitmap bitmap = params[0];
+
+                if (bitmap.getByteCount() > 10 * 1024 * 1024) //Abort! Image is too big, this could explode the app's memory.
+                    return bitmap;
+
+                BlurMaskFilter blurFilter;
+
+                try {
+                    blurFilter = new BlurMaskFilter(bitmap.getWidth() / 80, BlurMaskFilter.Blur.OUTER);
+                } catch (IllegalArgumentException ex) {
+                    Log.w("PlayingItemFragment", "IllegalArgumentException occurred creating BlurMaskFilter: " + ex.getMessage(), ex);
+                    return bitmap;
+                }
+
+                Paint shadowPaint = new Paint();
+                shadowPaint.setMaskFilter(blurFilter);
+
+                int[] offsetXY = new int[2];
+                Bitmap shadowImage = bitmap.extractAlpha(shadowPaint, offsetXY);
+                Bitmap shadowImage32 = shadowImage.copy(Bitmap.Config.ARGB_8888, true);
+                shadowImage.recycle();
+                setPremultiplied(shadowImage32);
+
+                Canvas c = new Canvas(shadowImage32);
+                c.drawBitmap(bitmap, -offsetXY[0], -offsetXY[1], null);
+
+                return shadowImage32;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                callback.onBitmapReady(bitmap);
+            }
+        };
+
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bitmap);
+    }
+
+    @TargetApi(19)
+    private static void setPremultiplied(Bitmap bitmap) {
+        if (Build.VERSION.SDK_INT >= 19 && !bitmap.isPremultiplied())
+            bitmap.setPremultiplied(true);
+    }
+
+    public static void createBlurredBitmap(Bitmap bitmap, final BitmapCallback callback) {
+        AsyncTask<Bitmap, Void, Bitmap> task = new AsyncTask<Bitmap, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Bitmap... params) {
+                Bitmap bitmap = params[0];
+
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                boolean didScale = false;
+
+                if (width > 400) { //always create a 400px wide image
+                    double ratio = (double)400 / (double)width;
+                    width = 400;
+                    height *= ratio;
+                    didScale = true;
+                }
+
+                Bitmap scaled = Bitmap.createScaledBitmap(bitmap, width, height, false);
+
+                if (scaled == null) {
+                    return bitmap;
+                }
+
+                Bitmap retVal = fastblur(scaled, 14);
+                if (didScale) scaled.recycle();
+
+                return retVal;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                callback.onBitmapReady(bitmap);
+            }
+        };
+
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bitmap);
+    }
+
+    private static Bitmap fastblur(Bitmap sentBitmap, int radius) {
         // Stack Blur v1.0 from
         // http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html
         //
