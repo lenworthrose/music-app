@@ -100,6 +100,8 @@ public abstract class BaseSwitchableAdapter extends CursorAdapter implements Ada
             ids.add(id);
         else
             ids.remove(Long.valueOf(id));
+
+        mode.setTitle(getContext().getString(R.string.num_selected, ids.size()));
     }
 
     @Override
