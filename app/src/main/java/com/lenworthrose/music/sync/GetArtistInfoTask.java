@@ -8,7 +8,13 @@ import android.util.Log;
 
 import com.lenworthrose.music.sql.SqlArtistsStore;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import fm.last.api.Artist;
@@ -16,7 +22,7 @@ import fm.last.api.LastFmServer;
 import fm.last.api.LastFmServerFactory;
 
 /**
- * Responsible for fetching info from MusicBrainz, as well as querying the Albums DB for cover art.
+ * Responsible for fetching Artist info and image from Last.fm, as well as querying the Albums DB for cover art.
  */
 public class GetArtistInfoTask extends AsyncTask<Void, Void, Void> {
     private List<SqlArtistsStore.ArtistModel> newArtists;
@@ -32,42 +38,77 @@ public class GetArtistInfoTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         for (SqlArtistsStore.ArtistModel artist : newArtists) {
-            String[] projection = {
-                    MediaStore.Audio.Albums._ID,
-                    MediaStore.Audio.Albums.ARTIST,
-                    MediaStore.Audio.Albums.ALBUM_ART
-            };
+            String[] albumArt = getAlbumArtUrls(artist);
 
-            int i = 0;
-            String[] albumArt = new String[4];
-            Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection,
-                    MediaStore.Audio.Media.ARTIST_ID + "=?", new String[] { String.valueOf(artist.getId()) }, null);
-
-            if (cursor.moveToFirst())
-                do {
-                    albumArt[i++] = cursor.getString(2);
-                } while (cursor.moveToNext() && i < 4);
-
-            String mbid = null, bio = null;
+            String mbid = null, bio = null, imgPath = null;
 
             try {
                 Artist fmArtist = lastFm.getArtistInfo(artist.getName(), null, "en", null);
                 mbid = fmArtist.getMbid();
                 bio = fmArtist.getBio().getSummary();
+
+                String megaImgUrl = fmArtist.getURLforImageSize("mega");
+                if (megaImgUrl != null) imgPath = retrieveArt(megaImgUrl, mbid);
             } catch (IOException ex) {
                 Log.e("GetArtistInfoTask", "IOException occurred attempting to get info from Last.fm", ex);
             }
 
-            cursor.close();
-
-            SqlArtistsStore.getInstance().updateArtist(artist.getId(), mbid, bio, albumArt);
+            SqlArtistsStore.getInstance().updateArtist(artist.getId(), mbid, bio, imgPath, albumArt);
         }
 
         return null;
     }
 
-    @Override
-    protected void onPostExecute(Void aVoid) {
+    private String[] getAlbumArtUrls(SqlArtistsStore.ArtistModel artist) {
+        String[] projection = {
+                MediaStore.Audio.Albums._ID,
+                MediaStore.Audio.Albums.ARTIST,
+                MediaStore.Audio.Albums.ALBUM_ART
+        };
 
+        int i = 0;
+        String[] albumArt = new String[4];
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection,
+                MediaStore.Audio.Media.ARTIST_ID + "=?", new String[] { String.valueOf(artist.getId()) }, null);
+
+        if (cursor.moveToFirst())
+            do {
+                albumArt[i++] = cursor.getString(2);
+            } while (cursor.moveToNext() && i < 4);
+
+        cursor.close();
+
+        return albumArt;
+    }
+
+    private String retrieveArt(String coverArtUrl, String fileName) {
+        try {
+            URL url = new URL(coverArtUrl);
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.connect();
+
+            if (conn.getResponseCode() == 200) {
+                File file = new File(context.getFilesDir(), fileName + ".jpg");
+                InputStream inputStream = conn.getInputStream();
+                FileOutputStream outputStream = new FileOutputStream(file);
+
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+
+                while ((bytesRead = inputStream.read(buffer)) != -1)
+                    outputStream.write(buffer, 0, bytesRead);
+
+                inputStream.close();
+                outputStream.close();
+
+                return file.getAbsolutePath();
+            }
+        } catch (MalformedURLException ex) {
+            Log.e("GetArtistInfoTask", "MalformedURLException occurred attempting to fetch cover art: " + coverArtUrl, ex);
+        } catch (IOException ex) {
+            Log.e("GetArtistInfoTask", "IOException occurred attempting to fetch cover art", ex);
+        }
+
+        return null;
     }
 }

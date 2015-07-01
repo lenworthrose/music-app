@@ -48,7 +48,7 @@ public class SqlArtistsStore {
             ArtistsStoreContract.ArtistEntry.COLUMN_NUM_ALBUMS,
             ArtistsStoreContract.ArtistEntry.COLUMN_ARTIST_ART_FILE_URL,
             ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_ID,
-            ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_WIKI_INFO
+            ArtistsStoreContract.ArtistEntry.COLUMN_BIO
     };
 
     private SQLiteDatabase db;
@@ -75,10 +75,11 @@ public class SqlArtistsStore {
         return db.query(TABLE_NAME, PROJECTION_ONE, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) }, null, null, null);
     }
 
-    public void updateArtist(long id, String musicBrainzId, String musicBrainzInfo, String... albumArtUris) {
+    public void updateArtist(long id, String musicBrainzId, String lastFmInfo, String artistImgUrl, String... albumArtUris) {
         ContentValues values = new ContentValues();
         values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_ID, musicBrainzId);
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_WIKI_INFO, musicBrainzInfo);
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_BIO, lastFmInfo);
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ARTIST_ART_FILE_URL, artistImgUrl);
 
         if (albumArtUris != null) {
             try {

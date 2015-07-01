@@ -125,7 +125,6 @@ public class MediaStoreService extends Service implements SqlArtistsStore.InitLi
         Log.d("MediaStoreService", "MediaStore sync complete! New artist count: " + newArtists.size());
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).commit();
 
-        //TODO: Retrieve content from MusicBrainz
         GetArtistInfoTask infoTask = new GetArtistInfoTask(this, newArtists) {
             @Override
             protected void onPostExecute(Void aVoid) {

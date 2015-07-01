@@ -18,7 +18,7 @@ public class ArtistsStoreContract {
             ArtistEntry.COLUMN_NAME + TEXT_TYPE + COMMA_SEP +
             ArtistEntry.COLUMN_NUM_ALBUMS + INTEGER_TYPE + COMMA_SEP +
             ArtistEntry.COLUMN_MUSICBRAINZ_ID + TEXT_TYPE + COMMA_SEP +
-            ArtistEntry.COLUMN_MUSICBRAINZ_WIKI_INFO + TEXT_TYPE + COMMA_SEP +
+            ArtistEntry.COLUMN_BIO + TEXT_TYPE + COMMA_SEP +
             ArtistEntry.COLUMN_ARTIST_ART_FILE_URL + TEXT_TYPE + COMMA_SEP +
             ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1 + TEXT_TYPE + COMMA_SEP +
             ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2 + TEXT_TYPE + COMMA_SEP +
@@ -32,7 +32,7 @@ public class ArtistsStoreContract {
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_NUM_ALBUMS = "numalbums";
         public static final String COLUMN_MUSICBRAINZ_ID = "mbid";
-        public static final String COLUMN_MUSICBRAINZ_WIKI_INFO = "info";
+        public static final String COLUMN_BIO = "bio";
         public static final String COLUMN_ARTIST_ART_FILE_URL = "fileurl";
         public static final String COLUMN_ALBUM_ART_FILE_URL_1 = "albumarturl1";
         public static final String COLUMN_ALBUM_ART_FILE_URL_2 = "albumarturl2";
