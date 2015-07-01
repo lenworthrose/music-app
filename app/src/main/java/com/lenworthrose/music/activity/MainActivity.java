@@ -76,6 +76,12 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
+    protected void onDestroy() {
+        stopService(new Intent(this, PlaybackService.class));
+        super.onDestroy();
+    }
+
+    @Override
     public void onNavigate(IdType type, long id) {
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id))
                 .addToBackStack(String.valueOf(id)).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
