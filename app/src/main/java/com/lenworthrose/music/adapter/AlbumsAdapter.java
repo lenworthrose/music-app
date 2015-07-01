@@ -56,7 +56,7 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
                 whereVars = null;
                 break;
             case ALBUM:
-                where = MediaStore.Audio.Media._ID;
+                where = MediaStore.Audio.Albums._ID;
                 break;
             default:
                 where = null;
@@ -70,7 +70,7 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
                 PROJECTION,
                 where,
                 whereVars,
-                MediaStore.Audio.Albums.FIRST_YEAR);
+                MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
     }
 
     @Override
