@@ -1,6 +1,5 @@
 package com.lenworthrose.music.playback;
 
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
@@ -47,7 +46,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     private boolean isPrepared;
     private WifiManager.WifiLock wifiLock;
     private AudioManager audioMan;
-    private NotificationManager notificationManager;
     private BroadcastReceiver noisyReceiver;
     private MediaSessionManager mediaSessionManager;
     private ScheduledExecutorService scheduler;
@@ -104,8 +102,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         IntentFilter intentFilter = new IntentFilter(Constants.PLAYBACK_STATE_CHANGED);
         intentFilter.addAction(Constants.PLAYING_NOW_CHANGED);
         broadcastMan.registerReceiver(mediaSessionManager, intentFilter);
-
-//        notificationManager = new NotificationManager(this, mediaSessionManager);
     }
 
     @Override
