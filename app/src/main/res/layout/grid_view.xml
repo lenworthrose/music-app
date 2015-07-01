@@ -4,17 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <GridView
+    <com.lenworthrose.music.view.HeaderGridView
         android:id="@+id/abs_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
         android:choiceMode="multipleChoiceModal"
         android:columnWidth="115dp"
         android:drawSelectorOnTop="true"
         android:fastScrollEnabled="true"
-        android:gravity="center"
         android:horizontalSpacing="3dp"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"

@@ -14,12 +14,13 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AdapterFactory;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.view.HeaderGridView;
 import com.lenworthrose.music.view.ListHeader;
 
 /**
  * This Fragment handles the display of information from the media library. It can be configured
  * to display content as either a list or a grid.
- *
+ * <p/>
  * The {@code isGridView()} method is currently used to determine whether the current list should
  * be displayed as a grid or a list. Eventually, this should be determined by user preference, but
  * for now it's hardcoded.
@@ -52,8 +53,14 @@ public class LibraryFragment extends Fragment {
 
         AbsListView listView = (AbsListView)view.findViewById(R.id.abs_list_view);
 
-        if (idType != null && !isGridView())
-            ((ListView)listView).addHeaderView(new ListHeader(getActivity(), idType, id), null, false);
+        if (idType != null) {
+            ListHeader header = new ListHeader(getActivity(), idType, id);
+
+            if (isGridView())
+                ((HeaderGridView)listView).addHeaderView(header, null, false);
+            else
+                ((ListView)listView).addHeaderView(header, null, false);
+        }
 
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(adapter);

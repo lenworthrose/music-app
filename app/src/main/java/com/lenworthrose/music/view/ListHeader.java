@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -18,6 +19,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AlbumsAdapter;
+import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.util.Utils;
 
 /**
@@ -50,6 +52,9 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
         CursorLoader loader;
 
         switch (type) {
+            case ARTIST:
+                loader = ArtistsStore.getInstance().getArtistInfo(getContext(), id);
+                break;
             case ALBUM:
                 loader = AlbumsAdapter.getAlbums(getContext(), IdType.ALBUM, id);
                 break;
@@ -69,6 +74,15 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
         if (data.getCount() == 0 || !data.moveToFirst()) return;
 
         switch (type) {
+            case ARTIST:
+                album.setText(data.getString(2));
+                year.setText(Html.fromHtml(data.getString(6)).toString());
+                year.setSingleLine(false);
+                year.setMaxLines(5);
+                artist.setVisibility(View.GONE);
+                tracksDuration.setVisibility(View.GONE);
+                setImages(data.getString(4));
+                break;
             case ALBUM:
                 artist.setText(data.getString(5));
                 album.setText(data.getString(1));
@@ -77,23 +91,28 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
                 int year = data.getInt(3);
                 if (year > 0) this.year.setText(String.valueOf(year));
 
-                Glide.with(getContext()).load(data.getString(4)).asBitmap().into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        coverArt.setImageBitmap(resource);
+                setImages(data.getString(4));
+                break;
+        }
 
-                        Utils.createBlurredBitmap(resource, new Utils.BitmapCallback() {
-                            @Override
-                            public void onBitmapReady(Bitmap bitmap) {
-                                background.setImageBitmap(bitmap);
-                                background.animate().alpha(1f).setDuration(300).start();
-                            }
-                        });
+        data.close();
+    }
+
+    private void setImages(String imageUrl) {
+        Glide.with(getContext()).load(imageUrl).asBitmap().into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                coverArt.setImageBitmap(resource);
+
+                Utils.createBlurredBitmap(resource, new Utils.BitmapCallback() {
+                    @Override
+                    public void onBitmapReady(Bitmap bitmap) {
+                        background.setImageBitmap(bitmap);
+                        background.animate().alpha(1f).setDuration(300).start();
                     }
                 });
-
-                data.close();
-        }
+            }
+        });
     }
 
     private ViewTreeObserver.OnGlobalLayoutListener layoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {

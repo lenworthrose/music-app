@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -82,8 +83,13 @@ public class ArtistsStore {
         return db.query(TABLE_NAME, PROJECTION_ALL, null, null, null, null, ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
     }
 
-    public Cursor getArtistInfo(long id) {
-        return db.query(TABLE_NAME, PROJECTION_ONE, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) }, null, null, null);
+    public CursorLoader getArtistInfo(Context context, final long id) {
+        return new CursorLoader(context) {
+            @Override
+            public Cursor loadInBackground() {
+                return db.query(TABLE_NAME, PROJECTION_ONE, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) }, null, null, null);
+            }
+        };
     }
 
     void updateArtist(long id, String musicBrainzId, String lastFmInfo, String artistImgUrl, String... albumArtUris) {
