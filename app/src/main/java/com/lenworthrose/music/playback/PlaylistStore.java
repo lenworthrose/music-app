@@ -1,4 +1,4 @@
-package com.lenworthrose.music.sql;
+package com.lenworthrose.music.playback;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.lenworthrose.music.sql.PlaylistStoreContract.PlaylistEntry;
+import com.lenworthrose.music.playback.PlaylistStoreContract.PlaylistEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Random;
  * Manages the Playing Now Playlist database. Contains methods to add tracks from
  * a {@link Cursor} containing Song data from the {@link android.provider.MediaStore}.
  */
-public class SqlPlaylistStore {
+public class PlaylistStore {
     public static final String TABLE_NAME = "playlist";
 
     public interface InitListener {
@@ -41,7 +41,7 @@ public class SqlPlaylistStore {
 
     public Cursor read() {
         if (db == null) {
-            Log.e("SqlPlaylistStore", "db was null when attempting read!");
+            Log.e("PlaylistStore", "db was null when attempting read!");
             return null;
         }
 
@@ -62,7 +62,7 @@ public class SqlPlaylistStore {
 
     public void setPlaylist(Cursor songsCursor) {
         if (db == null) {
-            Log.e("SqlPlaylistStore", "db was null when attempting write!");
+            Log.e("PlaylistStore", "db was null when attempting write!");
             return;
         }
 
@@ -81,7 +81,7 @@ public class SqlPlaylistStore {
 
             db.setTransactionSuccessful();
         } catch (Exception ex) {
-            Log.e("SqlPlaylistStore", "Exception occurred writing to playlist SQL database.", ex);
+            Log.e("PlaylistStore", "Exception occurred writing to playlist SQL database.", ex);
         } finally {
             db.endTransaction();
         }
@@ -178,7 +178,7 @@ public class SqlPlaylistStore {
 
             db.setTransactionSuccessful();
         } catch (Exception ex) {
-            Log.e("SqlPlaylistStore", "Exception occurred shuffling playlist SQL database.", ex);
+            Log.e("PlaylistStore", "Exception occurred shuffling playlist SQL database.", ex);
         } finally {
             db.endTransaction();
         }
@@ -195,14 +195,14 @@ public class SqlPlaylistStore {
 //                int listPos = adapter.getListPosition(cur.getPosition());
 //
 //                if (listPos == DragSortCursorAdapter.REMOVED) {
-//                    Log.d("SqlPlaylistStore", "Playlist item removed: cursorPosition=" + cur.getPosition() + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
+//                    Log.d("PlaylistStore", "Playlist item removed: cursorPosition=" + cur.getPosition() + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
 //                    db.delete(TABLE_NAME, PlaylistEntry._ID + " = " + String.valueOf(cur.getLong(0)), null);
 //                } else if (listPos != cur.getPosition()) {
 //                    ContentValues values = new ContentValues();
 //                    values.put(PlaylistEntry.COLUMN_SEQUENCE, listPos);
 //
 //                    db.update(TABLE_NAME, values, PlaylistEntry._ID + " = " + String.valueOf(cur.getLong(0)), null);
-//                    Log.d("SqlPlaylistStore", "Playlist item moved: cursorPosition=" + cur.getPosition() + " listPos=" + listPos + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
+//                    Log.d("PlaylistStore", "Playlist item moved: cursorPosition=" + cur.getPosition() + " listPos=" + listPos + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
 //                }
 //            }
 //

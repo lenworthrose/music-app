@@ -1,4 +1,4 @@
-package com.lenworthrose.music.sql;
+package com.lenworthrose.music.playback;
 
 import android.provider.BaseColumns;
 
@@ -12,8 +12,8 @@ public final class PlaylistStoreContract {
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
 
-    static final String SQL_CREATE_DEVICE_PLAYLIST = buildCreatePlaylistTableSql(SqlPlaylistStore.TABLE_NAME);
-    static final String SQL_DELETE_DEVICE_PLAYLIST = "DROP TABLE IF EXISTS " + SqlPlaylistStore.TABLE_NAME;
+    static final String SQL_CREATE_DEVICE_PLAYLIST = buildCreatePlaylistTableSql(PlaylistStore.TABLE_NAME);
+    static final String SQL_DELETE_DEVICE_PLAYLIST = "DROP TABLE IF EXISTS " + PlaylistStore.TABLE_NAME;
 
     public static String buildCreatePlaylistTableSql(String tableName) {
         return buildCreatePlaylistTableSql(tableName, false);

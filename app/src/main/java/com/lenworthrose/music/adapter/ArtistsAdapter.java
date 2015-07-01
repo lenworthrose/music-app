@@ -11,7 +11,8 @@ import android.widget.AdapterView;
 import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.sql.SqlArtistsStore;
+import com.lenworthrose.music.sync.ArtistModel;
+import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
@@ -21,10 +22,10 @@ import java.util.List;
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Artists.
  */
-public class ArtistsAdapter extends BaseSwitchableAdapter implements SqlArtistsStore.ArtistsStoreListener {
+public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStore.ArtistsStoreListener {
     public ArtistsAdapter(Context context, boolean isGrid) {
         super(context, isGrid);
-        SqlArtistsStore.getInstance().addListener(this);
+        ArtistsStore.getInstance().addListener(this);
     }
 
     @Override
@@ -32,14 +33,14 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements SqlArtistsS
         return new CursorLoader(getContext()) {
             @Override
             public Cursor loadInBackground() {
-                return SqlArtistsStore.getInstance().getArtists();
+                return ArtistsStore.getInstance().getArtists();
             }
         };
     }
 
     @Override
-    public void onMediaStoreSyncComplete(List<SqlArtistsStore.ArtistModel> newArtists) {
-        swapCursor(SqlArtistsStore.getInstance().getArtists());
+    public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
+        swapCursor(ArtistsStore.getInstance().getArtists());
     }
 
     @Override

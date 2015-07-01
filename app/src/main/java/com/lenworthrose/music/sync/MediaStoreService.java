@@ -15,7 +15,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.sql.SqlArtistsStore;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ import java.util.List;
  * A {@link Service} that listens for changes to the {@link android.provider.MediaStore} database. It will also perform the first
  * sync with the MediaStore database to build the app's own Artist database.
  */
-public class MediaStoreService extends Service implements SqlArtistsStore.InitListener, SqlArtistsStore.ArtistsStoreListener {
+public class MediaStoreService extends Service implements ArtistsStore.InitListener, ArtistsStore.ArtistsStoreListener {
     public static final String ACTION_MEDIA_STORE_SYNC_COMPLETE = "com.lenworthrose.music.sync.MediaStoreService.SYNC_COMPLETE";
     public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.sync.MediaStoreService.SYNC";
 
@@ -96,8 +95,7 @@ public class MediaStoreService extends Service implements SqlArtistsStore.InitLi
             b.setContentTitle(getString(R.string.syncing_with_media_store));
             startForeground(NOTIFICATION_ID, b.build());
 
-            SqlArtistsStore.getInstance().addListener(this);
-            SqlArtistsStore.getInstance().init(MediaStoreService.this, MediaStoreService.this);
+            ArtistsStore.getInstance().init(MediaStoreService.this, MediaStoreService.this);
         }
     }
 
@@ -114,14 +112,15 @@ public class MediaStoreService extends Service implements SqlArtistsStore.InitLi
         cursorLoader.registerListener(0, new Loader.OnLoadCompleteListener<Cursor>() {
             @Override
             public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
-                SqlArtistsStore.getInstance().syncFromMediaStore(data);
+                ArtistsStore.getInstance().addListener(MediaStoreService.this);
+                ArtistsStore.getInstance().syncFromMediaStore(data);
             }
         });
         cursorLoader.startLoading();
     }
 
     @Override
-    public void onMediaStoreSyncComplete(List<SqlArtistsStore.ArtistModel> newArtists) {
+    public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
         Log.d("MediaStoreService", "MediaStore sync complete! New artist count: " + newArtists.size());
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).commit();
 
@@ -130,7 +129,7 @@ public class MediaStoreService extends Service implements SqlArtistsStore.InitLi
             protected void onPostExecute(Void aVoid) {
                 Log.d("MediaStoreService", "GetArtistInfoTask complete!");
                 isSyncingWithMediaStore = false;
-                SqlArtistsStore.getInstance().removeListener(MediaStoreService.this);
+                ArtistsStore.getInstance().removeListener(MediaStoreService.this);
                 stopForeground(true);
                 LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
             }

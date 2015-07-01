@@ -1,4 +1,4 @@
-package com.lenworthrose.music.sql;
+package com.lenworthrose.music.sync;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

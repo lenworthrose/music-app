@@ -22,7 +22,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.lenworthrose.music.sql.SqlPlaylistStore;
 import com.lenworthrose.music.util.Constants;
 
 import java.io.IOException;
@@ -41,8 +40,8 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
-        AudioManager.OnAudioFocusChangeListener, SqlPlaylistStore.InitListener, Loader.OnLoadCompleteListener<Cursor> {
-    private SqlPlaylistStore playlistStore;
+        AudioManager.OnAudioFocusChangeListener, PlaylistStore.InitListener, Loader.OnLoadCompleteListener<Cursor> {
+    private PlaylistStore playlistStore;
     private MediaPlayer currentTrack;
     private MediaPlayer nextTrack;
     private boolean isPrepared;
@@ -97,7 +96,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         broadcastMan = LocalBroadcastManager.getInstance(this);
         scheduler = Executors.newScheduledThreadPool(1);
         audioMan = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        playlistStore = new SqlPlaylistStore();
+        playlistStore = new PlaylistStore();
         playlistStore.setListener(this);
         playlistStore.init(this);
 

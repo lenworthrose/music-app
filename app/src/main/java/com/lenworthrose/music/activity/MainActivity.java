@@ -14,12 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.lenworthrose.music.IdType;
+import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.sync.MediaStoreService;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.playback.PlaybackService;
-import com.lenworthrose.music.sql.SqlArtistsStore;
 import com.lenworthrose.music.util.NavigationListener;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
  *
  * Responsible for starting the {@link MediaStoreService}.
  */
-public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, SqlArtistsStore.InitListener {
+public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, ArtistsStore.InitListener {
     private PlaybackService playbackService;
 
     @Override
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         startService(new Intent(this, PlaybackService.class));
-        SqlArtistsStore.getInstance().init(this, this);
+        ArtistsStore.getInstance().init(this, this);
         startService(new Intent(this, MediaStoreService.class));
     }
 

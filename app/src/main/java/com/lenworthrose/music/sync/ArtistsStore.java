@@ -1,4 +1,4 @@
-package com.lenworthrose.music.sql;
+package com.lenworthrose.music.sync;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,17 +14,21 @@ import java.util.List;
 /**
  * Manages the Artists database.
  */
-public class SqlArtistsStore {
+public class ArtistsStore {
+    public interface InitListener {
+        void onArtistsDbInitialized();
+    }
+
     public interface ArtistsStoreListener {
         void onMediaStoreSyncComplete(List<ArtistModel> newArtists);
     }
 
-    public static SqlArtistsStore getInstance() {
-        return LazyHolder.INSTANCE;
+    private static final class LazyHolder {
+        static ArtistsStore INSTANCE = new ArtistsStore();
     }
 
-    private static final class LazyHolder {
-        static SqlArtistsStore INSTANCE = new SqlArtistsStore();
+    public static ArtistsStore getInstance() {
+        return LazyHolder.INSTANCE;
     }
 
     private static final String TABLE_NAME = "artists";
@@ -52,18 +56,24 @@ public class SqlArtistsStore {
     };
 
     private SQLiteDatabase db;
+    private InitTask initTask;
+    private boolean isInitializing, isInitialized;
+    private List<InitListener> initListeners = new ArrayList<>(3);
     private List<WeakReference<ArtistsStoreListener>> artistsStoreListeners = new ArrayList<>(3);
 
-    public void addListener(ArtistsStoreListener listener) {
-        artistsStoreListeners.add(new WeakReference<>(listener));
-    }
+    private ArtistsStore() { }
 
-    public void removeListener(ArtistsStoreListener artistsStoreListener) {
-        for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
-            WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
+    public void init(Context context, InitListener listener) {
+        if (isInitialized) {
+            listener.onArtistsDbInitialized();
+        } else {
+            initListeners.add(listener);
 
-            if (listener.get() == null || listener.get() == artistsStoreListener)
-                artistsStoreListeners.remove(i);
+            if (!isInitializing) {
+                isInitializing = true;
+                initTask = new InitTask();
+                initTask.execute(context);
+            }
         }
     }
 
@@ -75,7 +85,7 @@ public class SqlArtistsStore {
         return db.query(TABLE_NAME, PROJECTION_ONE, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) }, null, null, null);
     }
 
-    public void updateArtist(long id, String musicBrainzId, String lastFmInfo, String artistImgUrl, String... albumArtUris) {
+    void updateArtist(long id, String musicBrainzId, String lastFmInfo, String artistImgUrl, String... albumArtUris) {
         ContentValues values = new ContentValues();
         values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_ID, musicBrainzId);
         values.put(ArtistsStoreContract.ArtistEntry.COLUMN_BIO, lastFmInfo);
@@ -88,7 +98,7 @@ public class SqlArtistsStore {
                 values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
                 values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
             } catch (IndexOutOfBoundsException ex) {
-                Log.d("SqlArtistsStore", "IndexOutOfBoundsException occurred attempting to add album art to ContentValues: albumArtUris.length=" + albumArtUris.length);
+                Log.d("ArtistsStore", "IndexOutOfBoundsException occurred attempting to add album art to ContentValues: albumArtUris.length=" + albumArtUris.length);
             }
         }
 
@@ -136,54 +146,16 @@ public class SqlArtistsStore {
         }
     }
 
-    private static ContentValues createContentValuesFrom(Cursor artistsCursor) {
-        ContentValues values = new ContentValues();
-        values.put(ArtistsStoreContract.ArtistEntry._ID, artistsCursor.getLong(0));
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY, artistsCursor.getString(3));
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NAME, artistsCursor.getString(1));
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NUM_ALBUMS, artistsCursor.getInt(2));
-        return values;
+    public void addListener(ArtistsStoreListener listener) {
+        artistsStoreListeners.add(new WeakReference<>(listener));
     }
 
-    public static class ArtistModel {
-        private String name;
-        private long id;
+    public void removeListener(ArtistsStoreListener artistsStoreListener) {
+        for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
+            WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
 
-        public ArtistModel(long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
-    // -------- Boring initialization code
-
-    public interface InitListener {
-        void onArtistsDbInitialized();
-    }
-
-    private InitTask initTask;
-    private boolean isInitializing, isInitialized;
-    private List<InitListener> initListeners = new ArrayList<>(3);
-
-    public void init(Context context, InitListener listener) {
-        if (isInitialized) {
-            listener.onArtistsDbInitialized();
-        } else {
-            initListeners.add(listener);
-
-            if (!isInitializing) {
-                isInitializing = true;
-                initTask = new InitTask();
-                initTask.execute(context);
-            }
+            if (listener.get() == null || listener.get() == artistsStoreListener)
+                artistsStoreListeners.remove(i);
         }
     }
 
@@ -205,5 +177,14 @@ public class SqlArtistsStore {
 
             initListeners.clear();
         }
+    }
+
+    private static ContentValues createContentValuesFrom(Cursor artistsCursor) {
+        ContentValues values = new ContentValues();
+        values.put(ArtistsStoreContract.ArtistEntry._ID, artistsCursor.getLong(0));
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY, artistsCursor.getString(3));
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NAME, artistsCursor.getString(1));
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NUM_ALBUMS, artistsCursor.getInt(2));
+        return values;
     }
 }

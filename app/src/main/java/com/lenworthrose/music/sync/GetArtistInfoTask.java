@@ -6,8 +6,6 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.lenworthrose.music.sql.SqlArtistsStore;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,11 +23,11 @@ import fm.last.api.LastFmServerFactory;
  * Responsible for fetching Artist info and image from Last.fm, as well as querying the Albums DB for cover art.
  */
 public class GetArtistInfoTask extends AsyncTask<Void, Void, Void> {
-    private List<SqlArtistsStore.ArtistModel> newArtists;
+    private List<ArtistModel> newArtists;
     private Context context;
     private LastFmServer lastFm;
 
-    public GetArtistInfoTask(Context context, List<SqlArtistsStore.ArtistModel> newArtists) {
+    public GetArtistInfoTask(Context context, List<ArtistModel> newArtists) {
         this.context = context;
         this.newArtists = newArtists;
         lastFm = LastFmServerFactory.getServer("http://ws.audioscrobbler.com/2.0/", "31cf9ad7f222197a94a63d614d28b267", "76a5de88fc74f512700849e718567c35");
@@ -37,7 +35,7 @@ public class GetArtistInfoTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        for (SqlArtistsStore.ArtistModel artist : newArtists) {
+        for (ArtistModel artist : newArtists) {
             String[] albumArt = getAlbumArtUrls(artist);
 
             String mbid = null, bio = null, imgPath = null;
@@ -53,13 +51,13 @@ public class GetArtistInfoTask extends AsyncTask<Void, Void, Void> {
                 Log.e("GetArtistInfoTask", "IOException occurred attempting to get info from Last.fm", ex);
             }
 
-            SqlArtistsStore.getInstance().updateArtist(artist.getId(), mbid, bio, imgPath, albumArt);
+            ArtistsStore.getInstance().updateArtist(artist.getId(), mbid, bio, imgPath, albumArt);
         }
 
         return null;
     }
 
-    private String[] getAlbumArtUrls(SqlArtistsStore.ArtistModel artist) {
+    private String[] getAlbumArtUrls(ArtistModel artist) {
         String[] projection = {
                 MediaStore.Audio.Albums._ID,
                 MediaStore.Audio.Albums.ARTIST,
