@@ -1,4 +1,4 @@
-package com.lenworthrose.music;
+package com.lenworthrose.music.sync;
 
 import android.app.Notification;
 import android.app.Service;
@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.lenworthrose.music.R;
 import com.lenworthrose.music.sql.SqlArtistsStore;
 
 import java.util.List;
@@ -23,16 +24,15 @@ import java.util.List;
  * sync with the MediaStore database to build the app's own Artist database.
  */
 public class MediaStoreService extends Service implements SqlArtistsStore.InitListener, SqlArtistsStore.ArtistsStoreListener {
-    public static final String ACTION_MEDIA_STORE_SYNC_COMPLETE = "com.lenworthrose.music.MediaStoreService.SYNC_COMPLETE";
-    public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.MediaStoreService.SYNC";
+    public static final String ACTION_MEDIA_STORE_SYNC_COMPLETE = "com.lenworthrose.music.sync.MediaStoreService.SYNC_COMPLETE";
+    public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.sync.MediaStoreService.SYNC";
 
     private static final int NOTIFICATION_ID = 36663;
-    private static final String PREF_HAS_SYNCED = "HasSyncedWithMediaStore";
+    private static final String SETTING_HAS_COMPLETED_INITIAL_SYNC = "HasCompletedInitialSync";
 
     private Cursor cursor;
     private boolean isObservingMediaStore, isSyncingWithMediaStore;
     private ContentObserver observer;
-    private LocalBroadcastManager broadcastMan;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -42,7 +42,6 @@ public class MediaStoreService extends Service implements SqlArtistsStore.InitLi
     @Override
     public void onCreate() {
         super.onCreate();
-        broadcastMan = LocalBroadcastManager.getInstance(this);
     }
 
     @Override
@@ -56,7 +55,7 @@ public class MediaStoreService extends Service implements SqlArtistsStore.InitLi
             }
         }
 
-        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREF_HAS_SYNCED, false))
+        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, false))
             startMediaStoreSync();
         else
             startObservingMediaStore();
@@ -123,15 +122,22 @@ public class MediaStoreService extends Service implements SqlArtistsStore.InitLi
 
     @Override
     public void onMediaStoreSyncComplete(List<SqlArtistsStore.ArtistModel> newArtists) {
-        //TODO: create a new AsyncTask that will perform the following:
-        //TODO: Retrieve content from MusicBrainz
-        //TODO: Retrieve list of cover art from MediaStore
-
-        isSyncingWithMediaStore = false;
-        SqlArtistsStore.getInstance().removeListener(this);
         Log.d("MediaStoreService", "MediaStore sync complete! New artist count: " + newArtists.size());
-        stopForeground(true);
-        broadcastMan.sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).commit();
+
+        //TODO: Retrieve content from MusicBrainz
+        GetArtistInfoTask infoTask = new GetArtistInfoTask(this, newArtists) {
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Log.d("MediaStoreService", "GetArtistInfoTask complete!");
+                isSyncingWithMediaStore = false;
+                SqlArtistsStore.getInstance().removeListener(MediaStoreService.this);
+                stopForeground(true);
+                LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+            }
+        };
+
+        infoTask.execute();
     }
 
     @Override

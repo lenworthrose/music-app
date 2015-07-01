@@ -120,6 +120,7 @@ public class SqlArtistsStore {
                 }
             }
 
+            artistsCursor.close();
             return newArtists;
         }
 

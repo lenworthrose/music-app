@@ -14,7 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.lenworthrose.music.IdType;
-import com.lenworthrose.music.MediaStoreService;
+import com.lenworthrose.music.sync.MediaStoreService;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.fragment.LibraryFragment;

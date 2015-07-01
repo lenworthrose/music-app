@@ -32,7 +32,7 @@
             android:enabled="true" />
 
         <service
-            android:name=".MediaStoreService"
+            android:name=".sync.MediaStoreService"
             android:enabled="true" />
 
         <receiver android:name=".playback.MediaSessionManager$MediaKeyReceiver">

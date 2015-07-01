@@ -8,6 +8,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.sql.SqlArtistsStore;
@@ -52,6 +53,7 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements SqlArtistsS
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(2));
+        Glide.with(getContext()).load(cursor.getString(5)).into(view.getImageView());
     }
 
     @Override
