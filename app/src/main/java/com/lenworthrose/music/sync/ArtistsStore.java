@@ -21,6 +21,7 @@ public class ArtistsStore {
 
     public interface ArtistsStoreListener {
         void onMediaStoreSyncComplete(List<ArtistModel> newArtists);
+        void onArtistInfoFetchComplete();
     }
 
     private static final class LazyHolder {
@@ -110,6 +111,13 @@ public class ArtistsStore {
         task.execute(artistsCursor);
     }
 
+    void notifyArtistInfoFetchComplete() {
+        for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
+            WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
+            if (listener.get() != null) listener.get().onArtistInfoFetchComplete();
+        }
+    }
+
     private class MediaStoreMigrationTask extends AsyncTask<Cursor, Void, List<ArtistModel>> {
         @Override
         protected List<ArtistModel> doInBackground(Cursor... params) {
@@ -139,9 +147,7 @@ public class ArtistsStore {
         protected void onPostExecute(List<ArtistModel> newArtists) {
             for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
                 WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
-
-                if (listener.get() != null)
-                    listener.get().onMediaStoreSyncComplete(newArtists);
+                if (listener.get() != null) listener.get().onMediaStoreSyncComplete(newArtists);
             }
         }
     }

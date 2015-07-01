@@ -44,6 +44,11 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
     }
 
     @Override
+    public void onArtistInfoFetchComplete() {
+        swapCursor(ArtistsStore.getInstance().getArtists());
+    }
+
+    @Override
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
         view.setTitle(cursor.getString(2));
 

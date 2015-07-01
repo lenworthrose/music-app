@@ -155,6 +155,9 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     }
 
     @Override
+    public void onArtistInfoFetchComplete() { }
+
+    @Override
     public void onDestroy() {
         stopObservingMediaStore();
         super.onDestroy();
