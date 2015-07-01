@@ -105,7 +105,7 @@ public class ArtistsStore {
         db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
     }
 
-    public void syncFromMediaStore(Cursor artistsCursor) {
+    void syncFromMediaStore(Cursor artistsCursor) {
         MediaStoreMigrationTask task = new MediaStoreMigrationTask();
         task.execute(artistsCursor);
     }

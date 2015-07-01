@@ -1,7 +1,9 @@
 package com.lenworthrose.music.sync;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -32,6 +34,8 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     private Cursor cursor;
     private boolean isObservingMediaStore, isSyncingWithMediaStore;
     private ContentObserver observer;
+    private NotificationManager notifyMan;
+    private Notification.Builder notificationBuilder;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -41,6 +45,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     @Override
     public void onCreate() {
         super.onCreate();
+        notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     @Override
@@ -90,10 +95,10 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         if (!isSyncingWithMediaStore) {
             isSyncingWithMediaStore = true;
 
-            Notification.Builder b = new Notification.Builder(MediaStoreService.this);
-            b.setTicker(getString(R.string.syncing_with_media_store)).setSmallIcon(R.drawable.sync);
-            b.setContentTitle(getString(R.string.syncing_with_media_store));
-            startForeground(NOTIFICATION_ID, b.build());
+            String text = getString(R.string.syncing_with_media_store);
+            notificationBuilder = new Notification.Builder(this);
+            notificationBuilder.setTicker(text).setSmallIcon(R.drawable.sync).setContentTitle(text);
+            startForeground(NOTIFICATION_ID, notificationBuilder.build());
 
             ArtistsStore.getInstance().init(MediaStoreService.this, MediaStoreService.this);
         }
@@ -123,14 +128,25 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
         Log.d("MediaStoreService", "MediaStore sync complete! New artist count: " + newArtists.size());
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).commit();
+        ArtistsStore.getInstance().removeListener(MediaStoreService.this);
+        isSyncingWithMediaStore = false;
+
+        String text = getString(R.string.fetching_artist_info);
+        notificationBuilder.setContentTitle(text).setTicker(text);
+        notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
 
         GetArtistInfoTask infoTask = new GetArtistInfoTask(this, newArtists) {
             @Override
+            protected void onProgressUpdate(Integer... values) {
+                notificationBuilder.setProgress(values[1], values[0], false);
+                notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
+            }
+
+            @Override
             protected void onPostExecute(Void aVoid) {
                 Log.d("MediaStoreService", "GetArtistInfoTask complete!");
-                isSyncingWithMediaStore = false;
-                ArtistsStore.getInstance().removeListener(MediaStoreService.this);
                 stopForeground(true);
+                notificationBuilder = null;
                 LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
             }
         };

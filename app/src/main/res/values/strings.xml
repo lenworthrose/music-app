@@ -29,5 +29,6 @@
     <string name="pause">Pause</string>
 
     <!-- Media Sync -->
-    <string name="syncing_with_media_store">Syncing with media store...</string>
+    <string name="syncing_with_media_store">Syncing with media store…</string>
+    <string name="fetching_artist_info">Retrieving artist info…</string>
 </resources>

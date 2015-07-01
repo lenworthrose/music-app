@@ -22,7 +22,7 @@ import fm.last.api.LastFmServerFactory;
 /**
  * Responsible for fetching Artist info and image from Last.fm, as well as querying the Albums DB for cover art.
  */
-public class GetArtistInfoTask extends AsyncTask<Void, Void, Void> {
+public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
     private List<ArtistModel> newArtists;
     private Context context;
     private LastFmServer lastFm;
@@ -35,7 +35,10 @@ public class GetArtistInfoTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
+        int current = 0;
+
         for (ArtistModel artist : newArtists) {
+            publishProgress(current++, newArtists.size());
             String[] albumArt = getAlbumArtUrls(artist);
 
             String mbid = null, bio = null, imgPath = null;
