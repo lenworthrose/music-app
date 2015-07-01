@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/drag-sort-listview" />
+            <option value="$PROJECT_DIR$/lastFmAPI" />
           </set>
         </option>
       </GradleProjectSettings>

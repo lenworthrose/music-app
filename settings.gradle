@@ -1,1 +1,2 @@
 include ':drag-sort-listview', ':app'
+include ':lastFmAPI'
