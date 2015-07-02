@@ -17,15 +17,12 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.lenworthrose.music.util.Constants;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * The PlaybackService is responsible for all things playback. It handles scheduling the {@link MediaPlayer}
@@ -39,7 +36,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
-        AudioManager.OnAudioFocusChangeListener, PlaylistStore.InitListener, Loader.OnLoadCompleteListener<Cursor> {
+        AudioManager.OnAudioFocusChangeListener, PlaylistStore.InitListener {
     private PlaylistStore playlistStore;
     private MediaPlayer currentTrack;
     private MediaPlayer nextTrack;
@@ -48,7 +45,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     private AudioManager audioMan;
     private BroadcastReceiver noisyReceiver;
     private MediaSessionManager mediaSessionManager;
-    private ScheduledExecutorService scheduler;
     protected Cursor playlistCursor;
     protected int playlistPosition;
     private Constants.RepeatMode repeatMode = Constants.RepeatMode.Off;
@@ -72,11 +68,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         notifyPlayingItemChanged();
     }
 
-    @Override
-    public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
-        play(data, 0);
-    }
-
     public class LocalBinder extends Binder {
         public PlaybackService getService() {
             return PlaybackService.this;
@@ -92,7 +83,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     public void onCreate() {
         super.onCreate();
         broadcastMan = LocalBroadcastManager.getInstance(this);
-        scheduler = Executors.newScheduledThreadPool(1);
         audioMan = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         playlistStore = new PlaylistStore();
         playlistStore.setListener(this);
