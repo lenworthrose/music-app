@@ -16,6 +16,7 @@ import android.widget.RemoteViews;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.AppWidgetTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.playback.PlaybackService;
@@ -68,25 +69,15 @@ public class WidgetService extends Service implements ServiceConnection {
         String artist = item.getArtist();
 
         for (int appWidgetId : appWidgetIds) {
-            final int widgetId = appWidgetId;
             RemoteViews rv = new RemoteViews(playbackService.getPackageName(), R.layout.widget_view);
             rv.setTextViewText(R.id.widget_title, item.getTitle());
             rv.setTextViewText(R.id.widget_subtitle, artist);
             rv.setViewVisibility(R.id.widget_subtitle, artist == null || artist.isEmpty() ? View.GONE : View.VISIBLE);
             appMan.partiallyUpdateAppWidget(appWidgetId, rv);
 
-            if (item.getAlbumArtUrl() != null && !item.getAlbumArtUrl().isEmpty())
-                Glide.with(playbackService).load(item.getAlbumArtUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        RemoteViews rv = new RemoteViews(playbackService.getPackageName(), R.layout.widget_view);
-                        rv.setImageViewBitmap(R.id.widget_image, resource);
-                        appMan.partiallyUpdateAppWidget(widgetId, rv);
-                        WidgetService.this.unbindService(WidgetService.this);
-                    }
-                });
-            else
-                playbackService.unbindService(this);
+            Glide.with(playbackService).load(item.getAlbumArtUrl()).asBitmap().into(new AppWidgetTarget(this, rv, R.id.widget_image, appWidgetIds));
+
+            WidgetService.this.unbindService(this);
         }
     }
 
