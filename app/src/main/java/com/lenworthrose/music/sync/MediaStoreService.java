@@ -32,7 +32,6 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     private static final int NOTIFICATION_ID = 36663;
     private static final String SETTING_HAS_COMPLETED_INITIAL_SYNC = "HasCompletedInitialSync";
 
-    private Cursor artistsCursor, albumsCursor;
     private boolean isObservingMediaStore, isSyncingArtists, isGettingArtistInfo, isUpdatingAlbums, isArtistSyncPending, isAlbumUpdatePending;
     private ContentObserver artistsObserver, albumsObserver;
     private NotificationManager notifyMan;
@@ -47,7 +46,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     public void onCreate() {
         super.onCreate();
         notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationBuilder = new Notification.Builder(this);
+        notificationBuilder = new Notification.Builder(this).setSmallIcon(R.drawable.sync);
     }
 
     @Override
@@ -55,8 +54,10 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
                 case ACTION_SYNC_WITH_MEDIA_STORE:
-                    stopObservingMediaStore();
                     startArtistsSync();
+                    return START_STICKY;
+                case ACTION_UPDATE_ALBUMS:
+                    startUpdatingAlbums();
                     return START_STICKY;
             }
         }
@@ -77,39 +78,19 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     private void startObservingMediaStore() {
         if (!isObservingMediaStore) {
             isObservingMediaStore = true;
-            artistsCursor = getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, new String[] { "*" }, null, null, null);
-
-            if (!artistsCursor.moveToFirst()) {
-                Log.e("MediaStoreService", "Unable to start observing MediaStore's Artists table!");
-                artistsCursor.setNotificationUri(getContentResolver(), MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI);
-                isObservingMediaStore = false;
-                stopSelf();
-            }
 
             artistsObserver = new ArtistsContentObserver();
-            artistsCursor.registerContentObserver(artistsObserver);
+            getContentResolver().registerContentObserver(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, true, artistsObserver);
 
-            albumsCursor = getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[] { "*" }, null, null, null);
-
-            if (!albumsCursor.moveToFirst()) {
-                Log.e("MediaStoreService", "Unable to start observing MediaStore's Albums table!");
-                albumsCursor.close();
-            } else {
-                albumsCursor.setNotificationUri(getContentResolver(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI);
-                albumsObserver = new AlbumsContentObserver();
-                albumsCursor.registerContentObserver(albumsObserver);
-            }
+            albumsObserver = new AlbumsContentObserver();
+            getContentResolver().registerContentObserver(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, true, albumsObserver);
         }
     }
 
     private void stopObservingMediaStore() {
         if (isObservingMediaStore) {
-            artistsCursor.unregisterContentObserver(artistsObserver);
-            artistsCursor.close();
-
-            albumsCursor.unregisterContentObserver(albumsObserver);
-            albumsCursor.close();
-
+            getContentResolver().unregisterContentObserver(artistsObserver);
+            getContentResolver().unregisterContentObserver(albumsObserver);
             isObservingMediaStore = false;
         }
     }
@@ -119,7 +100,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
             isSyncingArtists = true;
 
             String text = getString(R.string.syncing_with_media_store);
-            notificationBuilder.setTicker(text).setSmallIcon(R.drawable.sync).setContentTitle(text);
+            notificationBuilder.setTicker(text).setContentTitle(text);
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
 
             String[] projection = {
@@ -153,7 +134,8 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         ArtistsStore.getInstance().removeListener(MediaStoreService.this);
         isSyncingArtists = false;
 
-        if (!isActive()) {
+        if (!newArtists.isEmpty()) {
+            Log.d("MediaStoreService", "Starting GetArtistInfoTask");
             isGettingArtistInfo = true;
             String text = getString(R.string.fetching_artist_info);
             notificationBuilder.setContentTitle(text).setTicker(text);
@@ -179,6 +161,8 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
             };
 
             infoTask.execute();
+        } else {
+            stopForeground(true);
         }
     }
 
@@ -188,7 +172,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     private void startUpdatingAlbums() {
         if (!isActive()) {
             isUpdatingAlbums = true;
-            Log.d("MediaStoreService", "startUpdatingAlbums()");
+            Log.d("MediaStoreService", "Starting UpdateCoverArtTask");
             String text = getString(R.string.updating_artist_albums);
             notificationBuilder.setTicker(text).setContentTitle(text);
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
@@ -202,6 +186,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
                 @Override
                 protected void onPostExecute(Void aVoid) {
+                    Log.d("MediaStoreService", "Finished updating albums");
                     LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
                     ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
                     stopForeground(true);

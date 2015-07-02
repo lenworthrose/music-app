@@ -11,7 +11,7 @@ import com.lenworthrose.music.sync.MediaStoreService;
 /**
  * Fragment to show Settings.
  */
-public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener{
+public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
