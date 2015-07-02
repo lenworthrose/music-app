@@ -167,6 +167,13 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     private class AddAsNextLoaderCallbacks extends PlaybackLoaderCallbacks {
         @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            type = (IdType)args.get(TYPE);
+            ids = (ArrayList<Long>)args.getSerializable(IDS);
+            return SongsAdapter.createSongsLoader(MainActivity.this, type, ids.remove(ids.size() - 1));
+        }
+
+        @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             playbackService.addAsNext(data);
             if (!ids.isEmpty()) addAsNext(type, ids);
