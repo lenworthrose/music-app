@@ -3,48 +3,54 @@ package com.lenworthrose.music.playback;
 import android.database.Cursor;
 
 /**
- * A wrapper around {@link PlaybackService}'s database {@link Cursor}, providing a way
- * to get information about the item without needing to know the cursor's column indices.
+ * A wrapper around {@link PlaybackService}'s database {@link Cursor}, retrieving relevant
+ * fields so that users of this data don't need to know Cursor indices.
  *
  * See {@link PlaylistStore} for the projection used in this query.
  */
 public class PlayingItem {
-    private Cursor cursor;
-    private int playlistPosition;
+    private String artist, album, title, artUrl;
+    private int playlistPosition, trackNum;
+    private long duration = -1;
 
     PlayingItem(Cursor cursor, int position) {
+        playlistPosition = position + 1;
         if (cursor == null || cursor.getCount() == 0) return;
 
-        this.cursor = cursor;
-        playlistPosition = position;
         cursor.moveToPosition(position);
+        artist = cursor.getString(3);
+        album = cursor.getString(4);
+        title = cursor.getString(5);
+        duration = cursor.getLong(7);
+        artUrl = cursor.getString(8);
+        trackNum = cursor.getInt(6);
     }
 
     public String getArtist() {
-        return cursor == null ? null : cursor.getString(3);
+        return artist;
     }
 
     public String getAlbum() {
-        return cursor == null ? null : cursor.getString(4);
+        return album;
     }
 
     public String getTitle() {
-        return cursor == null ? null : cursor.getString(5);
+        return title;
     }
 
     public long getDuration() {
-        return cursor == null ? -1 : cursor.getLong(7);
+        return duration;
     }
 
     public int getPlaylistPosition() {
-        return playlistPosition + 1;
+        return playlistPosition;
     }
 
     public String getAlbumArtUrl() {
-        return cursor == null ? null : cursor.getString(8);
+        return artUrl;
     }
 
     public int getTrackNum() {
-        return cursor == null ? -1 : cursor.getInt(6);
+        return trackNum;
     }
 }

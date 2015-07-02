@@ -14,12 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.lenworthrose.music.IdType;
-import com.lenworthrose.music.sync.ArtistsStore;
-import com.lenworthrose.music.sync.MediaStoreService;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.playback.PlaybackService;
+import com.lenworthrose.music.sync.ArtistsStore;
+import com.lenworthrose.music.sync.MediaStoreService;
 import com.lenworthrose.music.util.NavigationListener;
 
 import java.util.ArrayList;
@@ -135,9 +135,16 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         public static final String TYPE = "Type";
         public static final String IDS = "IDs";
 
+        protected IdType type;
+        protected ArrayList<Long> ids;
+
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return SongsAdapter.createSongsLoader(MainActivity.this, (IdType)args.get(TYPE), (ArrayList<Long>)args.getSerializable(IDS));
+            type = (IdType)args.get(TYPE);
+            ids = (ArrayList<Long>)args.getSerializable(IDS);
+            ArrayList<Long> nextId = new ArrayList<>(1);
+            nextId.add(ids.remove(0));
+            return SongsAdapter.createSongsLoader(MainActivity.this, type, nextId);
         }
 
         @Override
@@ -148,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             playbackService.play(data, 0);
+            if (!ids.isEmpty()) add(type, ids);
         }
     }
 
@@ -155,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             playbackService.add(data);
+            if (!ids.isEmpty()) add(type, ids);
         }
     }
 
@@ -162,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             playbackService.addAsNext(data);
+            if (!ids.isEmpty()) addAsNext(type, ids);
         }
     }
 }
