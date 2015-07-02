@@ -1,7 +1,10 @@
 package com.lenworthrose.music.util;
 
 import android.annotation.TargetApi;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +17,8 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.lenworthrose.music.activity.PlayingNowActivity;
+
 import java.io.FileNotFoundException;
 
 public class Utils {
@@ -24,14 +29,10 @@ public class Utils {
         return filter;
     }
 
-    public static Bitmap getBitmapForContentUri(Context context, String uri) {
-        try {
-            ParcelFileDescriptor pfd = context.getContentResolver().openFileDescriptor(Uri.parse(uri), "r");
-            return BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
-        } catch (FileNotFoundException ex) {
-            Log.e("Utils", "FileNotFoundException occurred attempting to get Bitmap for uri=" + uri, ex);
-            return null;
-        }
+    public static PendingIntent createPlayingNowPendingIntentWithBackstack(Context context, int reqId) {
+        Intent intent = new Intent(context, PlayingNowActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return TaskStackBuilder.create(context).addNextIntentWithParentStack(intent).getPendingIntent(reqId, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     /**

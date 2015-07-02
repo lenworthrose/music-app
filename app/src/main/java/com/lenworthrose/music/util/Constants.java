@@ -15,9 +15,6 @@ public class Constants {
     public static final String PLAYBACK_STATE_CHANGED = "com.lenworthrose.music.PlaybackStateChanged";
 
     public static final String TYPE = "Type";
-    public static final String TYPE_ARTISTS = "Artists";
-    public static final String TYPE_ALBUMS = "Albums";
-    public static final String TYPE_SONGS = "Songs";
     public static final String ID = "ID";
 
     public static final String SETTING_KEEP_SCREEN_ON = "keep_screen_on";

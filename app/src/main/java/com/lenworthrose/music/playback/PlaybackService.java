@@ -139,6 +139,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         if (currentTrack == null) {
             if (!isEndOfPlaylist()) {
                 playlistPosition++;
+                storePlaylistPosition();
                 notifyPlayingItemChanged();
             }
         } else if (!isEndOfPlaylist()) {
@@ -150,6 +151,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         if (currentTrack == null) {
             if (playlistPosition > 0) {
                 playlistPosition--;
+                storePlaylistPosition();
                 notifyPlayingItemChanged();
             }
         } else {

@@ -29,17 +29,27 @@
             android:label="@string/playing_now" />
 
         <service
-            android:name=".playback.PlaybackService"
-            android:enabled="true" />
+            android:name=".playback.PlaybackService" />
 
         <service
-            android:name=".sync.MediaStoreService"
-            android:enabled="true" />
+            android:name=".sync.MediaStoreService" />
+
+        <service
+            android:name=".widget.WidgetService" />
 
         <receiver android:name=".playback.MediaSessionManager$MediaKeyReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
+        </receiver>
+
+        <receiver android:name=".widget.WidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/app_widget_provider" />
         </receiver>
     </application>
 </manifest>

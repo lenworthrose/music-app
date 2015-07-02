@@ -2,7 +2,6 @@ package com.lenworthrose.music.playback;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,6 +24,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.Utils;
 
 /**
  * The MediaSessionManager listens on {@link PlaybackService} Broadcasts, pushing
@@ -294,7 +294,7 @@ public class MediaSessionManager extends BroadcastReceiver {
         if (item.getArtist() != null && !item.getArtist().isEmpty()) sb.append(item.getArtist()).append(" - ");
         sb.append(item.getAlbum());
 
-        PendingIntent pi = createPlayingNowPendingIntentWithBackstack(665);
+        PendingIntent pi = Utils.createPlayingNowPendingIntentWithBackstack(playbackService, 665);
         Notification.Builder builder = new Notification.Builder(playbackService);
         builder.setTicker(ticker).setSmallIcon(R.drawable.audio).setOngoing(true).setLargeIcon(coverArt).setContentIntent(pi)
                 .setContentTitle(item.getTitle()).setContentText(sb);
@@ -321,12 +321,6 @@ public class MediaSessionManager extends BroadcastReceiver {
         intent.setAction(Intent.ACTION_MEDIA_BUTTON);
         intent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, keycode));
         return PendingIntent.getBroadcast(playbackService, keycode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    public PendingIntent createPlayingNowPendingIntentWithBackstack(int reqId) {
-        Intent intent = new Intent(playbackService, PlayingNowActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        return TaskStackBuilder.create(playbackService).addNextIntentWithParentStack(intent).getPendingIntent(reqId, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
 
