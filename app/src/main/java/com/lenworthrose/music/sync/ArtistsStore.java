@@ -112,6 +112,27 @@ public class ArtistsStore {
         db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
     }
 
+    void updateArtist(long id, String... albumArtUris) {
+        ContentValues values = new ContentValues();
+
+        if (albumArtUris != null) {
+            try {
+                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1, albumArtUris[0]);
+                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2, albumArtUris[1]);
+                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
+                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
+            } catch (IndexOutOfBoundsException ex) {
+                Log.d("ArtistsStore", "IndexOutOfBoundsException occurred attempting to add album art to ContentValues: albumArtUris.length=" + albumArtUris.length);
+            }
+        }
+
+        db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
+    }
+
+    void removeArtist(String artistKey) {
+        db.delete(TABLE_NAME, ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY + "=?", new String[] { artistKey });
+    }
+
     void syncFromMediaStore(Cursor artistsCursor) {
         MediaStoreMigrationTask task = new MediaStoreMigrationTask();
         task.execute(artistsCursor);

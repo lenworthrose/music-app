@@ -39,7 +39,7 @@ public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
 
         for (ArtistModel artist : newArtists) {
             publishProgress(current++, newArtists.size());
-            String[] albumArt = getAlbumArtUrls(artist);
+            String[] albumArt = getAlbumArtUrls(context, artist.getId());
 
             String mbid = null, bio = null, imgPath = null;
 
@@ -60,21 +60,20 @@ public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
         return null;
     }
 
-    private String[] getAlbumArtUrls(ArtistModel artist) {
+    private static String[] getAlbumArtUrls(Context context, long artistId) {
         String[] projection = {
-                MediaStore.Audio.Albums._ID,
-                MediaStore.Audio.Albums.ARTIST,
                 MediaStore.Audio.Albums.ALBUM_ART
         };
 
         int i = 0;
         String[] albumArt = new String[4];
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection,
-                MediaStore.Audio.Media.ARTIST_ID + "=?", new String[] { String.valueOf(artist.getId()) }, null);
+                MediaStore.Audio.Media.ARTIST_ID + "=?", new String[] { String.valueOf(artistId) }, MediaStore.Audio.Albums.ALBUM_KEY + " DESC");
 
         if (cursor.moveToFirst())
             do {
-                albumArt[i++] = cursor.getString(2);
+                if (cursor.getString(0) != null)
+                    albumArt[i++] = cursor.getString(0);
             } while (cursor.moveToNext() && i < 4);
 
         cursor.close();
