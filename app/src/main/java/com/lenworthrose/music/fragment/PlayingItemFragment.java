@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
@@ -282,6 +282,11 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
             Glide.with(this).load(item.getAlbumArtUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
                 @Override
+                public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                    resetToLogo();
+                }
+
+                @Override
                 public void onResourceReady(Bitmap art, GlideAnimation<? super Bitmap> glideAnimation) {
                     if (art != null) {
                         Utils.createDropShadowBitmap(art, new Utils.BitmapCallback() {
@@ -299,8 +304,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                                     ((PlayingNowActivity)getActivity()).setBackgroundImage(bitmap);
                                 }
                             });
-                    } else {
-                        resetToLogo();
                     }
                 }
             });
@@ -388,6 +391,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void resetToLogo() {
+        coverArt.setAlpha(1f);
         coverArt.setImageResource(R.drawable.logo);
 
         if (getActivity() instanceof PlayingNowActivity)

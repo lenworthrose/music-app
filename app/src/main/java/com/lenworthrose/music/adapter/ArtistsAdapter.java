@@ -56,13 +56,13 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
         view.setStatus(context.getResources().getQuantityString(R.plurals.num_of_albums, albumCount, albumCount));
 
         view.setImageVisible(true);
-        Glide.with(getContext()).load(cursor.getString(4)).into(view.getImageView());
+        Glide.with(getContext()).load(cursor.getString(4)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
     }
 
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(2));
-        Glide.with(getContext()).load(cursor.getString(5)).into(view.getImageView());
+        Glide.with(getContext()).load(cursor.getString(5)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
     }
 
     @Override

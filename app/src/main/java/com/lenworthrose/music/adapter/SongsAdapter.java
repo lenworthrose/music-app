@@ -10,7 +10,6 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;

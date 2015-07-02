@@ -8,16 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.AppWidgetTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.playback.PlayingItem;
@@ -75,7 +72,8 @@ public class WidgetService extends Service implements ServiceConnection {
             rv.setViewVisibility(R.id.widget_subtitle, artist == null || artist.isEmpty() ? View.GONE : View.VISIBLE);
             appMan.partiallyUpdateAppWidget(appWidgetId, rv);
 
-            Glide.with(playbackService).load(item.getAlbumArtUrl()).asBitmap().into(new AppWidgetTarget(this, rv, R.id.widget_image, appWidgetIds));
+            Glide.with(playbackService).load(item.getAlbumArtUrl()).asBitmap().fallback(R.drawable.logo)
+                    .error(R.drawable.logo).into(new AppWidgetTarget(this, rv, R.id.widget_image, appWidgetIds));
 
             WidgetService.this.unbindService(this);
         }

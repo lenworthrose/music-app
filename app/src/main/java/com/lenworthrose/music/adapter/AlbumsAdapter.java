@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 
 import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
+import com.lenworthrose.music.R;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
@@ -86,13 +87,13 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
         if (year > 0) view.setStatus(String.valueOf(year));
 
         view.setImageVisible(true);
-        Glide.with(context).load(cursor.getString(4)).into(view.getImageView());
+        Glide.with(context).load(cursor.getString(4)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
     }
 
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(1));
-        Glide.with(context).load(cursor.getString(4)).into(view.getImageView());
+        Glide.with(context).load(cursor.getString(4)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
     }
 
     @Override
