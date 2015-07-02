@@ -107,16 +107,16 @@ public class SongsAdapter extends BaseSwitchableAdapter {
 
     @Override
     protected void onPlayClicked(ArrayList<Long> ids) {
-
+        getNavigationListener().play(IdType.SONG, ids);
     }
 
     @Override
     protected void onAddClicked(ArrayList<Long> ids) {
-
+        getNavigationListener().add(IdType.SONG, ids);
     }
 
     @Override
     protected void onAddAsNextClicked(ArrayList<Long> ids) {
-
+        getNavigationListener().addAsNext(IdType.SONG, ids);
     }
 }
