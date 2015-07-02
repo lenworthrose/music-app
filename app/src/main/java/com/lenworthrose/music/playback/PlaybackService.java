@@ -20,17 +20,20 @@ import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.lenworthrose.music.IdType;
+import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.util.Constants;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * The PlaybackService is responsible for all things playback. It handles scheduling the {@link MediaPlayer}
  * instances that play music based on the current Playing Now Playlist, and provides the interface for modifying
  * the playlist and controlling playback.
- *
+ * <p/>
  * The Service is bind-able, which is the preferred way of interacting with it.
- *
+ * <p/>
  * It sends out Broadcasts using a {@link LocalBroadcastManager} when playback state or the current item changes.
  * See {@link Constants} for the action strings used.
  */
@@ -228,13 +231,13 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
                 currentTrack.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
                 currentTrack.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 listenOn(currentTrack);
-                currentTrack.setDataSource(this, getUriFromCursor(playlistCursor)); 
+                currentTrack.setDataSource(this, getUriFromCursor(playlistCursor));
                 currentTrack.prepareAsync();
 
                 acquireWifiLock();
                 registerNoisyReceiver();
                 if (mediaSessionManager != null) mediaSessionManager.register();
-                
+
                 notifyPlayingItemChanged();
                 notifyStateChanged();
 
@@ -275,66 +278,87 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         playTask.execute(songsCursor);
     }
 
-    public void add(Cursor songsCursor) {
-        if (songsCursor == null) return;
+    public void play(final IdType type, final ArrayList<Long> ids) {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                playlistStore.setPlaylist(SongsAdapter.createSongsCursor(PlaybackService.this, type, ids.get(0)));
 
-        if (playlistCursor == null || playlistCursor.getCount() == 0) {
-            play(songsCursor, 0);
-        } else {
-            AsyncTask<Cursor, Void, Boolean> addTask = new AsyncTask<Cursor, Void, Boolean>() {
-                @Override
-                protected Boolean doInBackground(Cursor... params) {
-                    boolean isNextTrackScheduleRequired = isEndOfPlaylist();
-                    playlistStore.add(params[0]);
-                    if (playlistCursor != null) playlistCursor.close();
-                    playlistCursor = playlistStore.read();
-                    return isNextTrackScheduleRequired;
-                }
+                for (int i = 1; i < ids.size(); i++)
+                    playlistStore.add(SongsAdapter.createSongsCursor(PlaybackService.this, type, ids.get(i)));
 
-                @Override
-                protected void onPostExecute(Boolean isNextTrackScheduleRequired) {
-                    if (isNextTrackScheduleRequired) {
-                        cancelNextTrack(); //Just in case!
-                        scheduleNextTrack();
-                    }
+                if (playlistCursor != null) playlistCursor.close();
+                playlistCursor = playlistStore.read();
+                return null;
+            }
 
-                    notifyPlaylistChanged();
-                }
-            };
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                notifyPlaylistChanged();
+                play(0);
+            }
+        };
 
-            addTask.execute(songsCursor);
-        }
+        task.execute();
     }
 
-    public void addAsNext(Cursor songsCursor) {
-        if (songsCursor == null) return;
+    public void add(final IdType type, final ArrayList<Long> ids) {
+        AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                boolean retVal = isEndOfPlaylist();
 
-        if (playlistCursor == null || playlistCursor.getCount() == 0)
-            play(songsCursor, 0);
-        else {
-            if (isEndOfPlaylist()) {
-                add(songsCursor);
-            } else {
-                AsyncTask<Cursor, Void, Void> addTask = new AsyncTask<Cursor, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Cursor... params) {
-                        playlistStore.addAfter(playlistPosition + 1, params[0]);
-                        if (playlistCursor != null) playlistCursor.close();
-                        playlistCursor = playlistStore.read();
-                        return null;
-                    }
+                for (Long id : ids)
+                    playlistStore.add(SongsAdapter.createSongsCursor(PlaybackService.this, type, id));
 
-                    @Override
-                    protected void onPostExecute(Void aVoid) {
-                        cancelNextTrack();
-                        scheduleNextTrack();
-                        notifyPlaylistChanged();
-                    }
-                };
+                if (playlistCursor != null) playlistCursor.close();
+                playlistCursor = playlistStore.read();
 
-                addTask.execute(songsCursor);
+                return retVal;
             }
+
+            @Override
+            protected void onPostExecute(Boolean isNextTrackScheduleRequired) {
+                if (isNextTrackScheduleRequired) {
+                    cancelNextTrack(); //Just in case!
+                    scheduleNextTrack();
+                }
+
+                notifyPlaylistChanged();
+            }
+        };
+
+        task.execute();
+    }
+
+    public void addAsNext(final IdType type, final ArrayList<Long> ids) {
+        if (isEndOfPlaylist()) {
+            add(type, ids);
+            return;
         }
+
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                for (int i = ids.size() - 1; i >= 0; i--) {
+                    long id = ids.get(i);
+                    playlistStore.addAfter(playlistPosition + 1, SongsAdapter.createSongsCursor(PlaybackService.this, type, id));
+                }
+
+                if (playlistCursor != null) playlistCursor.close();
+                playlistCursor = playlistStore.read();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                cancelNextTrack();
+                scheduleNextTrack();
+                notifyPlaylistChanged();
+            }
+        };
+
+        task.execute();
     }
 
 //    public void playlistEdited(int currentFileKey) {
@@ -631,7 +655,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     protected void storePlaylistPosition() {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("DevicePlaylistPosition", playlistPosition).apply();
     }
-    
+
     private Uri getUriFromCursor(Cursor cursor) {
         return getUriForMedia(cursor.getLong(2)); //TODO: undo hardcode!
     }

@@ -7,15 +7,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.sync.ArtistsStore;
@@ -94,26 +91,17 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void play(IdType type, ArrayList<Long> ids) {
-        Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, ids);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, type);
-        getSupportLoaderManager().restartLoader(0, b, new PlayLoaderCallbacks());
+        playbackService.play(type, ids);
     }
 
     @Override
     public void add(IdType type, ArrayList<Long> ids) {
-        Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, ids);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, type);
-        getSupportLoaderManager().restartLoader(0, b, new AddLoaderCallbacks());
+        playbackService.add(type, ids);
     }
 
     @Override
     public void addAsNext(IdType type, ArrayList<Long> ids) {
-        Bundle b = new Bundle();
-        b.putSerializable(PlaybackLoaderCallbacks.IDS, ids);
-        b.putSerializable(PlaybackLoaderCallbacks.TYPE, type);
-        getSupportLoaderManager().restartLoader(0, b, new AddAsNextLoaderCallbacks());
+        playbackService.addAsNext(type, ids);
     }
 
     @Override
@@ -129,54 +117,5 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void onArtistsDbInitialized() {
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance()).commit();
-    }
-
-    private abstract class PlaybackLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
-        public static final String TYPE = "Type";
-        public static final String IDS = "IDs";
-
-        protected IdType type;
-        protected ArrayList<Long> ids;
-
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            type = (IdType)args.get(TYPE);
-            ids = (ArrayList<Long>)args.getSerializable(IDS);
-            return SongsAdapter.createSongsLoader(MainActivity.this, type, ids.remove(0));
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) { }
-    }
-
-    private class PlayLoaderCallbacks extends PlaybackLoaderCallbacks {
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            playbackService.play(data, 0);
-            if (!ids.isEmpty()) add(type, ids);
-        }
-    }
-
-    private class AddLoaderCallbacks extends PlaybackLoaderCallbacks {
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            playbackService.add(data);
-            if (!ids.isEmpty()) add(type, ids);
-        }
-    }
-
-    private class AddAsNextLoaderCallbacks extends PlaybackLoaderCallbacks {
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            type = (IdType)args.get(TYPE);
-            ids = (ArrayList<Long>)args.getSerializable(IDS);
-            return SongsAdapter.createSongsLoader(MainActivity.this, type, ids.remove(ids.size() - 1));
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            playbackService.addAsNext(data);
-            if (!ids.isEmpty()) addAsNext(type, ids);
-        }
     }
 }

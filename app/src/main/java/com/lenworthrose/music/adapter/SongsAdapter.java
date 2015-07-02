@@ -20,6 +20,16 @@ import java.util.ArrayList;
  * A {@link BaseSwitchableAdapter} that manages lists of Songs.
  */
 public class SongsAdapter extends BaseSwitchableAdapter {
+    private static String[] PROJECTION = {
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.TRACK,
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ALBUM_ID
+    };
+
     private long parentId;
     private IdType type;
 
@@ -61,22 +71,34 @@ public class SongsAdapter extends BaseSwitchableAdapter {
         getNavigationListener().playSongs(getCursor(), position - (parent.getCount() - getCount()));
     }
 
+    public static Cursor createSongsCursor(Context context, IdType type, long id) {
+        String where = buildWhere(type);
+        String[] whereVars = type == null ? null : new String[] { String.valueOf(id) };
+        String sortOrder = buildSortOrder(type);
+
+        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                PROJECTION,
+                where,
+                whereVars,
+                sortOrder);
+    }
+
     public static CursorLoader createSongsLoader(Context context, IdType type, long id) {
-        String[] projection = {
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.TRACK,
-                MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.ALBUM_ID
-        };
+        String where = buildWhere(type);
+        String[] whereVars = type == null ? null : new String[] { String.valueOf(id) };
+        String sortOrder = buildSortOrder(type);
 
-        String where = null;
-        String[] whereVars = null;
-        String sortOrder;
+        return new CursorLoader(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                PROJECTION,
+                where,
+                whereVars,
+                sortOrder);
+    }
 
+    private static String buildWhere(IdType type) {
         if (type != null) {
+            String where;
+
             switch (type) {
                 case ARTIST:
                     where = MediaStore.Audio.Media.ARTIST_ID;
@@ -91,18 +113,15 @@ public class SongsAdapter extends BaseSwitchableAdapter {
                     return null;
             }
 
-            where += "= ?";
-            whereVars = new String[] { String.valueOf(id) };
-            sortOrder = MediaStore.Audio.Media.ALBUM_ID + ',' + MediaStore.Audio.Media.TRACK;
-        } else {
-            sortOrder = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
+            return where + "= ?";
         }
 
-        return new CursorLoader(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                where,
-                whereVars,
-                sortOrder);
+        return null;
+    }
+
+    private static String buildSortOrder(IdType type) {
+        return type == null ? MediaStore.Audio.Media.DEFAULT_SORT_ORDER
+                : MediaStore.Audio.Media.ALBUM_ID + ',' + MediaStore.Audio.Media.TRACK;
     }
 
     @Override
