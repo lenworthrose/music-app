@@ -86,8 +86,8 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void onViewModeToggled(IdType type, long id) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id))
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
+        getSupportFragmentManager().popBackStack();
+        onNavigate(type, id);
     }
 
     @Override
