@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
@@ -24,9 +25,10 @@ import java.util.ArrayList;
 /**
  * The main Activity for the application. Implements {@link NavigationListener} so it can handle navigation
  * events. Manages the {@link LibraryFragment}s that display the media library.
- *
- * Responsible for starting the {@link PlaybackService}. Also binds to the Service so it can modify the Playing Now playlist.
- *
+ * <p/>
+ * Responsible for starting and stopping the {@link PlaybackService}. Also binds to the Service so it can
+ * modify the Playing Now playlist.
+ * <p/>
  * Responsible for starting the {@link MediaStoreService}.
  */
 public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, ArtistsStore.InitListener {
@@ -92,22 +94,42 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void playSongs(Cursor songsCursor, int from) {
-        playbackService.play(songsCursor, from);
+        playbackService.play(songsCursor, from, new PlaybackService.PlaybackModificationCompleteListener() {
+            @Override
+            public void onPlaybackModificationComplete() {
+                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
+            }
+        });
     }
 
     @Override
     public void play(IdType type, ArrayList<Long> ids) {
-        playbackService.play(type, ids);
+        playbackService.play(type, ids, new PlaybackService.PlaybackModificationCompleteListener() {
+            @Override
+            public void onPlaybackModificationComplete() {
+                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
+            }
+        });
     }
 
     @Override
     public void add(IdType type, ArrayList<Long> ids) {
-        playbackService.add(type, ids);
+        playbackService.add(type, ids, new PlaybackService.PlaybackModificationCompleteListener() {
+            @Override
+            public void onPlaybackModificationComplete() {
+                Toast.makeText(MainActivity.this, R.string.added, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     public void addAsNext(IdType type, ArrayList<Long> ids) {
-        playbackService.addAsNext(type, ids);
+        playbackService.addAsNext(type, ids, new PlaybackService.PlaybackModificationCompleteListener() {
+            @Override
+            public void onPlaybackModificationComplete() {
+                Toast.makeText(MainActivity.this, R.string.added_as_next, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

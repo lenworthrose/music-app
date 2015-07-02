@@ -40,6 +40,10 @@ import java.util.ArrayList;
 public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         AudioManager.OnAudioFocusChangeListener, PlaylistStore.InitListener {
+    public interface PlaybackModificationCompleteListener {
+        void onPlaybackModificationComplete();
+    }
+
     private PlaylistStore playlistStore;
     private MediaPlayer currentTrack;
     private MediaPlayer nextTrack;
@@ -253,32 +257,34 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         }
     }
 
-    public void play(Cursor songsCursor, int from) {
+    public void play(Cursor songsCursor, final int from, final PlaybackModificationCompleteListener listener) {
         if (songsCursor == null) return;
-        if (from > songsCursor.getCount() || from < 0) from = 0;
 
-        final int fromPos = from;
-
-        AsyncTask<Cursor, Void, Void> playTask = new AsyncTask<Cursor, Void, Void>() {
+        AsyncTask<Cursor, Void, Integer> playTask = new AsyncTask<Cursor, Void, Integer>() {
             @Override
-            protected Void doInBackground(Cursor... params) {
-                playlistStore.setPlaylist(params[0]);
+            protected Integer doInBackground(Cursor... params) {
+                Cursor songsCursor = params[0];
+
+                int retVal = (from > songsCursor.getCount() || from < 0) ? 0 : from;
+
+                playlistStore.setPlaylist(songsCursor);
                 if (playlistCursor != null) playlistCursor.close();
                 playlistCursor = playlistStore.read();
-                return null;
+                return retVal;
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
+            protected void onPostExecute(Integer fromPos) {
                 notifyPlaylistChanged();
                 play(fromPos);
+                listener.onPlaybackModificationComplete();
             }
         };
 
         playTask.execute(songsCursor);
     }
 
-    public void play(final IdType type, final ArrayList<Long> ids) {
+    public void play(final IdType type, final ArrayList<Long> ids, final PlaybackModificationCompleteListener listener) {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -296,13 +302,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
             protected void onPostExecute(Void aVoid) {
                 notifyPlaylistChanged();
                 play(0);
+                listener.onPlaybackModificationComplete();
             }
         };
 
         task.execute();
     }
 
-    public void add(final IdType type, final ArrayList<Long> ids) {
+    public void add(final IdType type, final ArrayList<Long> ids, final PlaybackModificationCompleteListener listener) {
         AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
@@ -325,15 +332,16 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
                 }
 
                 notifyPlaylistChanged();
+                listener.onPlaybackModificationComplete();
             }
         };
 
         task.execute();
     }
 
-    public void addAsNext(final IdType type, final ArrayList<Long> ids) {
+    public void addAsNext(final IdType type, final ArrayList<Long> ids, final PlaybackModificationCompleteListener listener) {
         if (isEndOfPlaylist()) {
-            add(type, ids);
+            add(type, ids, listener);
             return;
         }
 
@@ -355,6 +363,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
                 cancelNextTrack();
                 scheduleNextTrack();
                 notifyPlaylistChanged();
+                listener.onPlaybackModificationComplete();
             }
         };
 
