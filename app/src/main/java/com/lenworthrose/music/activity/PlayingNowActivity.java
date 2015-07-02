@@ -1,5 +1,7 @@
 package com.lenworthrose.music.activity;
 
+import android.app.TaskStackBuilder;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -7,8 +9,10 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -43,6 +47,28 @@ public class PlayingNowActivity extends AppCompatActivity {
             pager.setAdapter(new PlayingNowTabPagerAdapter(getSupportFragmentManager()));
             ((PagerSlidingTabStrip)findViewById(R.id.pn_root_tabs)).setViewPager(pager);
         }
+
+        if (getActionBar() != null) {
+            getActionBar().setDisplayShowHomeEnabled(true);
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+
+                if (NavUtils.shouldUpRecreateTask(this, upIntent))
+                    TaskStackBuilder.create(this).addNextIntentWithParentStack(upIntent).startActivities();
+                else
+                    NavUtils.navigateUpTo(this, upIntent);
+
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private class PlayingNowTabPagerAdapter extends FragmentPagerAdapter {

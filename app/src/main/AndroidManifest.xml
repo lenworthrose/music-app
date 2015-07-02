@@ -26,7 +26,8 @@
 
         <activity
             android:name=".activity.PlayingNowActivity"
-            android:label="@string/playing_now" />
+            android:label="@string/playing_now"
+            android:parentActivityName=".activity.MainActivity" />
 
         <activity
             android:name=".activity.SettingsActivity"
