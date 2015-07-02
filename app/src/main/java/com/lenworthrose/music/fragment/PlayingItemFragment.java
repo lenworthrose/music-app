@@ -60,7 +60,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private ScheduledFuture<?> hideOverlaysFuture;
     private boolean areOverlaysVisible = true;
     private Animation pauseBlinkAnimation = new AlphaAnimation(0f, 1f);
-    private CoverArtFadeListener fadeListener = new CoverArtFadeListener();
     private PlaybackService playbackService;
     private Handler handler;
 
@@ -279,8 +278,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             playlistTracks.setText(String.valueOf(playbackService.getPlaylistSize()));
             positionDisplay.setText(R.string.blank_time);
 
-            fadeListener.reset();
-            coverArt.animate().alpha(0.08f).setDuration(200).withEndAction(fadeListener);
+            coverArt.animate().alpha(0.08f).setDuration(75);
 
             Glide.with(this).load(item.getAlbumArtUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
                 @Override
@@ -289,7 +287,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                         Utils.createDropShadowBitmap(art, new Utils.BitmapCallback() {
                             @Override
                             public void onBitmapReady(Bitmap bitmap) {
-                                fadeListener.setNewCoverArt(bitmap);
+                                coverArt.setImageBitmap(bitmap);
+                                coverArt.animate().alpha(1f).setDuration(175);
                             }
                         });
 
@@ -389,7 +388,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void resetToLogo() {
-        fadeListener.setNewCoverArt(BitmapFactory.decodeResource(getResources(), R.drawable.logo));
+        coverArt.setImageResource(R.drawable.logo);
 
         if (getActivity() instanceof PlayingNowActivity)
             ((PlayingNowActivity)getActivity()).setBackgroundImage(null);
@@ -481,34 +480,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         @Override
         public void run() {
             view.setVisibility(visible ? View.VISIBLE : View.GONE);
-        }
-    }
-
-    private class CoverArtFadeListener implements Runnable {
-        private Bitmap newCoverArt;
-        private boolean isFadeOutDone;
-
-        @Override
-        public void run() {
-            isFadeOutDone = true;
-            setImageAndStartFadeIn();
-        }
-
-        public void setNewCoverArt(Bitmap newCoverArt) {
-            this.newCoverArt = newCoverArt;
-            setImageAndStartFadeIn();
-        }
-
-        public void reset() {
-            newCoverArt = null;
-            isFadeOutDone = false;
-        }
-
-        private void setImageAndStartFadeIn() {
-            if (isFadeOutDone && newCoverArt != null) {
-                coverArt.setImageBitmap(newCoverArt);
-                coverArt.animate().alpha(1f).setDuration(300);
-            }
         }
     }
 
