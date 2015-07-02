@@ -37,7 +37,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         ArrayList<Long> list = new ArrayList<>();
         list.add(parentId);
-        return createSongsLoader(getContext(), type, list );
+        return createSongsLoader(getContext(), type, list);
     }
 
     @Override
@@ -76,6 +76,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
 
         String where = null;
         String[] whereVars = null;
+        String sortOrder;
 
         if (parentIds != null) {
             StringBuilder sb;
@@ -109,13 +110,16 @@ public class SongsAdapter extends BaseSwitchableAdapter {
             }
 
             where = sb.toString();
+            sortOrder = MediaStore.Audio.Media.ALBUM_ID + ',' + MediaStore.Audio.Media.TRACK;
+        } else {
+            sortOrder = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
         }
 
         return new CursorLoader(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection,
                 where,
                 whereVars,
-                MediaStore.Audio.Media.ALBUM_ID + ',' + MediaStore.Audio.Media.TRACK);
+                sortOrder);
     }
 
     @Override
