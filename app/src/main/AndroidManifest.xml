@@ -28,6 +28,10 @@
             android:name=".activity.PlayingNowActivity"
             android:label="@string/playing_now" />
 
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/action_settings" />
+
         <service
             android:name=".playback.PlaybackService" />
 

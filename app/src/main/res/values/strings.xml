@@ -35,4 +35,11 @@
     <string name="syncing_with_media_store">Syncing with media store…</string>
     <string name="fetching_artist_info">Retrieving artist info…</string>
     <string name="updating_artist_albums">Updating album info…</string>
+
+    <!-- Preferences -->
+    <string name="library_refresh">Library Refresh</string>
+    <string name="refresh_artists">Refresh Artists</string>
+    <string name="refresh_artists_desc">Search for new artists in the media store</string>
+    <string name="refresh_albums">Refresh Albums</string>
+    <string name="refresh_albums_desc">Refresh the cover art for all albums. Will also remove artists that have no albums.</string>
 </resources>
