@@ -7,5 +7,6 @@ public enum IdType {
     ARTIST,
     ALBUM,
     PLAYLIST,
-    GENRE
+    GENRE,
+    SONG
 }

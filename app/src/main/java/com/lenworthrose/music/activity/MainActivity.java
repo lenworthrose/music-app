@@ -142,9 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             type = (IdType)args.get(TYPE);
             ids = (ArrayList<Long>)args.getSerializable(IDS);
-            ArrayList<Long> nextId = new ArrayList<>(1);
-            nextId.add(ids.remove(0));
-            return SongsAdapter.createSongsLoader(MainActivity.this, type, nextId);
+            return SongsAdapter.createSongsLoader(MainActivity.this, type, ids.remove(0));
         }
 
         @Override

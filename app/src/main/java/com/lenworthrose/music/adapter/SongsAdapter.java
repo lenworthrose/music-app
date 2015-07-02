@@ -35,9 +35,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        ArrayList<Long> list = new ArrayList<>();
-        list.add(parentId);
-        return createSongsLoader(getContext(), type, list);
+        return createSongsLoader(getContext(), type, parentId);
     }
 
     @Override
@@ -63,7 +61,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
         getNavigationListener().playSongs(getCursor(), position - (parent.getCount() - getCount()));
     }
 
-    public static CursorLoader createSongsLoader(Context context, IdType type, ArrayList<Long> parentIds) {
+    public static CursorLoader createSongsLoader(Context context, IdType type, long id) {
         String[] projection = {
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.TITLE,
@@ -78,38 +76,23 @@ public class SongsAdapter extends BaseSwitchableAdapter {
         String[] whereVars = null;
         String sortOrder;
 
-        if (parentIds != null) {
-            StringBuilder sb;
-
+        if (type != null) {
             switch (type) {
                 case ARTIST:
-                    sb = new StringBuilder(MediaStore.Audio.Media.ARTIST_ID);
+                    where = MediaStore.Audio.Media.ARTIST_ID;
                     break;
                 case ALBUM:
-                    sb = new StringBuilder(MediaStore.Audio.Media.ALBUM_ID);
+                    where = MediaStore.Audio.Media.ALBUM_ID;
+                    break;
+                case SONG:
+                    where = MediaStore.Audio.Media._ID;
                     break;
                 default:
                     return null;
             }
 
-            whereVars = new String[parentIds.size()];
-
-            if (parentIds.size() > 1) {
-                sb.append(" IN (");
-
-                for (int i = 0; i < parentIds.size(); i++) {
-                    sb.append("?,");
-                    whereVars[i] = String.valueOf(parentIds.get(i));
-                }
-
-                sb.setLength(sb.length() - 1);
-                sb.append(')');
-            } else {
-                sb.append("= ?");
-                whereVars[0] = String.valueOf(parentIds.get(0));
-            }
-
-            where = sb.toString();
+            where += "= ?";
+            whereVars = new String[] { String.valueOf(id) };
             sortOrder = MediaStore.Audio.Media.ALBUM_ID + ',' + MediaStore.Audio.Media.TRACK;
         } else {
             sortOrder = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
