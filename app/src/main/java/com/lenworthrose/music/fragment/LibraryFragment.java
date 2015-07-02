@@ -1,9 +1,14 @@
 package com.lenworthrose.music.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -14,6 +19,7 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AdapterFactory;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
 import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.view.HeaderGridView;
 import com.lenworthrose.music.view.ListHeader;
 
@@ -26,6 +32,11 @@ import com.lenworthrose.music.view.ListHeader;
  * for now it's hardcoded.
  */
 public class LibraryFragment extends Fragment {
+    private static String SETTING_VIEW_MODE_ARTISTS = "ArtistsViewMode";
+    private static String SETTING_VIEW_MODE_ALBUMS = "AlbumsViewMode";
+    private static String SETTING_VIEW_MODE_SONGS = "SongsViewMode";
+
+    private AbsListView absListView;
     private BaseSwitchableAdapter adapter;
     private IdType idType;
     private long id;
@@ -39,6 +50,8 @@ public class LibraryFragment extends Fragment {
         id = savedInstanceState.getLong(Constants.ID);
         adapter = AdapterFactory.createAdapter(getActivity(), isGridView(), idType, id);
         getLoaderManager().initLoader(0, null, adapter);
+
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -51,35 +64,84 @@ public class LibraryFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        AbsListView listView = (AbsListView)view.findViewById(R.id.abs_list_view);
+        absListView = (AbsListView)view.findViewById(R.id.abs_list_view);
 
         if (idType != null) {
             ListHeader header = new ListHeader(getActivity(), idType, id);
 
-            if (isGridView())
-                ((HeaderGridView)listView).addHeaderView(header, null, false);
+            if (absListView instanceof HeaderGridView)
+                ((HeaderGridView)absListView).addHeaderView(header, null, false);
             else
-                ((ListView)listView).addHeaderView(header, null, false);
+                ((ListView)absListView).addHeaderView(header, null, false);
+
+            if (adapter instanceof ListHeader.ImageLoadListener) header.setImageLoadListener(((ListHeader.ImageLoadListener)adapter));
         }
 
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(adapter);
-        listView.setMultiChoiceModeListener(adapter);
+        absListView.setAdapter(adapter);
+        absListView.setOnItemClickListener(adapter);
+        absListView.setMultiChoiceModeListener(adapter);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_library_fragment, menu);
+
+        menu.findItem(R.id.action_toggle_view_mode).setIcon(isGridView() ? R.drawable.playlists : R.drawable.grid);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_toggle_view_mode:
+                toggleViewMode();
+                ((NavigationListener)getActivity()).onViewModeToggled(idType, id);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onDestroyView() {
-        if (!isGridView()) ((AbsListView)getView().findViewById(R.id.abs_list_view)).setAdapter(null);
+        absListView.setAdapter(null);
         super.onDestroyView();
     }
 
+    private void toggleViewMode() {
+        String toEdit;
+
+        if (idType == null)
+            toEdit = SETTING_VIEW_MODE_ARTISTS;
+        else
+            switch (idType) {
+                case ALBUM:
+                    toEdit = SETTING_VIEW_MODE_SONGS;
+                    break;
+                case ARTIST:
+                    toEdit = SETTING_VIEW_MODE_ALBUMS;
+                    break;
+                default:
+                    toEdit = null;
+                    break;
+            }
+
+        if (toEdit != null)
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putBoolean(toEdit, !(absListView instanceof HeaderGridView)).commit();
+    }
+
     private boolean isGridView() {
-        if (idType == null) return true; //Home screen
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        if (idType == null) return prefs.getBoolean(SETTING_VIEW_MODE_ARTISTS, true); //Home screen; assume artists
 
         switch (idType) {
             case PLAYLIST:
-            case ALBUM:
                 return false;
+            case ALBUM:
+                return prefs.getBoolean(SETTING_VIEW_MODE_SONGS, false);
+            case ARTIST:
+                return prefs.getBoolean(SETTING_VIEW_MODE_ALBUMS, true);
             default:
                 return true;
         }

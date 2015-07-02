@@ -2,6 +2,7 @@ package com.lenworthrose.music.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
@@ -9,9 +10,11 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;
+import com.lenworthrose.music.view.ListHeader;
 import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
@@ -19,7 +22,7 @@ import java.util.ArrayList;
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Songs.
  */
-public class SongsAdapter extends BaseSwitchableAdapter {
+public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.ImageLoadListener {
     private static String[] PROJECTION = {
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -32,6 +35,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
 
     private long parentId;
     private IdType type;
+    private Bitmap bitmap;
 
     public SongsAdapter(Context context, boolean isGrid) {
         this(context, isGrid, null, Long.MIN_VALUE);
@@ -57,6 +61,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(buildTitle(cursor));
+        view.getImageView().setImageBitmap(bitmap);
     }
 
     protected String buildTitle(Cursor cursor) {
@@ -137,5 +142,11 @@ public class SongsAdapter extends BaseSwitchableAdapter {
     @Override
     protected void onAddAsNextClicked(ArrayList<Long> ids) {
         getNavigationListener().addAsNext(IdType.SONG, ids);
+    }
+
+    @Override
+    public void onImageLoaded(Bitmap image) {
+        bitmap = image;
+        notifyDataSetInvalidated();
     }
 }

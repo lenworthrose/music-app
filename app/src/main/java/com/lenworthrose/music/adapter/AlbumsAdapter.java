@@ -81,6 +81,11 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     @Override
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
         view.setTitle(cursor.getString(1));
+
+        int year = cursor.getInt(3);
+        if (year > 0) view.setStatus(String.valueOf(year));
+
+        view.setImageVisible(true);
         Glide.with(context).load(cursor.getString(4)).into(view.getImageView());
     }
 

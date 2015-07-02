@@ -54,6 +54,9 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
 
         int albumCount = cursor.getInt(3);
         view.setStatus(context.getResources().getQuantityString(R.plurals.num_of_albums, albumCount, albumCount));
+
+        view.setImageVisible(true);
+        Glide.with(getContext()).load(cursor.getString(4)).into(view.getImageView());
     }
 
     @Override

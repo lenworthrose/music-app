@@ -85,6 +85,12 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
+    public void onViewModeToggled(IdType type, long id) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id))
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
+    }
+
+    @Override
     public void playSongs(Cursor songsCursor, int from) {
         playbackService.play(songsCursor, from);
     }

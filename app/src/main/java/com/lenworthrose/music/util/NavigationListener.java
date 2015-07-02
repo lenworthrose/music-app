@@ -12,6 +12,7 @@ import java.util.ArrayList;
  */
 public interface NavigationListener {
     void onNavigate(IdType type, long id);
+    void onViewModeToggled(IdType type, long id);
 
     void playSongs(Cursor songsCursor, int from);
 
