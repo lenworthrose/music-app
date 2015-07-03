@@ -43,6 +43,10 @@ https://github.com/astuetz/PagerSlidingTabStrip
 App icon created by Linh Pham Thi Dieu:
 https://www.iconfinder.com/phdieuli
 
+Other icons from Google's Material Design Icon Pack and Pixle's Subway Icon Set:
+https://github.com/google/material-design-icons
+https://github.com/mariuszostrowski/subway
+
 Uses code taken from the Last.fm library:
 https://github.com/lastfm/lastfm-android/tree/master/library
 
