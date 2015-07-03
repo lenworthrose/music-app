@@ -7,8 +7,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AlphabetIndexer;
-import android.widget.SectionIndexer;
 
 import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
@@ -24,8 +22,7 @@ import java.util.List;
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Artists.
  */
-public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStore.ArtistsStoreListener, SectionIndexer {
-    private AlphabetIndexer indexer;
+public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStore.ArtistsStoreListener {
     private CursorLoader loader;
 
     public ArtistsAdapter(Context context, boolean isGrid) {
@@ -43,12 +40,6 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
         };
 
         return loader;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        super.onLoadFinished(loader, data);
-        indexer = new MusicAlphabetIndexer(data, 2, getContext().getString(R.string.fast_scroll_alphabet));
     }
 
     @Override
@@ -76,21 +67,6 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(2));
         Glide.with(getContext()).load(cursor.getString(5)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
-    }
-
-    @Override
-    public Object[] getSections() {
-        return indexer.getSections();
-    }
-
-    @Override
-    public int getPositionForSection(int sectionIndex) {
-        return indexer.getPositionForSection(sectionIndex);
-    }
-
-    @Override
-    public int getSectionForPosition(int position) {
-        return indexer.getSectionForPosition(position);
     }
 
     @Override
