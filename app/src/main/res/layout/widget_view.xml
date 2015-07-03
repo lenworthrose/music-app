@@ -7,11 +7,10 @@
 
     <ImageView
         android:id="@+id/widget_image"
-        android:layout_width="wrap_content"
+        android:layout_width="82dp"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:clickable="true"
-        android:minWidth="82dp"
         android:src="@drawable/logo"
         tools:ignore="ContentDescription,RtlHardcoded" />
 
