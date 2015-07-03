@@ -31,6 +31,18 @@ Last.fm. I'd strongly recommend connecting to Wi-Fi for this!
 
 Written by Lenworth Rose
 
+Uses the DragSortListView library, written by Carl Bauer, and licensed under the Apache License v2.0:
+https://github.com/bauerca/drag-sort-listview
+
+Uses the PagerSlidingTabStrip library, written by Andreas Stuetz, and licensed under the Apache License v2.0:
+https://github.com/astuetz/PagerSlidingTabStrip
+
+Uses the Glide library, written by Sam Judd, and licensed under the Apache License v2.0:
+https://github.com/astuetz/PagerSlidingTabStrip
+
+Uses code taken from the Last.fm library:
+https://github.com/lastfm/lastfm-android/tree/master/library
+
 ## License
 
 Copyright 2015 Lenworth Rose
