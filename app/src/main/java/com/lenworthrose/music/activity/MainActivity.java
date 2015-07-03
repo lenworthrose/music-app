@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         startService(new Intent(this, PlaybackService.class));
         ArtistsStore.getInstance().init(this, this);
         startService(new Intent(this, MediaStoreService.class));
