@@ -433,33 +433,57 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     public void shuffleAll() {
         if (playlistCursor == null || playlistCursor.getCount() == 0) return;
 
-        boolean wasPlaying = isPlaying();
+        final boolean wasPlaying = isPlaying();
         stop();
 
-        playlistStore.shuffle(-1);
-        if (playlistCursor != null) playlistCursor.close();
-        playlistCursor = playlistStore.read();
-        notifyPlaylistChanged();
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                playlistStore.shuffle(-1);
+                if (playlistCursor != null) playlistCursor.close();
+                playlistCursor = playlistStore.read();
+                return null;
+            }
 
-        if (wasPlaying) {
-            play(0);
-        } else {
-            playlistPosition = 0;
-            storePlaylistPosition();
-            notifyPlayingItemChanged();
-        }
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                notifyPlaylistChanged();
+
+                if (wasPlaying) {
+                    play(0);
+                } else {
+                    playlistPosition = 0;
+                    storePlaylistPosition();
+                    notifyPlayingItemChanged();
+                }
+            }
+        };
+
+        task.execute();
     }
 
     public void shuffleRemaining() {
         if (playlistCursor == null || playlistCursor.getCount() == 0) return;
 
-        playlistStore.shuffle(playlistPosition);
-        if (playlistCursor != null) playlistCursor.close();
-        playlistCursor = playlistStore.read();
-        notifyPlaylistChanged();
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                playlistStore.shuffle(playlistPosition);
+                if (playlistCursor != null) playlistCursor.close();
+                playlistCursor = playlistStore.read();
+                return null;
+            }
 
-        cancelNextTrack();
-        scheduleNextTrack();
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                notifyPlaylistChanged();
+
+                cancelNextTrack();
+                scheduleNextTrack();
+            }
+        };
+
+        task.execute();
     }
 
     private void scheduleNextTrack() {

@@ -49,6 +49,11 @@
     <string name="off">Off</string>
     <string name="track">Track</string>
     <string name="stop">Stop</string>
-    <string name="choose_repeat_mode">Choose repeat mode</string>
+    <string name="choose_repeat_mode">Select a repeat mode:</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Shuffle -->
+    <string name="choose_shuffle_mode">What would you like to shuffle?</string>
+    <string name="remaining">Remaining</string>
+    <string name="all">All</string>
 </resources>

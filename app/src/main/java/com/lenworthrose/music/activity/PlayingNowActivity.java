@@ -22,6 +22,7 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
 import com.lenworthrose.music.fragment.RepeatDialogFragment;
+import com.lenworthrose.music.fragment.ShuffleDialogFragment;
 import com.lenworthrose.music.util.Constants;
 
 /**
@@ -31,7 +32,6 @@ import com.lenworthrose.music.util.Constants;
  */
 public class PlayingNowActivity extends AppCompatActivity {
     private ImageView background;
-    private ViewPager pager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class PlayingNowActivity extends AppCompatActivity {
         setContentView(R.layout.act_playing_now);
 
         background = (ImageView)findViewById(R.id.pn_background_image);
-        pager = (ViewPager)findViewById(R.id.pn_root_container);
+        ViewPager pager = (ViewPager)findViewById(R.id.pn_root_container);
 
         if (pager != null) {
             pager.setAdapter(new PlayingNowTabPagerAdapter(getSupportFragmentManager()));
@@ -135,6 +135,6 @@ public class PlayingNowActivity extends AppCompatActivity {
     }
 
     public void onShuffleClicked(MenuItem unused) {
-
+        new ShuffleDialogFragment().show(getFragmentManager(), "Shuffle");
     }
 }
