@@ -54,7 +54,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     private MediaSessionManager mediaSessionManager;
     protected Cursor playlistCursor;
     protected int playlistPosition;
-    private Constants.RepeatMode repeatMode = Constants.RepeatMode.Off;
+    private Constants.RepeatMode repeatMode = Constants.RepeatMode.OFF;
     private LocalBroadcastManager broadcastMan;
     private final IBinder binder = new LocalBinder();
 
@@ -99,6 +99,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         IntentFilter intentFilter = new IntentFilter(Constants.PLAYBACK_STATE_CHANGED);
         intentFilter.addAction(Constants.PLAYING_NOW_CHANGED);
         broadcastMan.registerReceiver(mediaSessionManager, intentFilter);
+
+        repeatMode = Constants.RepeatMode.values()[PreferenceManager.getDefaultSharedPreferences(this).getInt(Constants.SETTING_REPEAT_MODE, 0)];
     }
 
     @Override
@@ -192,14 +194,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     public Constants.PlaybackState getState() {
         if (currentTrack != null) {
             if (currentTrack.isPlaying())
-                return Constants.PlaybackState.Playing;
+                return Constants.PlaybackState.PLAYING;
             else if (currentTrack.getCurrentPosition() > 0)
-                return Constants.PlaybackState.Paused;
+                return Constants.PlaybackState.PAUSED;
             else
-                return Constants.PlaybackState.Buffering;
+                return Constants.PlaybackState.BUFFERING;
         }
 
-        return Constants.PlaybackState.Stopped;
+        return Constants.PlaybackState.STOPPED;
     }
 
     public int getPosition() {
@@ -214,12 +216,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         repeatMode = mode;
 
         if (isEndOfPlaylist()) {
-            if (mode == Constants.RepeatMode.Playlist) {
+            if (mode == Constants.RepeatMode.PLAYLIST || mode == Constants.RepeatMode.TRACK) {
                 if (playlistCursor != null && playlistCursor.getCount() > 0 && currentTrack != null && nextTrack == null) scheduleNextTrack();
             } else {
                 cancelNextTrack();
             }
         }
+
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putInt(Constants.SETTING_REPEAT_MODE, mode.ordinal()).commit();
     }
 
     public void play(int playlistPosition) {
@@ -464,7 +468,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         int nextTrackIndex;
 
         if (isEndOfPlaylist()) {
-            if (getRepeatMode() != Constants.RepeatMode.Playlist || playlistCursor == null || playlistCursor.getCount() == 0)
+            if (repeatMode == Constants.RepeatMode.OFF || repeatMode == Constants.RepeatMode.STOP
+                    || playlistCursor == null || playlistCursor.getCount() == 0)
                 return;
 
             nextTrackIndex = 0;

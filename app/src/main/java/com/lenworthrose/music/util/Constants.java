@@ -19,18 +19,19 @@ public class Constants {
 
     public static final String SETTING_KEEP_SCREEN_ON = "keep_screen_on";
     public static final String SETTING_AUTO_HIDE_PLAYING_NOW_OVERLAYS = "auto_hide_playing_now_overlays";
+    public static final String SETTING_REPEAT_MODE = "repeat_mode";
 
     public enum PlaybackState {
-        Stopped,
-        Paused,
-        Playing,
-        Buffering //3 = Buffering || Aborting, Please wait
+        STOPPED,
+        PAUSED,
+        PLAYING,
+        BUFFERING
     }
 
     public enum RepeatMode {
-        Off,
-        Playlist,
-        Track,
-        Stop
+        OFF,
+        PLAYLIST,
+        TRACK,
+        STOP
     }
 }

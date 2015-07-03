@@ -152,7 +152,7 @@ public class MediaSessionManager extends BroadcastReceiver {
     public void onStateChanged(Constants.PlaybackState newState) {
         if (mediaSession == null) return;
 
-        if (newState == Constants.PlaybackState.Stopped) {
+        if (newState == Constants.PlaybackState.STOPPED) {
             mediaSession.setActive(false);
             playbackService.stopForeground(true);
             return;
@@ -163,13 +163,13 @@ public class MediaSessionManager extends BroadcastReceiver {
                 | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS | PlaybackStateCompat.ACTION_STOP | PlaybackStateCompat.ACTION_SEEK_TO;
 
         switch (newState) {
-            case Buffering:
+            case BUFFERING:
                 state = PlaybackStateCompat.STATE_BUFFERING;
                 break;
-            case Playing:
+            case PLAYING:
                 state = PlaybackStateCompat.STATE_PLAYING;
                 break;
-            case Paused:
+            case PAUSED:
                 state = PlaybackStateCompat.STATE_PAUSED;
                 break;
             default:
@@ -213,7 +213,7 @@ public class MediaSessionManager extends BroadcastReceiver {
 
     public void onPlayingItemChanged(final PlayingItem playingItem) {
         if (mediaSession == null) return;
-        if (playbackService.isPlaying()) onStateChanged(Constants.PlaybackState.Playing); //Called to update PlaybackStateCompat
+        if (playbackService.isPlaying()) onStateChanged(Constants.PlaybackState.PLAYING); //Called to update PlaybackStateCompat
 
         Glide.with(playbackService).load(playingItem.getAlbumArtUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
             @Override
@@ -308,8 +308,8 @@ public class MediaSessionManager extends BroadcastReceiver {
         builder.addAction(R.drawable.skip_previous, playbackService.getString(R.string.previous), createMediaPendingIntent(KeyEvent.KEYCODE_MEDIA_PREVIOUS));
 
         Constants.PlaybackState state = playbackService.getState();
-        int drawable = state == Constants.PlaybackState.Paused ? R.drawable.play : R.drawable.pause;
-        String text = playbackService.getString(state == Constants.PlaybackState.Paused ? R.string.play : R.string.pause);
+        int drawable = state == Constants.PlaybackState.PAUSED ? R.drawable.play : R.drawable.pause;
+        String text = playbackService.getString(state == Constants.PlaybackState.PAUSED ? R.string.play : R.string.pause);
         builder.addAction(drawable, text, createMediaPendingIntent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE));
 
         builder.addAction(R.drawable.skip_next, playbackService.getString(R.string.next), createMediaPendingIntent(KeyEvent.KEYCODE_MEDIA_NEXT));

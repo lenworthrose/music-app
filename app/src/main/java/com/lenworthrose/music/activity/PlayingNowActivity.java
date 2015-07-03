@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -20,6 +21,7 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
+import com.lenworthrose.music.fragment.RepeatDialogFragment;
 import com.lenworthrose.music.util.Constants;
 
 /**
@@ -55,6 +57,13 @@ public class PlayingNowActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_playing_now, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -65,6 +74,10 @@ public class PlayingNowActivity extends AppCompatActivity {
                 else
                     NavUtils.navigateUpTo(this, upIntent);
 
+                return true;
+            case R.id.action_repeat:
+                return true;
+            case R.id.action_shuffle:
                 return true;
         }
 
@@ -115,5 +128,13 @@ public class PlayingNowActivity extends AppCompatActivity {
             background.setImageResource(android.R.color.transparent);
 
         if (old != null) old.recycle();
+    }
+
+    public void onRepeatClicked(MenuItem unused) {
+        new RepeatDialogFragment().show(getFragmentManager(), "Repeat");
+    }
+
+    public void onShuffleClicked(MenuItem unused) {
+
     }
 }

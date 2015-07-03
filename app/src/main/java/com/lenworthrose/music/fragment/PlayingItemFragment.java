@@ -326,7 +326,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         playPause.setImageResource(R.drawable.play);
 
         switch (state) {
-            case Stopped:
+            case STOPPED:
                 positionDisplay.setText(R.string.blank_time);
                 durationDisplay.setText(R.string.blank_time);
                 positionBar.setProgress(0);
@@ -335,7 +335,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 playPause.setAlpha(1f);
                 positionDisplay.clearAnimation();
                 break;
-            case Playing:
+            case PLAYING:
                 positionBar.setEnabled(true);
                 playPause.setAlpha(1f);
                 playPause.setImageResource(R.drawable.pause);
@@ -359,20 +359,20 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 handler.postDelayed(new UpdatePositionRunnable(), 333);
 
                 break;
-            case Buffering:
+            case BUFFERING:
                 positionBar.setEnabled(false);
                 playPause.setEnabled(false);
                 playPause.setAlpha(.30f);
                 playPause.setImageResource(R.drawable.play);
                 positionDisplay.clearAnimation();
                 break;
-            case Paused:
+            case PAUSED:
                 positionDisplay.setText(Utils.longToTimeDisplay(playbackService.getPosition()));
                 positionDisplay.startAnimation(pauseBlinkAnimation);
                 break;
         }
 
-        if (state != PlaybackState.Playing) {
+        if (state != PlaybackState.PLAYING) {
             cancelHideOverlays();
             setOverlaysVisible(true);
         }
@@ -424,7 +424,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void scheduleHideOverlays() {
-        if (!autoHideOverlays || playbackService.getState() != PlaybackState.Playing) return;
+        if (!autoHideOverlays || playbackService.getState() != PlaybackState.PLAYING) return;
 
         if (hideOverlaysFuture != null)
             hideOverlaysFuture.cancel(false);
@@ -490,7 +490,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private class UpdatePositionRunnable implements Runnable {
         @Override
         public void run() {
-            if (playbackService.getState() == PlaybackState.Playing) {
+            if (playbackService.getState() == PlaybackState.PLAYING) {
                 updatePosition();
                 handler.postDelayed(new UpdatePositionRunnable(), 1000);
             }

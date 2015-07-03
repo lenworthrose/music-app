@@ -30,6 +30,8 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="pause">Pause</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="repeat">Repeat</string>
 
     <!-- Media Sync -->
     <string name="syncing_with_media_store">Syncing with media store…</string>
@@ -42,4 +44,11 @@
     <string name="refresh_artists_desc">Search for new artists in the media store</string>
     <string name="refresh_albums">Refresh Albums</string>
     <string name="refresh_albums_desc">Refresh the cover art for all albums. Will also remove artists that have no albums.</string>
+
+    <!-- Repeat Modes -->
+    <string name="off">Off</string>
+    <string name="track">Track</string>
+    <string name="stop">Stop</string>
+    <string name="choose_repeat_mode">Choose repeat mode</string>
+    <string name="cancel">Cancel</string>
 </resources>
