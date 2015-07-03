@@ -68,18 +68,6 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
         listView.setDragEnabled(false);
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        if (menu.findItem(R.id.action_shuffle) == null) {
-//            inflater.inflate(R.menu.playlist, menu);
-//
-//            if (Playback.getInstance().isSavePlaylistSupported())
-//                menu.add(R.string.save_playlist).setIcon(R.drawable.save_playlist);
-//        }
-//
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -104,39 +92,6 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
         super.onStop();
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (!isVisible()) return false;
-//
-//        switch (item.getItemId()) {
-//            case R.id.action_repeat:
-//                RepeatDialogFragment repeat = new RepeatDialogFragment();
-//                repeat.show(getActivity().getFragmentManager(), "repeatDialog");
-//                return true;
-//            case R.id.action_shuffle:
-//                ShuffleDialogFragment shuffle = new ShuffleDialogFragment();
-//                shuffle.show(getActivity().getFragmentManager(), "shuffleDialog");
-//                return true;
-//            case R.id.action_edit_playlist:
-//                if (adapter.getCount() > 0) {
-//                    Intent intent = new Intent(getActivity(), EditPlaylistActivity.class);
-//                    intent.putExtra(EditPlaylistActivity.SELECTED_ITEM, listView.getCheckedItemPosition());
-//                    startActivity(intent);
-//                } else {
-//                    RemoteApp.showToast(R.string.no_tracks_in_playlist);
-//                }
-//
-//                return true;
-//            case 666666:
-//                NewPlaylistNameDialogFragment newPlaylist = new NewPlaylistNameDialogFragment();
-//                newPlaylist.setTargetFragment(this, 666666);
-//                newPlaylist.show(getChildFragmentManager(), null);
-//                return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
     public void playlistUpdated() {
         if (isDetached()) return;
 
@@ -155,32 +110,6 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
             });
         }
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == 666666 && resultCode == Activity.RESULT_OK) {
-//            String name = data.getStringExtra(NewPlaylistNameDialogFragment.NAME);
-//
-//            BooleanRequest req = new BooleanRequest(Command.SavePlayingNowToPlaylist, name, null, new Response.Listener<Boolean>() {
-//                @Override
-//                public void onResponse(Boolean response) {
-//                    if (response)
-//                        RemoteApp.showToast(R.string.playlist_save_successful);
-//                    else
-//                        RemoteApp.showToast(R.string.playlist_save_failed);
-//                }
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    RemoteApp.showToast(getString(R.string.error_occurred, Utils.getVolleyErrorString(error)));
-//                }
-//            });
-//
-//            RemoteApp.getRequestQueue().add(req);
-//        } else {
-//            super.onActivityResult(requestCode, resultCode, data);
-//        }
-//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
