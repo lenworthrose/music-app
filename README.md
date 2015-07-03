@@ -40,6 +40,9 @@ https://github.com/astuetz/PagerSlidingTabStrip
 Uses the Glide library, written by Sam Judd, and licensed under the Apache License v2.0:
 https://github.com/astuetz/PagerSlidingTabStrip
 
+App icon created by Linh Pham Thi Dieu:
+https://www.iconfinder.com/phdieuli
+
 Uses code taken from the Last.fm library:
 https://github.com/lastfm/lastfm-android/tree/master/library
 
