@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.lenworthrose.music.IdType;
@@ -19,6 +20,7 @@ import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.sync.MediaStoreService;
 import com.lenworthrose.music.util.NavigationListener;
+import com.lenworthrose.music.view.NowPlayingBar;
 
 import java.util.ArrayList;
 
@@ -134,17 +136,26 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
+    public void onArtistsDbInitialized() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance()).commit();
+    }
+
+    @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         playbackService = ((PlaybackService.LocalBinder)service).getService();
+
+        NowPlayingBar nowPlayingBar = (NowPlayingBar)findViewById(R.id.main_now_playing_bar);
+        nowPlayingBar.setPlaybackService(playbackService);
+        nowPlayingBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
+            }
+        });
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         playbackService = null;
-    }
-
-    @Override
-    public void onArtistsDbInitialized() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance()).commit();
     }
 }

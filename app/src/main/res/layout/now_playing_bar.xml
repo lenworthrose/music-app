@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?actionBarSize"
+    android:background="?colorPrimary"
+    android:gravity="center_vertical"
+    android:padding="1dp">
+
+    <ImageView
+        android:id="@+id/np_cover"
+        android:layout_width="?actionBarSize"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/np_title"
+            style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/np_subtitle"
+            style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:orientation="horizontal"
+        tools:ignore="RtlHardcoded">
+
+        <ImageView
+            android:id="@+id/np_play_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="5dp"
+            android:background="?selectableItemBackground"
+            android:scaleType="centerInside"
+            android:src="@drawable/play"
+            tools:ignore="ContentDescription,RtlHardcoded" />
+
+        <ImageView
+            android:id="@+id/np_next"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?selectableItemBackground"
+            android:scaleType="centerInside"
+            android:src="@drawable/skip_next"
+            tools:ignore="ContentDescription" />
+    </LinearLayout>
+</LinearLayout>
