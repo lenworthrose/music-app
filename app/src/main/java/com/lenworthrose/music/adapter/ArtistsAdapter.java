@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStore.ArtistsStoreListener, SectionIndexer {
     private AlphabetIndexer indexer;
+    private CursorLoader loader;
 
     public ArtistsAdapter(Context context, boolean isGrid) {
         super(context, isGrid);
@@ -34,12 +35,14 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getContext()) {
+        loader = new CursorLoader(getContext()) {
             @Override
             public Cursor loadInBackground() {
                 return ArtistsStore.getInstance().getArtists();
             }
         };
+
+        return loader;
     }
 
     @Override
@@ -50,12 +53,12 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
 
     @Override
     public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
-        swapCursor(ArtistsStore.getInstance().getArtists());
+        loader.forceLoad();
     }
 
     @Override
     public void onArtistInfoFetchComplete() {
-        swapCursor(ArtistsStore.getInstance().getArtists());
+        loader.forceLoad();
     }
 
     @Override
