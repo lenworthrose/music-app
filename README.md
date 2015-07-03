@@ -1,7 +1,11 @@
 # music-app
 
-muZak is a music player for Android. The strength of muZak is the degree of control it allows over the Playing Now
-playlist, a playlist which is dynamically generated based on the tracks that have been selected for playback.
+muZak is a music player for Android. It allows playback of content located on your device, and renders content from
+the device's MediaStore.
+
+muZak centers around a dynamically generated Playing Now playlist. You can view this playlist from the Playing Now
+page, and while browsing your music library you can add tracks to this list. From the Playing Now page you can edit
+the Playing Now playlist, using a combination of drag-and-drop and swipe to delete.
 
 ## Installation
 
