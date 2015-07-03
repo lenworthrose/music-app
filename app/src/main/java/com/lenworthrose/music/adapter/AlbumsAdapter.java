@@ -8,6 +8,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AlphabetIndexer;
+import android.widget.SectionIndexer;
 
 import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
@@ -20,7 +22,7 @@ import java.util.ArrayList;
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Albums.
  */
-public class AlbumsAdapter extends BaseSwitchableAdapter {
+public class AlbumsAdapter extends BaseSwitchableAdapter implements SectionIndexer {
     private static String[] PROJECTION = {
             MediaStore.Audio.Albums._ID,
             MediaStore.Audio.Albums.ALBUM,
@@ -32,6 +34,7 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
 
     private IdType type;
     private long parentId;
+    private AlphabetIndexer indexer;
 
     public AlbumsAdapter(Context context, boolean isGrid) {
         this(context, isGrid, null, Long.MIN_VALUE);
@@ -80,6 +83,12 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     }
 
     @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        super.onLoadFinished(loader, data);
+        indexer = new MusicAlphabetIndexer(data, 1, getContext().getString(R.string.fast_scroll_alphabet));
+    }
+
+    @Override
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
         view.setTitle(cursor.getString(1));
 
@@ -94,6 +103,21 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(1));
         Glide.with(context).load(cursor.getString(4)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
+    }
+
+    @Override
+    public Object[] getSections() {
+        return indexer.getSections();
+    }
+
+    @Override
+    public int getPositionForSection(int sectionIndex) {
+        return indexer.getPositionForSection(sectionIndex);
+    }
+
+    @Override
+    public int getSectionForPosition(int position) {
+        return indexer.getSectionForPosition(position);
     }
 
     @Override

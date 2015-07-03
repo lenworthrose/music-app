@@ -8,5 +8,6 @@
         android:id="@+id/abs_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:choiceMode="multipleChoiceModal" />
+        android:choiceMode="multipleChoiceModal"
+        android:fastScrollEnabled="true" />
 </FrameLayout>
