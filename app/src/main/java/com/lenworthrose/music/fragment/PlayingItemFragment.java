@@ -239,27 +239,21 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
         if (playbackService != null) playbackStateChanged();
     }
 
     @Override
     public void onPause() {
         cancelHideOverlays();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         handler.removeCallbacksAndMessages(null);
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         getActivity().unbindService(this);
         super.onDestroy();
     }
@@ -416,6 +410,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         PlaybackService.LocalBinder binder = (PlaybackService.LocalBinder)service;
         playbackService = binder.getService();
         playingItemChanged();
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
     }
 
     @Override

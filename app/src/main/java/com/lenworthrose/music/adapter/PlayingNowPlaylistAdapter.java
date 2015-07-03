@@ -49,6 +49,7 @@ public class PlayingNowPlaylistAdapter extends DragSortCursorAdapter {
         item.setSubtitle(cursor.getString(3));
         item.setStatus(Utils.longToTimeDisplay(cursor.getLong(7)));
         item.setImageVisible(true);
+        item.setEditModeEnabled(isEditModeEnabled);
         Glide.with(context).load(cursor.getString(8)).into(item.getImageView());
     }
 

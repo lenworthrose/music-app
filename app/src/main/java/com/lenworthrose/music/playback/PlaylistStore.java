@@ -9,7 +9,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
 import com.lenworthrose.music.playback.PlaylistStoreContract.PlaylistEntry;
+import com.mobeta.android.dslv.DragSortCursorAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,37 +186,37 @@ public class PlaylistStore {
         }
     }
 
-//    public void performPlaylistActions(PlayingNowPlaylistAdapter adapter) {
-//        Cursor cur = adapter.getCursor();
-//        cur.moveToPosition(-1);
-//
-//        db.beginTransaction();
-//
-//        try {
-//            while (cur.moveToNext()) {
-//                int listPos = adapter.getListPosition(cur.getPosition());
-//
-//                if (listPos == DragSortCursorAdapter.REMOVED) {
-//                    Log.d("PlaylistStore", "Playlist item removed: cursorPosition=" + cur.getPosition() + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
-//                    db.delete(TABLE_NAME, PlaylistEntry._ID + " = " + String.valueOf(cur.getLong(0)), null);
-//                } else if (listPos != cur.getPosition()) {
-//                    ContentValues values = new ContentValues();
-//                    values.put(PlaylistEntry.COLUMN_SEQUENCE, listPos);
-//
-//                    db.update(TABLE_NAME, values, PlaylistEntry._ID + " = " + String.valueOf(cur.getLong(0)), null);
-//                    Log.d("PlaylistStore", "Playlist item moved: cursorPosition=" + cur.getPosition() + " listPos=" + listPos + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
-//                }
-//            }
-//
-//            db.setTransactionSuccessful();
-//        } finally {
-//            db.endTransaction();
-//        }
-//    }
+    public void performPlaylistActions(PlayingNowPlaylistAdapter adapter) {
+        Cursor cur = adapter.getCursor();
+        cur.moveToPosition(-1);
 
-    public int findPosition(int key) {
+        db.beginTransaction();
+
+        try {
+            while (cur.moveToNext()) {
+                int listPos = adapter.getListPosition(cur.getPosition());
+
+                if (listPos == DragSortCursorAdapter.REMOVED) {
+                    Log.d("PlaylistStore", "Playlist item removed: cursorPosition=" + cur.getPosition() + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
+                    db.delete(TABLE_NAME, PlaylistEntry._ID + " = " + String.valueOf(cur.getLong(0)), null);
+                } else if (listPos != cur.getPosition()) {
+                    ContentValues values = new ContentValues();
+                    values.put(PlaylistEntry.COLUMN_SEQUENCE, listPos);
+
+                    db.update(TABLE_NAME, values, PlaylistEntry._ID + " = " + String.valueOf(cur.getLong(0)), null);
+                    Log.d("PlaylistStore", "Playlist item moved: cursorPosition=" + cur.getPosition() + " listPos=" + listPos + " name=" + cur.getString(6) + " _id=" + cur.getLong(0));
+                }
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public int findPosition(long songId) {
         int retVal = -1;
-        Cursor cur = db.query(TABLE_NAME, new String[] { PlaylistEntry.COLUMN_SEQUENCE }, PlaylistEntry.COLUMN_SONG_ID + " = " + key, null, null, null, null);
+        Cursor cur = db.query(TABLE_NAME, new String[] { PlaylistEntry.COLUMN_SEQUENCE }, PlaylistEntry.COLUMN_SONG_ID + " = " + songId, null, null, null, null);
         if (cur.moveToFirst()) retVal = cur.getInt(0);
         cur.close();
 

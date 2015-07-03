@@ -139,4 +139,8 @@ public class PlayingNowActivity extends AppCompatActivity {
     public void onShuffleClicked(MenuItem unused) {
         new ShuffleDialogFragment().show(getFragmentManager(), "Shuffle");
     }
+
+    public void onEditPlaylistClicked(MenuItem unused) {
+        startActivity(new Intent(this, EditPlaylistActivity.class));
+    }
 }

@@ -14,4 +14,11 @@
         android:onClick="onRepeatClicked"
         android:title="@string/repeat"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_edit_playlist"
+        android:icon="@drawable/edit"
+        android:onClick="onEditPlaylistClicked"
+        android:title="@string/edit_playlist"
+        app:showAsAction="ifRoom" />
 </menu>

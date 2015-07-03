@@ -33,6 +33,10 @@
             android:name=".activity.SettingsActivity"
             android:label="@string/action_settings" />
 
+        <activity
+            android:name=".activity.EditPlaylistActivity"
+            android:label="@string/edit_playlist" />
+
         <service
             android:name=".playback.PlaybackService" />
 

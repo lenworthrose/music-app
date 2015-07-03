@@ -57,4 +57,12 @@
     <string name="choose_shuffle_mode">What would you like to shuffle?</string>
     <string name="remaining">Remaining</string>
     <string name="all">All</string>
+
+    <!-- Edit Playlist -->
+    <string name="edit_playlist">Edit Playlist</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="unsaved_changed">Unsaved changes</string>
+    <string name="unsaved_changes_warning">Your changes have not been saved! Would you like to save them now?</string>
+    <string name="save">Save</string>
 </resources>

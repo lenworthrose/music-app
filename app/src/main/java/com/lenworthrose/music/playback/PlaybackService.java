@@ -21,6 +21,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.lenworthrose.music.IdType;
+import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.util.Constants;
 
@@ -376,32 +377,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         task.execute();
     }
 
-//    public void playlistEdited(int currentFileKey) {
-//        if (playlistCursor != null) playlistCursor.close();
-//        playlistCursor = playlistStore.read();
-//
-//        boolean isPlayingItemRemoved = false;
-//        playlistPosition = 0;
-//
-//        if (currentFileKey != -1) {
-//            int position = playlistStore.findPosition(currentFileKey);
-//
-//            if (position >= 0) {
-//                playlistPosition = position;
-//            } else {
-//                isPlayingItemRemoved = true;
-//                stop();
-//            }
-//        }
-//
-//        storePlaylistPosition();
-//        notifyPlaylistChanged();
-//        if (isPlayingItemRemoved) notifyPlayingItemChanged();
-//
-//        cancelNextTrack();
-//        scheduleNextTrack();
-//    }
-
     public int getPlaylistSize() {
         return playlistCursor == null ? 0 : playlistCursor.getCount();
     }
@@ -484,6 +459,32 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         };
 
         task.execute();
+    }
+
+    public void performPlaylistActions(PlayingNowPlaylistAdapter adapter) {
+        Cursor cursor = adapter.getCursor();
+        cursor.moveToPosition(playlistPosition);
+
+        long currentSongId = adapter.getCursor().getLong(2);
+        playlistStore.performPlaylistActions(adapter);
+
+        if (playlistCursor != null) playlistCursor.close();
+        playlistCursor = playlistStore.read();
+        playlistPosition = 0;
+
+        int position = playlistStore.findPosition(currentSongId);
+
+        if (position >= 0)
+            playlistPosition = position;
+        else
+            stop();
+
+        storePlaylistPosition();
+        notifyPlaylistChanged();
+        notifyPlayingItemChanged();
+
+        cancelNextTrack();
+        scheduleNextTrack();
     }
 
     private void scheduleNextTrack() {

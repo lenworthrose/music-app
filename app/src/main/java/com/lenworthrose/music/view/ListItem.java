@@ -12,11 +12,9 @@ import com.lenworthrose.music.R;
  * an optional small thumbnail, a title, subtitle, and status text.
  */
 public class ListItem extends CheckableFrameLayout {
-    private String key;
     private ImageView dragHandle;
     private SquareImageView image;
     private TextView title, subtitle, status;
-    private boolean isEditModeEnabled;
 
     public ListItem(Context context) {
         super(context);
@@ -49,5 +47,9 @@ public class ListItem extends CheckableFrameLayout {
 
     public void setImageVisible(boolean visible) {
         image.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    public void setEditModeEnabled(boolean isEditModeEnabled) {
+        dragHandle.setVisibility(isEditModeEnabled ? VISIBLE : GONE);
     }
 }
