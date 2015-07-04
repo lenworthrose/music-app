@@ -36,12 +36,14 @@ import java.util.ArrayList;
  */
 public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, ArtistsStore.InitListener {
     private PlaybackService playbackService;
+    private NowPlayingBar nowPlayingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        nowPlayingBar = (NowPlayingBar)findViewById(R.id.main_now_playing_bar);
         startService(new Intent(this, PlaybackService.class));
         ArtistsStore.getInstance().init(this, this);
         startService(new Intent(this, MediaStoreService.class));
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     protected void onDestroy() {
         stopService(new Intent(this, PlaybackService.class));
+        nowPlayingBar.setPlaybackService(null);
         super.onDestroy();
     }
 
@@ -146,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     public void onServiceConnected(ComponentName name, IBinder service) {
         playbackService = ((PlaybackService.LocalBinder)service).getService();
 
-        NowPlayingBar nowPlayingBar = (NowPlayingBar)findViewById(R.id.main_now_playing_bar);
         nowPlayingBar.setPlaybackService(playbackService);
         nowPlayingBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,5 +161,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void onServiceDisconnected(ComponentName name) {
         playbackService = null;
+        nowPlayingBar.setPlaybackService(null);
     }
 }

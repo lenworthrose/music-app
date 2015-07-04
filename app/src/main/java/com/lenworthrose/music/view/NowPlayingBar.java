@@ -86,12 +86,16 @@ public class NowPlayingBar extends LinearLayout {
     public void setPlaybackService(PlaybackService service) {
         playbackService = service;
 
-        IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_CHANGED);
-        filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+        if (service != null) {
+            IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_CHANGED);
+            filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
+            LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
 
-        playingItemChanged();
-        playbackStateChanged();
+            playingItemChanged();
+            playbackStateChanged();
+        } else {
+            LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+        }
     }
 
     public void playingItemChanged() {
