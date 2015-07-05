@@ -28,7 +28,7 @@ import com.lenworthrose.music.view.ListHeader;
 /**
  * This Fragment handles the display of information from the media library. It can be configured
  * to display content as either a list or a grid.
- * <p>
+ * <p/>
  * The {@code isGridView()} method is currently used to determine whether the current list should
  * be displayed as a grid or a list. Eventually, this should be determined by user preference, but
  * for now it's hardcoded.
@@ -76,8 +76,6 @@ public class LibraryFragment extends Fragment {
                 ((HeaderGridView)absListView).addHeaderView(header, null, false);
             else
                 ((ListView)absListView).addHeaderView(header, null, false);
-
-            if (adapter instanceof ListHeader.ImageLoadListener) header.setImageLoadListener(((ListHeader.ImageLoadListener)adapter));
         }
 
         absListView.setAdapter(adapter);
@@ -129,8 +127,11 @@ public class LibraryFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        searchView.setIconified(true);
-        searchView.clearFocus();
+        if (searchView != null) {
+            searchView.setIconified(true);
+            searchView.clearFocus();
+        }
+
         absListView.setAdapter(null);
         super.onDestroyView();
     }

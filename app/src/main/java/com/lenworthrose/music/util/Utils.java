@@ -3,6 +3,7 @@ package com.lenworthrose.music.util;
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -10,11 +11,13 @@ import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
 import com.lenworthrose.music.activity.PlayingNowActivity;
+import com.lenworthrose.music.playback.PlaylistStoreContract;
 
 public class Utils {
     public static IntentFilter createPlaybackIntentFilter() {
@@ -385,5 +388,11 @@ public class Utils {
 
         bitmap.setPixels(pix, 0, w, 0, 0, w, h);
         return (bitmap);
+    }
+
+    public static String buildAlbumArtUrl(long albumId) {
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
+        albumArtUri = ContentUris.withAppendedId(albumArtUri, albumId);
+        return albumArtUri.toString();
     }
 }

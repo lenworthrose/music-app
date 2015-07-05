@@ -2,7 +2,6 @@ package com.lenworthrose.music.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.content.CursorLoader;
@@ -10,11 +9,11 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;
-import com.lenworthrose.music.view.ListHeader;
 import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Songs.
  */
-public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.ImageLoadListener {
+public class SongsAdapter extends BaseSwitchableAdapter {
     private static String[] PROJECTION = {
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -35,7 +34,6 @@ public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.Im
 
     private long parentId;
     private IdType type;
-    private Bitmap bitmap;
 
     public SongsAdapter(Context context, boolean isGrid) {
         this(context, isGrid, null, Long.MIN_VALUE);
@@ -56,13 +54,18 @@ public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.Im
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
         view.setTitle(buildTitle(cursor));
         view.setStatus(Utils.longToTimeDisplay(cursor.getLong(3)));
-        if (parentId == Constants.ALL) view.setSubtitle(cursor.getString(4));
+
+        if (parentId == Constants.ALL) {
+            view.setSubtitle(cursor.getString(4));
+            view.setImageVisible(true);
+            Glide.with(context).load(Utils.buildAlbumArtUrl(cursor.getLong(6))).into(view.getImageView());
+        }
     }
 
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(buildTitle(cursor));
-        view.getImageView().setImageBitmap(bitmap);
+        Glide.with(context).load(Utils.buildAlbumArtUrl(cursor.getLong(6))).into(view.getImageView());
     }
 
     protected String buildTitle(Cursor cursor) {
@@ -158,11 +161,5 @@ public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.Im
     @Override
     protected void onAddAsNextClicked(ArrayList<Long> ids) {
         getNavigationListener().addAsNext(IdType.SONG, ids);
-    }
-
-    @Override
-    public void onImageLoaded(Bitmap image) {
-        bitmap = image;
-        notifyDataSetInvalidated();
     }
 }

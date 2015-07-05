@@ -1,16 +1,15 @@
 package com.lenworthrose.music.playback;
 
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
 import com.lenworthrose.music.playback.PlaylistStoreContract.PlaylistEntry;
+import com.lenworthrose.music.util.Utils;
 import com.mobeta.android.dslv.DragSortCursorAdapter;
 
 import java.util.ArrayList;
@@ -232,10 +231,7 @@ public class PlaylistStore {
         values.put(PlaylistEntry.COLUMN_DURATION, cur.getLong(3));
         values.put(PlaylistEntry.COLUMN_ARTIST, cur.getString(4));
         values.put(PlaylistEntry.COLUMN_ALBUM, cur.getString(5));
-
-        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
-        albumArtUri = ContentUris.withAppendedId(albumArtUri, cur.getLong(6));
-        values.put(PlaylistEntry.COLUMN_ALBUM_ART_URL, albumArtUri.toString());
+        values.put(PlaylistEntry.COLUMN_ALBUM_ART_URL, Utils.buildAlbumArtUrl(cur.getLong(6)));
 
         return values;
     }

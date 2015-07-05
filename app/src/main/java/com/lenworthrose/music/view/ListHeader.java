@@ -28,14 +28,9 @@ import com.lenworthrose.music.util.Utils;
  * and also as a blurred background for this view.
  */
 public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteListener<Cursor> {
-    public interface ImageLoadListener {
-        void onImageLoaded(Bitmap image);
-    }
-
     private IdType type;
     private ImageView background, coverArt;
     private TextView artist, album, year, tracksDuration;
-    private ImageLoadListener listener;
 
     public ListHeader(Context context, IdType type, long id) {
         super(context);
@@ -51,10 +46,6 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
         getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
 
         populate(id);
-    }
-
-    public void setImageLoadListener(ImageLoadListener listener) {
-        this.listener = listener;
     }
 
     private void populate(long id) {
@@ -112,7 +103,6 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
             @Override
             public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                 coverArt.setImageBitmap(resource);
-                if (listener != null) listener.onImageLoaded(resource);
 
                 Utils.createBlurredBitmap(resource, new Utils.BitmapCallback() {
                     @Override
