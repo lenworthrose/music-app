@@ -56,6 +56,7 @@ public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.Im
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
         view.setTitle(buildTitle(cursor));
         view.setStatus(Utils.longToTimeDisplay(cursor.getLong(3)));
+        if (parentId == Constants.ALL) view.setSubtitle(cursor.getString(4));
     }
 
     @Override
