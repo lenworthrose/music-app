@@ -586,8 +586,12 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
      * @param shouldUnregisterRemote should be true if we aren't starting playback again. Otherwise, lockscreen widget will flicker!
      */
     private void releaseMediaPlayers(boolean shouldUnregisterRemote) {
-        nextTrack.reset();
-        currentTrack.reset();
+        try {
+            nextTrack.reset();
+            currentTrack.reset();
+        } catch (IllegalStateException ex) {
+            Log.w("PlaybackThread", "IllegalStateException occurred attempting to reset MediaPlayers");
+        }
 
         if (shouldUnregisterRemote) {
             if (mediaSessionManager != null) mediaSessionManager.unregister();

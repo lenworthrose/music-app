@@ -39,7 +39,6 @@ public class MediaSessionManager extends BroadcastReceiver {
 
     private MediaSessionCompat mediaSession;
     private PlaybackService playbackService;
-    private Intent lastPlayingItemChangedIntent;
     private Handler bgHandler;
 
     public static class MediaKeyReceiver extends BroadcastReceiver {
@@ -245,14 +244,16 @@ public class MediaSessionManager extends BroadcastReceiver {
                 });
 
                 if (!playbackService.isPlaylistEmpty()) { //Update the Notification, esp. to switch Play/Pause icons
-                    Glide.with(playbackService).load(lastPlayingItemChangedIntent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
+                    Glide.with(playbackService).load(playbackService.getPlayingItemIntent()
+                            .getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onLoadFailed(Exception e, Drawable errorDrawable) {
                             bgHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (mediaSession == null) return;
-                                    updateNotification(lastPlayingItemChangedIntent, BitmapFactory.decodeResource(playbackService.getResources(), R.drawable.logo));
+                                    updateNotification(playbackService.getPlayingItemIntent(),
+                                            BitmapFactory.decodeResource(playbackService.getResources(), R.drawable.logo));
                                 }
                             });
                         }
@@ -263,7 +264,7 @@ public class MediaSessionManager extends BroadcastReceiver {
                                 @Override
                                 public void run() {
                                     if (mediaSession == null) return;
-                                    updateNotification(lastPlayingItemChangedIntent, resource);
+                                    updateNotification(playbackService.getPlayingItemIntent(), resource);
                                 }
                             });
                         }
@@ -272,15 +273,13 @@ public class MediaSessionManager extends BroadcastReceiver {
 
                 break;
             case Constants.PLAYING_NOW_CHANGED:
-                lastPlayingItemChangedIntent = intent;
-
                 Glide.with(playbackService).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onLoadFailed(Exception e, Drawable errorDrawable) {
                         Bitmap fallback = BitmapFactory.decodeResource(playbackService.getResources(), R.drawable.audio);
                         if (mediaSession == null) return;
-                        updateMetadata(lastPlayingItemChangedIntent, fallback);
-                        updateNotification(lastPlayingItemChangedIntent, fallback);
+                        updateMetadata(playbackService.getPlayingItemIntent(), fallback);
+                        updateNotification(playbackService.getPlayingItemIntent(), fallback);
                     }
 
                     @Override
@@ -289,8 +288,8 @@ public class MediaSessionManager extends BroadcastReceiver {
                             @Override
                             public void run() {
                                 if (mediaSession == null) return;
-                                updateMetadata(lastPlayingItemChangedIntent, resource);
-                                updateNotification(lastPlayingItemChangedIntent, resource);
+                                updateMetadata(playbackService.getPlayingItemIntent(), resource);
+                                updateNotification(playbackService.getPlayingItemIntent(), resource);
                             }
                         });
                     }
