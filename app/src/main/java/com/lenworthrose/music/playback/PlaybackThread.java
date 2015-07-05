@@ -185,7 +185,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void playPause() {
-        if (!isPlaying()) {
+        if (!isPlaying() && playbackState != PlaybackState.PAUSED) {
             play(playlistPosition);
         } else {
             if (currentTrack.isPlaying())
@@ -228,7 +228,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void seek(int position) {
-        if (isPlaying()) {
+        if (isPlaying() || playbackState == PlaybackState.PAUSED) {
             try {
                 currentTrack.seekTo(position);
                 notifyStateChanged(PlaybackState.BUFFERING);
@@ -381,7 +381,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
     public int getDuration() {
         try {
-            return playbackState == PlaybackState.PLAYING ? currentTrack.getDuration() : -1;
+            return playbackState == PlaybackState.PLAYING || playbackState == PlaybackState.PAUSED ? currentTrack.getDuration() : -1;
         } catch (IllegalStateException ex) {
             return -1;
         }
@@ -393,7 +393,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
     public int getPosition() {
         try {
-            return !isPlaying() ? 0 : currentTrack.getCurrentPosition();
+            return !isPlaying() && playbackState != PlaybackState.PAUSED  ? 0 : currentTrack.getCurrentPosition();
         } catch (IllegalStateException ex) {
             return 0;
         }
@@ -663,7 +663,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public Intent getPlaybackStateIntent() {
         Intent intent = new Intent(Constants.PLAYBACK_STATE_CHANGED);
         intent.putExtra(Constants.EXTRA_STATE, playbackState);
-        if (playbackState == PlaybackState.PLAYING) intent.putExtra(Constants.EXTRA_DURATION, getDuration());
+        if (playbackState == PlaybackState.PLAYING || playbackState == PlaybackState.PAUSED) intent.putExtra(Constants.EXTRA_DURATION, getDuration());
         return intent;
     }
 

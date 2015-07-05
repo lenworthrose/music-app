@@ -295,6 +295,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
         PlaybackState state = (PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
         playPause.setImageResource(R.drawable.play);
+        int duration = intent.getIntExtra(Constants.EXTRA_DURATION, -1);
 
         switch (state) {
             case STOPPED:
@@ -313,8 +314,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 playPause.setEnabled(true);
                 scheduleHideOverlays();
                 positionDisplay.clearAnimation();
-
-                int duration = intent.getIntExtra(Constants.EXTRA_DURATION, -1);
 
                 if (duration < 0) {
                     positionBar.setProgress(0);
@@ -339,6 +338,10 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 break;
             case PAUSED:
                 positionDisplay.setText(Utils.longToTimeDisplay(playbackService.getPosition()));
+
+                positionBar.setMax(duration);
+                durationDisplay.setText(Utils.longToTimeDisplay(duration));
+
                 positionDisplay.startAnimation(pauseBlinkAnimation);
                 break;
         }
