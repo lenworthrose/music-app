@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.lenworthrose.music.IdType;
+import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListHeader;
@@ -65,8 +66,13 @@ public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.Im
 
     protected String buildTitle(Cursor cursor) {
         String title = cursor.getString(1);
-        int track = cursor.getInt(2) % 1000;
-        return track + ". " + title;
+
+        if (parentId != Constants.ALL) {
+            int track = cursor.getInt(2) % 1000;
+            return track + ". " + title;
+        }
+
+        return title;
     }
 
     @Override
