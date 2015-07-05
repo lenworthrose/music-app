@@ -49,7 +49,7 @@ public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.Im
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return createSongsLoader(getContext(), type, parentId);
+        return createSongsLoader(getContext(), type, parentId, getFilterQuery());
     }
 
     @Override
@@ -94,10 +94,20 @@ public class SongsAdapter extends BaseSwitchableAdapter implements ListHeader.Im
                 sortOrder);
     }
 
-    public static CursorLoader createSongsLoader(Context context, IdType type, long id) {
+    public static CursorLoader createSongsLoader(Context context, IdType type, long id, String filter) {
         String where = buildWhere(type);
         String[] whereVars = type == null ? null : new String[] { String.valueOf(id) };
         String sortOrder = buildSortOrder(type);
+
+        if (filter != null) {
+            where = (where != null) ? where + " AND " : "";
+            where += MediaStore.Audio.Media.TITLE + " LIKE ?";
+
+            if (whereVars != null)
+                whereVars = new String[] { String.valueOf(id), '%' + filter + '%' };
+            else
+                whereVars = new String[] { '%' + filter + '%' };
+        }
 
         return new CursorLoader(context, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 PROJECTION,

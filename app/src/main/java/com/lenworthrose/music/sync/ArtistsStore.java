@@ -80,7 +80,25 @@ public class ArtistsStore {
     }
 
     public Cursor getArtists() {
-        return db.query(TABLE_NAME, PROJECTION_ALL, null, null, null, null, ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
+        return getArtists(null);
+    }
+
+    public Cursor getArtists(String filter) {
+        String where = null;
+        String[] whereArgs = null;
+
+        if (filter != null) {
+            where = ArtistsStoreContract.ArtistEntry.COLUMN_NAME + " LIKE ?";
+            whereArgs = new String[] { '%' + filter + '%' };
+        }
+
+        return db.query(TABLE_NAME,
+                PROJECTION_ALL,
+                where,
+                whereArgs,
+                null,
+                null,
+                ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
     }
 
     public CursorLoader getArtistInfo(Context context, final long id) {

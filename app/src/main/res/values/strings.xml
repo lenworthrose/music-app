@@ -11,6 +11,7 @@
     <string name="added_as_next">Added as next!</string>
     <string name="open_drawer">Open Drawer</string>
     <string name="close_drawer">Close Drawer</string>
+    <string name="filter">Filter</string>
 
     <plurals name="num_of_albums">
         <item quantity="one">%1$d album</item>

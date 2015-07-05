@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,6 +42,7 @@ public class LibraryFragment extends Fragment {
     private BaseSwitchableAdapter adapter;
     private IdType idType;
     private long id;
+    private SearchView searchView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,6 +91,28 @@ public class LibraryFragment extends Fragment {
         inflater.inflate(R.menu.menu_library_fragment, menu);
 
         menu.findItem(R.id.action_toggle_view_mode).setIcon(isGridView() ? R.drawable.playlists : R.drawable.grid);
+
+        searchView = (SearchView)menu.findItem(R.id.action_filter).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (TextUtils.isEmpty(newText)) {
+                    searchView.setIconified(true);
+                    adapter.setFilter(null);
+                } else {
+                    adapter.setFilter(newText);
+                }
+
+                getLoaderManager().restartLoader(0, null, adapter);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -104,8 +129,17 @@ public class LibraryFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        searchView.setIconified(true);
+        searchView.clearFocus();
         absListView.setAdapter(null);
         super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(Constants.TYPE, idType);
+        outState.putLong(Constants.ID, id);
     }
 
     private void toggleViewMode() {

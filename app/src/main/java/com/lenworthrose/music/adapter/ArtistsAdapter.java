@@ -35,7 +35,7 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
         loader = new CursorLoader(getContext()) {
             @Override
             public Cursor loadInBackground() {
-                return ArtistsStore.getInstance().getArtists();
+                return ArtistsStore.getInstance().getArtists(getFilterQuery());
             }
         };
 

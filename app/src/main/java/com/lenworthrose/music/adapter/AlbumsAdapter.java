@@ -45,6 +45,10 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     }
 
     public static CursorLoader getAlbums(Context context, IdType type, long id) {
+        return getAlbums(context, type, id, null);
+    }
+
+    public static CursorLoader getAlbums(Context context, IdType type, long id, String filter) {
         String where = null;
         String[] whereVars = null;
 
@@ -66,6 +70,16 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
 
         if (where != null) where += "= ?";
 
+        if (filter != null) {
+            where = (where != null) ? where + " AND " : "";
+            where += MediaStore.Audio.Media.ALBUM + " LIKE ?";
+
+            if (whereVars != null)
+                whereVars = new String[] { String.valueOf(id), '%' + filter + '%' };
+            else
+                whereVars = new String[] { '%' + filter + '%' };
+        }
+
         return new CursorLoader(context, MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 PROJECTION,
                 where,
@@ -75,7 +89,7 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return getAlbums(getContext(), type, parentId);
+        return getAlbums(getContext(), type, parentId, getFilterQuery());
     }
 
     @Override

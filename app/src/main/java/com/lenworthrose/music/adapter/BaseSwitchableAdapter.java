@@ -34,6 +34,7 @@ public abstract class BaseSwitchableAdapter extends CursorAdapter implements Ada
     private Context context;
     private NavigationListener navListener;
     private ArrayList<Long> ids;
+    private String query;
 
     public BaseSwitchableAdapter(Context context, boolean isGrid) {
         super(context, null, 0);
@@ -52,10 +53,6 @@ public abstract class BaseSwitchableAdapter extends CursorAdapter implements Ada
 
     protected NavigationListener getNavigationListener() {
         return navListener;
-    }
-
-    protected boolean isGrid() {
-        return isGrid;
     }
 
     //--------------CursorAdapter impl
@@ -143,4 +140,12 @@ public abstract class BaseSwitchableAdapter extends CursorAdapter implements Ada
 
     protected abstract void updateListItem(ListItem view, Context context, Cursor cursor);
     protected abstract void updateGridItem(GridItem view, Context context, Cursor cursor);
+
+    public void setFilter(String query) {
+        this.query = query;
+    }
+
+    protected String getFilterQuery() {
+        return query;
+    }
 }
