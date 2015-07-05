@@ -23,8 +23,8 @@
 
         <ImageView
             android:id="@+id/fvh_cover_art"
-            android:layout_width="115dp"
-            android:layout_height="115dp"
+            android:layout_width="@dimen/grid_view_item_width"
+            android:layout_height="@dimen/grid_view_item_width"
             android:layout_marginRight="5dp"
             tools:ignore="ContentDescription,RtlHardcoded" />
 

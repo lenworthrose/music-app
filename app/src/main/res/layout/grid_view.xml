@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:choiceMode="multipleChoiceModal"
-        android:columnWidth="115dp"
+        android:columnWidth="@dimen/grid_view_item_width"
         android:drawSelectorOnTop="true"
         android:fastScrollEnabled="true"
         android:horizontalSpacing="3dp"

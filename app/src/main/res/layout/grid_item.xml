@@ -18,5 +18,5 @@
         android:paddingRight="1dp"
         android:paddingTop="1dp"
         android:textColor="@color/textSecondary"
-        android:textSize="12sp" />
+        android:textSize="@dimen/grid_item_text_size" />
 </merge>

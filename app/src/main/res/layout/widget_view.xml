@@ -7,7 +7,7 @@
 
     <ImageView
         android:id="@+id/widget_image"
-        android:layout_width="82dp"
+        android:layout_width="@dimen/widget_image_size"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:clickable="true"
@@ -72,8 +72,8 @@
                 android:adjustViewBounds="true"
                 android:background="@drawable/list_item_selector"
                 android:clickable="true"
-                android:maxHeight="40dp"
-                android:maxWidth="40dp"
+                android:maxHeight="@dimen/widget_button_size"
+                android:maxWidth="@dimen/widget_button_size"
                 android:scaleType="fitCenter"
                 android:src="@drawable/skip_previous"
                 tools:ignore="ContentDescription" />
@@ -94,8 +94,8 @@
                 android:adjustViewBounds="true"
                 android:background="@drawable/list_item_selector"
                 android:clickable="true"
-                android:maxHeight="40dp"
-                android:maxWidth="40dp"
+                android:maxHeight="@dimen/widget_button_size"
+                android:maxWidth="@dimen/widget_button_size"
                 android:scaleType="fitCenter"
                 android:src="@drawable/play"
                 tools:ignore="ContentDescription,RtlHardcoded" />
@@ -116,8 +116,8 @@
                 android:adjustViewBounds="true"
                 android:background="@drawable/list_item_selector"
                 android:clickable="true"
-                android:maxHeight="40dp"
-                android:maxWidth="40dp"
+                android:maxHeight="@dimen/widget_button_size"
+                android:maxWidth="@dimen/widget_button_size"
                 android:scaleType="fitCenter"
                 android:src="@drawable/stop"
                 tools:ignore="ContentDescription" />
@@ -138,8 +138,8 @@
                 android:adjustViewBounds="true"
                 android:background="@drawable/list_item_selector"
                 android:clickable="true"
-                android:maxHeight="40dp"
-                android:maxWidth="40dp"
+                android:maxHeight="@dimen/widget_button_size"
+                android:maxWidth="@dimen/widget_button_size"
                 android:scaleType="fitCenter"
                 android:src="@drawable/skip_next"
                 tools:ignore="ContentDescription" />

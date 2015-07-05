@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:minHeight="50dp"
+        android:minHeight="@dimen/navigation_drawer_list_item_height"
         android:orientation="vertical">
 
         <LinearLayout
@@ -23,8 +23,8 @@
 
             <ImageView
                 android:id="@+id/nav_image"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="@dimen/navigation_drawer_item_image_size"
+                android:layout_height="@dimen/navigation_drawer_item_image_size"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:singleLine="true"
-                android:textSize="16sp"
+                android:textSize="@dimen/list_item_title_text_size"
                 tools:ignore="RtlHardcoded" />
         </LinearLayout>
 
