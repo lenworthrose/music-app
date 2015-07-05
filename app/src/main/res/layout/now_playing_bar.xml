@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginRight="5dp"
-            android:background="?selectableItemBackground"
+            android:background="@drawable/list_item_selector"
             android:scaleType="centerInside"
             android:src="@drawable/play"
             tools:ignore="ContentDescription,RtlHardcoded" />
@@ -59,7 +59,7 @@
             android:id="@+id/np_next"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="?selectableItemBackground"
+            android:background="@drawable/list_item_selector"
             android:scaleType="centerInside"
             android:src="@drawable/skip_next"
             tools:ignore="ContentDescription" />

@@ -36,7 +36,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.playback.PlaybackService;
-import com.lenworthrose.music.playback.PlayingItem;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Constants.PlaybackState;
 import com.lenworthrose.music.util.Utils;
@@ -68,10 +67,10 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case Constants.PLAYING_NOW_CHANGED:
-                    playingItemChanged();
+                    playingItemChanged(intent);
                     break;
                 case Constants.PLAYBACK_STATE_CHANGED:
-                    playbackStateChanged();
+                    playbackStateChanged(intent);
                     break;
                 case Constants.PLAYING_NOW_PLAYLIST_CHANGED:
                     playlistUpdated();
@@ -241,40 +240,44 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     @Override
     public void onResume() {
         super.onResume();
-        if (playbackService != null) playbackStateChanged();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
+
+        if (playbackService != null) {
+            playingItemChanged(playbackService.getPlayingItemIntent());
+            playbackStateChanged(playbackService.getPlaybackStateIntent());
+        }
     }
 
     @Override
     public void onPause() {
         cancelHideOverlays();
         handler.removeCallbacksAndMessages(null);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         getActivity().unbindService(this);
         super.onDestroy();
     }
 
-    public void playingItemChanged() {
+    private void playingItemChanged(Intent intent) {
         if (isDetached()) return;
         if (autoHideOverlays) setOverlaysVisible(true);
 
-        PlayingItem item = playbackService.getPlayingItem();
-        artist.setText(item.getArtist());
-        album.setText(item.getAlbum());
-        title.setText(item.getTitle());
+        artist.setText(intent.getStringExtra(Constants.EXTRA_ARTIST));
+        album.setText(intent.getStringExtra(Constants.EXTRA_ALBUM));
+        title.setText(intent.getStringExtra(Constants.EXTRA_TITLE));
 
         if (!playbackService.isPlaylistEmpty()) {
-            playlistPosition.setText(String.valueOf(item.getPlaylistPosition()));
-            playlistTracks.setText(String.valueOf(playbackService.getPlaylistSize()));
+            playlistPosition.setText(String.valueOf(intent.getIntExtra(Constants.EXTRA_PLAYLIST_POSITION, 0)));
+            playlistTracks.setText(String.valueOf(intent.getIntExtra(Constants.EXTRA_PLAYLIST_TOTAL_TRACKS, 0)));
             positionDisplay.setText(R.string.blank_time);
 
             coverArt.animate().alpha(0.08f).setDuration(75);
 
-            Glide.with(this).load(item.getAlbumArtUrl()).asBitmap().into(new SimpleTarget<Bitmap>() {
+            Glide.with(this).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
                 @Override
                 public void onLoadFailed(Exception e, Drawable errorDrawable) {
                     resetToLogo();
@@ -310,13 +313,12 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         }
 
         artistAlbumContainer.setVisibility(artist.getText().toString().isEmpty() && album.getText().toString().isEmpty() ? View.GONE : View.VISIBLE);
-        playbackStateChanged();
     }
 
-    public void playbackStateChanged() {
+    private void playbackStateChanged(Intent intent) {
         if (isDetached()) return;
 
-        PlaybackState state = playbackService.getState();
+        PlaybackState state = (PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
         playPause.setImageResource(R.drawable.play);
 
         switch (state) {
@@ -337,7 +339,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 scheduleHideOverlays();
                 positionDisplay.clearAnimation();
 
-                int duration = playbackService.getDuration();
+                int duration = intent.getIntExtra(Constants.EXTRA_DURATION, -1);
 
                 if (duration < 0) {
                     positionBar.setProgress(0);
@@ -407,11 +409,9 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        PlaybackService.LocalBinder binder = (PlaybackService.LocalBinder)service;
-        playbackService = binder.getService();
-        playingItemChanged();
-
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
+        playbackService = ((PlaybackService.LocalBinder)service).getService();
+        playingItemChanged(playbackService.getPlayingItemIntent());
+        playbackStateChanged(playbackService.getPlaybackStateIntent());
     }
 
     @Override

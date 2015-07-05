@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.playback.PlaybackService;
-import com.lenworthrose.music.playback.PlayingItem;
 import com.lenworthrose.music.util.Constants;
 
 /**
@@ -35,10 +34,10 @@ public class NowPlayingBar extends LinearLayout {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case Constants.PLAYBACK_STATE_CHANGED:
-                    playbackStateChanged();
+                    playbackStateChanged(intent);
                     break;
                 case Constants.PLAYING_NOW_CHANGED:
-                    playingItemChanged();
+                    playingItemChanged(intent);
                     break;
             }
         }
@@ -91,17 +90,17 @@ public class NowPlayingBar extends LinearLayout {
             filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
 
-            playingItemChanged();
-            playbackStateChanged();
+            playingItemChanged(playbackService.getPlayingItemIntent());
+            playbackStateChanged(playbackService.getPlaybackStateIntent());
         } else {
             LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
         }
     }
 
-    public void playingItemChanged() {
-        PlayingItem item = playbackService.getPlayingItem();
+    public void playingItemChanged(Intent intent) {
+        String titleString = intent.getStringExtra(Constants.EXTRA_TITLE);
 
-        if (TextUtils.isEmpty(item.getTitle())) {
+        if (TextUtils.isEmpty(titleString)) {
             if (isVisible) {
                 isVisible = false;
                 animate().alpha(0f).setDuration(400).setStartDelay(100).withEndAction(new Runnable() {
@@ -127,21 +126,22 @@ public class NowPlayingBar extends LinearLayout {
                 });
             }
 
-            title.setText(item.getTitle());
-            String subtitle = item.getArtist();
+            title.setText(titleString);
+            String subtitle = intent.getStringExtra(Constants.EXTRA_ARTIST);
+            String album = intent.getStringExtra(Constants.EXTRA_ALBUM);
 
-            if (!TextUtils.isEmpty(item.getAlbum())) {
+            if (!TextUtils.isEmpty(album)) {
                 if (!subtitle.isEmpty()) subtitle += " - ";
-                subtitle += item.getAlbum();
+                subtitle += album;
             }
 
             this.subtitle.setText(subtitle);
-            Glide.with(getContext()).load(item.getAlbumArtUrl()).fallback(R.drawable.logo).error(R.drawable.logo).into(coverArt);
+            Glide.with(getContext()).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).fallback(R.drawable.logo).error(R.drawable.logo).into(coverArt);
         }
     }
 
-    public void playbackStateChanged() {
-        Constants.PlaybackState state = playbackService.getState();
+    public void playbackStateChanged(Intent intent) {
+        Constants.PlaybackState state = (Constants.PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
 
         switch (state) {
             case BUFFERING:

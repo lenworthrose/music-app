@@ -1,13 +1,17 @@
 package com.lenworthrose.music.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +24,7 @@ import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.sync.MediaStoreService;
+import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.view.NowPlayingBar;
 
@@ -37,6 +42,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, ArtistsStore.InitListener {
     private PlaybackService playbackService;
     private NowPlayingBar nowPlayingBar;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,23 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         startService(new Intent(this, PlaybackService.class));
         ArtistsStore.getInstance().init(this, this);
         startService(new Intent(this, MediaStoreService.class));
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getExtras().getInt(Constants.EXTRA_MODIFICATION_TYPE)) {
+                    case Constants.EXTRA_MODIFICATION_TYPE_PLAY:
+                        startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
+                        break;
+                    case Constants.EXTRA_MODIFICATION_TYPE_ADD:
+                        Toast.makeText(MainActivity.this, R.string.added, Toast.LENGTH_SHORT).show();
+                        break;
+                    case Constants.EXTRA_MODIFICATION_TYPE_ADD_AS_NEXT:
+                        Toast.makeText(MainActivity.this, R.string.added_as_next, Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -76,6 +99,20 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.PLAYBACK_MODIFICATION_COMPLETE));
+        nowPlayingBar.setPlaybackService(playbackService);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        nowPlayingBar.setPlaybackService(null);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         unbindService(this);
@@ -84,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     protected void onDestroy() {
         stopService(new Intent(this, PlaybackService.class));
-        nowPlayingBar.setPlaybackService(null);
         super.onDestroy();
     }
 
@@ -102,42 +138,22 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void playSongs(Cursor songsCursor, int from) {
-        playbackService.play(songsCursor, from, new PlaybackService.PlaybackModificationCompleteListener() {
-            @Override
-            public void onPlaybackModificationComplete() {
-                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
-            }
-        });
+        playbackService.play(songsCursor, from);
     }
 
     @Override
     public void play(IdType type, ArrayList<Long> ids) {
-        playbackService.play(type, ids, new PlaybackService.PlaybackModificationCompleteListener() {
-            @Override
-            public void onPlaybackModificationComplete() {
-                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
-            }
-        });
+        playbackService.play(type, ids);
     }
 
     @Override
     public void add(IdType type, ArrayList<Long> ids) {
-        playbackService.add(type, ids, new PlaybackService.PlaybackModificationCompleteListener() {
-            @Override
-            public void onPlaybackModificationComplete() {
-                Toast.makeText(MainActivity.this, R.string.added, Toast.LENGTH_SHORT).show();
-            }
-        });
+        playbackService.add(type, ids);
     }
 
     @Override
     public void addAsNext(IdType type, ArrayList<Long> ids) {
-        playbackService.addAsNext(type, ids, new PlaybackService.PlaybackModificationCompleteListener() {
-            @Override
-            public void onPlaybackModificationComplete() {
-                Toast.makeText(MainActivity.this, R.string.added_as_next, Toast.LENGTH_SHORT).show();
-            }
-        });
+        playbackService.addAsNext(type, ids);
     }
 
     @Override
@@ -161,6 +177,5 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void onServiceDisconnected(ComponentName name) {
         playbackService = null;
-        nowPlayingBar.setPlaybackService(null);
     }
 }

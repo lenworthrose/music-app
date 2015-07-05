@@ -30,12 +30,14 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
     private DragSortListView listView;
     private PlayingNowPlaylistAdapter adapter;
     private PlaybackService playbackService;
+    private int currentPlaylistPosition;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case Constants.PLAYING_NOW_CHANGED:
+                    currentPlaylistPosition = intent.getIntExtra(Constants.EXTRA_PLAYLIST_POSITION, 0) - 1;
                     playingItemChanged();
                     break;
                 case Constants.PLAYING_NOW_PLAYLIST_CHANGED:
@@ -72,22 +74,18 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
     public void onStart() {
         super.onStart();
         getActivity().bindService(new Intent(getActivity(), PlaybackService.class), this, Context.BIND_AUTO_CREATE);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
-    }
-
-    @Override
-    public void onPause() {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
-        super.onPause();
+        playingItemChanged();
     }
 
     @Override
     public void onStop() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         getActivity().unbindService(this);
         super.onStop();
     }
@@ -100,11 +98,11 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
     }
 
     public void playingItemChanged() {
-        if (!isDetached() && !playbackService.isPlaylistEmpty()) {
+        if (!isDetached() && adapter != null && !adapter.isEmpty()) {
             listView.post(new Runnable() {
                 @Override
                 public void run() {
-                    listView.setItemChecked(playbackService.getPlaylistPosition(), true);
+                    listView.setItemChecked(currentPlaylistPosition, true);
                     listView.setSelection(listView.getCheckedItemPosition());
                 }
             });
@@ -120,6 +118,7 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
     public void onServiceConnected(ComponentName name, IBinder service) {
         PlaybackService.LocalBinder binder = (PlaybackService.LocalBinder)service;
         playbackService = binder.getService();
+        currentPlaylistPosition = playbackService.getPlaylistPosition();
         adapter = new PlayingNowPlaylistAdapter(getActivity(), playbackService.getPlaylist());
         listView.setAdapter(adapter);
         playlistUpdated();

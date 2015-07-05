@@ -11,8 +11,25 @@ public class Constants {
 
     // Actions Broadcast by PlaybackService when changes occur.
     public static final String PLAYING_NOW_CHANGED = "com.lenworthrose.music.PlayingNowChanged";
+    public static final String EXTRA_ARTIST = "Artist";
+    public static final String EXTRA_ALBUM = "Album";
+    public static final String EXTRA_TITLE = "TItle";
+    public static final String EXTRA_TRACK_NUM = "TrackNum";
+    public static final String EXTRA_PLAYLIST_POSITION = "PlaylistPosition";
+    public static final String EXTRA_PLAYLIST_TOTAL_TRACKS = "PlaylistTotalTracks";
+    public static final String EXTRA_ALBUM_ART_URL = "AlbumArtUri";
+
     public static final String PLAYING_NOW_PLAYLIST_CHANGED = "com.lenworthrose.music.PlayingNowPlaylistChanged";
+
     public static final String PLAYBACK_STATE_CHANGED = "com.lenworthrose.music.PlaybackStateChanged";
+    public static final String EXTRA_STATE = "State";
+    public static final String EXTRA_DURATION = "Duration";
+
+    public static final String PLAYBACK_MODIFICATION_COMPLETE = "com.lenworthrose.music.PlaybackModificationComplete";
+    public static final String EXTRA_MODIFICATION_TYPE = "WHICH";
+    public static final int EXTRA_MODIFICATION_TYPE_PLAY = 0;
+    public static final int EXTRA_MODIFICATION_TYPE_ADD = 1;
+    public static final int EXTRA_MODIFICATION_TYPE_ADD_AS_NEXT = 2;
 
     public static final String TYPE = "Type";
     public static final String ID = "ID";
