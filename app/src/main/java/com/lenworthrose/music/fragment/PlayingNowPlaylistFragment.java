@@ -91,7 +91,7 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
     }
 
     public void playlistUpdated() {
-        if (isDetached()) return;
+        if (isDetached() || playbackService == null) return;
 
         adapter.changeCursor(playbackService.getPlaylist());
         playingItemChanged();

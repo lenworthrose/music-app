@@ -8,6 +8,8 @@ public class Constants {
     public static final String CMD_STOP = "com.lenworthrose.music.Stop";
     public static final String CMD_NEXT = "com.lenworthrose.music.Next";
     public static final String CMD_PREVIOUS = "com.lenworthrose.music.Previous";
+    public static final String CMD_ACTIVITY_STARTING = "com.lenworthrose.music.ActivityStarting";
+    public static final String CMD_ACTIVITY_CLOSING = "com.lenworthrose.music.ActivityClosing";
 
     // Actions Broadcast by PlaybackService when changes occur.
     public static final String PLAYING_NOW_CHANGED = "com.lenworthrose.music.PlayingNowChanged";

@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.lenworthrose.music.IdType;
@@ -27,6 +29,8 @@ import java.util.ArrayList;
 public class PlaybackService extends Service {
     private final IBinder binder = new LocalBinder();
     private PlaybackThread playbackThread;
+    private Handler handler;
+    private int activityCount = 0;
 
     public class LocalBinder extends Binder {
         public PlaybackService getService() {
@@ -42,6 +46,7 @@ public class PlaybackService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        handler = new Handler(Looper.getMainLooper());
         playbackThread = new PlaybackThread(this);
         playbackThread.start();
     }
@@ -61,6 +66,23 @@ public class PlaybackService extends Service {
                     break;
                 case Constants.CMD_NEXT:
                     playbackThread.getHandler().obtainMessage(PlaybackThread.NEXT).sendToTarget();
+                    break;
+                case Constants.CMD_ACTIVITY_STARTING:
+                    activityCount++;
+                    handler.removeCallbacksAndMessages(null);
+                    break;
+                case Constants.CMD_ACTIVITY_CLOSING:
+                    activityCount--;
+
+                    if (activityCount <= 0) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopSelf();
+                            }
+                        }, 750);
+                    }
+
                     break;
             }
         }

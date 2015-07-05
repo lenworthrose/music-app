@@ -263,7 +263,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void playingItemChanged(Intent intent) {
-        if (isDetached()) return;
+        if (isDetached() || playbackService == null) return;
         if (autoHideOverlays) setOverlaysVisible(true);
 
         artist.setText(intent.getStringExtra(Constants.EXTRA_ARTIST));
@@ -316,7 +316,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void playbackStateChanged(Intent intent) {
-        if (isDetached()) return;
+        if (isDetached() || playbackService == null) return;
 
         PlaybackState state = (PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
         playPause.setImageResource(R.drawable.play);
@@ -374,8 +374,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         }
     }
 
-    public void playlistUpdated() {
-        if (isDetached()) return;
+    private void playlistUpdated() {
+        if (isDetached() || playbackService == null) return;
 
         if (!playbackService.isPlaylistEmpty()) {
             playlistPosition.setText(String.valueOf(playbackService.getPlaylistPositionForDisplay()));

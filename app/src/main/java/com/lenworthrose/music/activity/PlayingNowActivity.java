@@ -24,6 +24,7 @@ import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
 import com.lenworthrose.music.fragment.RepeatDialogFragment;
 import com.lenworthrose.music.fragment.ShuffleDialogFragment;
+import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
 
 /**
@@ -38,6 +39,10 @@ public class PlayingNowActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        Intent intent = new Intent(this, PlaybackService.class);
+        intent.setAction(Constants.CMD_ACTIVITY_STARTING);
+        startService(intent);
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.SETTING_KEEP_SCREEN_ON, false))
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -84,6 +89,14 @@ public class PlayingNowActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, PlaybackService.class);
+        intent.setAction(Constants.CMD_ACTIVITY_CLOSING);
+        startService(intent);
+        super.onDestroy();
     }
 
     private class PlayingNowTabPagerAdapter extends FragmentPagerAdapter {

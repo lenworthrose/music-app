@@ -50,7 +50,11 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         setContentView(R.layout.activity_main);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         nowPlayingBar = (NowPlayingBar)findViewById(R.id.main_now_playing_bar);
-        startService(new Intent(this, PlaybackService.class));
+
+        Intent intent = new Intent(this, PlaybackService.class);
+        intent.setAction(Constants.CMD_ACTIVITY_STARTING);
+        startService(intent);
+
         ArtistsStore.getInstance().init(this, this);
         startService(new Intent(this, MediaStoreService.class));
 
@@ -120,7 +124,9 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(this, PlaybackService.class));
+        Intent intent = new Intent(this, PlaybackService.class);
+        intent.setAction(Constants.CMD_ACTIVITY_CLOSING);
+        startService(intent);
         super.onDestroy();
     }
 
