@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/app_settings">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/start_locations"
+            android:entryValues="@array/start_locations_ids"
+            android:key="start_location"
+            android:title="@string/start_location" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="auto_hide_playing_now_overlays"
+            android:summary="@string/auto_hide_overlays_desc"
+            android:title="@string/auto_hide_overlays" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/library_refresh">
         <Preference
             android:key="refresh_artists"

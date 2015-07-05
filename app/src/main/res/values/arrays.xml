@@ -7,4 +7,14 @@
         <item>Playing Now</item>
         <item>Settings</item>
     </string-array>
+    <string-array name="start_locations">
+        <item>Artists</item>
+        <item>Albums</item>
+        <item>Songs</item>
+    </string-array>
+    <string-array name="start_locations_ids">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

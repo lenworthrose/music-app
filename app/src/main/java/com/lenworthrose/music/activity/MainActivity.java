@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.media.AudioManager;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     private ListView drawerListView;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
+    private int selectedDrawerPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,8 +204,9 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void onArtistsDbInitialized() {
-        //TODO: Pull this from SharedPreferences once start location becomes configurable
-        onItemClick(drawerListView, null, 0, 0);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        selectedDrawerPosition = Integer.parseInt(prefs.getString(Constants.SETTING_START_LOCATION, "0"));
+        onItemClick(drawerListView, null, selectedDrawerPosition, selectedDrawerPosition);
     }
 
     @Override
@@ -247,7 +251,8 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 return;
         }
 
-        drawerListView.setItemChecked(position, true);
+        selectedDrawerPosition = position;
+        drawerListView.setItemChecked(selectedDrawerPosition, true);
 
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance(type)).commit();
@@ -258,8 +263,9 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
+                drawerListView.setItemChecked(selectedDrawerPosition, true);
                 drawerLayout.closeDrawers();
             }
-        }, 400);
+        }, 1000);
     }
 }
