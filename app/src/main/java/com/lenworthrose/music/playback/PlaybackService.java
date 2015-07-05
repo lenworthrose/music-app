@@ -31,6 +31,7 @@ public class PlaybackService extends Service {
     private PlaybackThread playbackThread;
     private Handler handler;
     private int activityCount = 0;
+    private int pendingCommand;
 
     public class LocalBinder extends Binder {
         public PlaybackService getService() {
@@ -56,16 +57,32 @@ public class PlaybackService extends Service {
         if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
                 case Constants.CMD_PLAY_PAUSE:
-                    playbackThread.getHandler().obtainMessage(PlaybackThread.PLAY_PAUSE).sendToTarget();
+                    if (playbackThread.getHandler() != null)
+                        playbackThread.getHandler().obtainMessage(PlaybackThread.PLAY_PAUSE).sendToTarget();
+                    else
+                        pendingCommand = PlaybackThread.PLAY_PAUSE;
+
                     break;
                 case Constants.CMD_STOP:
-                    playbackThread.getHandler().obtainMessage(PlaybackThread.STOP).sendToTarget();
+                    if (playbackThread.getHandler() != null)
+                        playbackThread.getHandler().obtainMessage(PlaybackThread.STOP).sendToTarget();
+                    else
+                        pendingCommand = PlaybackThread.STOP;
+
                     break;
                 case Constants.CMD_PREVIOUS:
-                    playbackThread.getHandler().obtainMessage(PlaybackThread.PREVIOUS).sendToTarget();
+                    if (playbackThread.getHandler() != null)
+                        playbackThread.getHandler().obtainMessage(PlaybackThread.PREVIOUS).sendToTarget();
+                    else
+                        pendingCommand = PlaybackThread.PREVIOUS;
+
                     break;
                 case Constants.CMD_NEXT:
-                    playbackThread.getHandler().obtainMessage(PlaybackThread.NEXT).sendToTarget();
+                    if (playbackThread.getHandler() != null)
+                        playbackThread.getHandler().obtainMessage(PlaybackThread.NEXT).sendToTarget();
+                    else
+                        pendingCommand = PlaybackThread.NEXT;
+
                     break;
                 case Constants.CMD_ACTIVITY_STARTING:
                     activityCount++;
@@ -194,5 +211,9 @@ public class PlaybackService extends Service {
 
     public Intent getPlaybackStateIntent() {
         return playbackThread.getPlaybackStateIntent();
+    }
+
+    void onPlaybackThreadInitialized() {
+        if (pendingCommand != 0) playbackThread.getHandler().obtainMessage(pendingCommand).sendToTarget();
     }
 }

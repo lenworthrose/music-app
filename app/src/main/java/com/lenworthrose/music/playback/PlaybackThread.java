@@ -92,6 +92,13 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 IntentFilter intentFilter = new IntentFilter(Constants.PLAYBACK_STATE_CHANGED);
                 intentFilter.addAction(Constants.PLAYING_NOW_CHANGED);
                 broadcastMan.registerReceiver(mediaSessionManager, intentFilter);
+
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        playbackService.onPlaybackThreadInitialized();
+                    }
+                }, 500); //Delay to give PlaylistStore time to init
             }
         });
 
@@ -254,9 +261,6 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
                         registerNoisyReceiver();
                         if (mediaSessionManager != null) mediaSessionManager.register();
-
-                        notifyPlayingItemChanged();
-                        return;
                     } else {
                         Log.e("PlaybackThread", "Unable to start device playback - AudioManager wouldn't allow us focus!");
                         //TODO: Show some sort of error dialog/toast
