@@ -38,7 +38,8 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textColor="@color/textSecondary"
-                android:textSize="@dimen/pn_subtitle_text_size" />
+                android:textSize="@dimen/pn_subtitle_text_size"
+                tools:ignore="RtlHardcoded" />
 
             <TextView
                 android:id="@+id/pn_album"
@@ -50,7 +51,8 @@
                 android:singleLine="true"
                 android:textColor="@color/textSecondary"
                 android:textSize="@dimen/pn_subtitle_text_size"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                tools:ignore="RtlHardcoded" />
         </LinearLayout>
 
         <TextView
@@ -75,21 +77,6 @@
         android:layout_gravity="bottom"
         android:orientation="vertical"
         android:paddingTop="1.5dp">
-
-        <FrameLayout
-            android:id="@+id/pn_rating_sleep_timer_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/pn_sleep_timer_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:onClick="onSleepTimerClicked"
-                android:src="@drawable/sleep_timer"
-                android:visibility="gone" />
-        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -180,7 +167,8 @@
             android:layout_height="wrap_content"
             android:padding="1dp"
             android:src="@drawable/skip_next"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <LinearLayout
@@ -199,7 +187,8 @@
             android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
-            android:src="@drawable/skip_previous" />
+            android:src="@drawable/skip_previous"
+            tools:ignore="ContentDescription,RtlHardcoded" />
 
         <ImageView
             android:id="@+id/pn_play_pause"
@@ -209,7 +198,8 @@
             android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
-            android:src="@drawable/play" />
+            android:src="@drawable/play"
+            tools:ignore="ContentDescription,RtlHardcoded" />
 
         <ImageView
             android:id="@+id/pn_stop"
@@ -219,7 +209,8 @@
             android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
-            android:src="@drawable/stop" />
+            android:src="@drawable/stop"
+            tools:ignore="ContentDescription,RtlHardcoded" />
 
         <ImageView
             android:id="@+id/pn_next"
@@ -228,6 +219,7 @@
             android:background="@drawable/list_item_selector"
             android:clickable="true"
             android:padding="1dp"
-            android:src="@drawable/skip_next" />
+            android:src="@drawable/skip_next"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 </RelativeLayout>

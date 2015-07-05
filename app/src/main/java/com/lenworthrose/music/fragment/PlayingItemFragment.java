@@ -53,7 +53,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private SeekBar positionBar;
     private TextView artist, album, title, playlistPosition, playlistTracks, positionDisplay, durationDisplay;
     private ImageView coverArt, playPause;
-    private View artistAlbumContainer, ratingSleepTimerContainer, topDetailContainer, bottomDetailContainer;
+    private View artistAlbumContainer, topDetailContainer, bottomDetailContainer;
     private boolean isPositionBarTouched, autoHideOverlays;
     private ScheduledExecutorService scheduleService;
     private ScheduledFuture<?> hideOverlaysFuture;
@@ -134,26 +134,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         }
     };
 
-    private View.OnLongClickListener searchLongClickListener = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            switch (v.getId()) {
-                case R.id.pn_artist:
-                    performSearch(artist.getText().toString(), null, null);
-                    break;
-                case R.id.pn_album:
-                case R.id.pn_coverArt:
-                    performSearch(artist.getText().toString(), album.getText().toString(), null);
-                    break;
-                case R.id.pn_name:
-                    performSearch(artist.getText().toString(), null, title.getText().toString());
-                    break;
-            }
-
-            return true;
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,11 +162,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         topDetailContainer = view.findViewById(R.id.pn_top_detail_container);
         artistAlbumContainer = topDetailContainer.findViewById(R.id.pn_artist_album_container);
         artist = (TextView)artistAlbumContainer.findViewById(R.id.pn_artist);
-        artist.setOnLongClickListener(searchLongClickListener);
         album = (TextView)artistAlbumContainer.findViewById(R.id.pn_album);
-        album.setOnLongClickListener(searchLongClickListener);
         title = (TextView)topDetailContainer.findViewById(R.id.pn_name);
-        title.setOnLongClickListener(searchLongClickListener);
         bottomDetailContainer = view.findViewById(R.id.pn_bottom_detail_container);
         playlistPosition = (TextView)bottomDetailContainer.findViewById(R.id.pn_playlist_position);
         playlistTracks = (TextView)bottomDetailContainer.findViewById(R.id.pn_playlist_tracks);
@@ -195,10 +172,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         positionBar = (SeekBar)bottomDetailContainer.findViewById(R.id.pn_position_seekbar);
         positionBar.setOnSeekBarChangeListener(seekListener);
         positionBar.setEnabled(false);
-        ratingSleepTimerContainer = bottomDetailContainer.findViewById(R.id.pn_rating_sleep_timer_container);
         coverArt = (ImageView)view.findViewById(R.id.pn_coverArt);
         coverArt.setOnClickListener(coverArtClickListener);
-        coverArt.setOnLongClickListener(searchLongClickListener);
         View playbackControlContainer = view.findViewById(R.id.pn_playback_control_container);
         playPause = (ImageView)playbackControlContainer.findViewById(R.id.pn_play_pause);
         playPause.setOnClickListener(playbackButtonClickListener);
@@ -401,10 +376,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             positionBar.setEnabled(true);
             positionDisplay.setText(Utils.longToTimeDisplay(position));
         }
-    }
-
-    private void performSearch(String artist, String album, String name) {
-
     }
 
     @Override
