@@ -317,6 +317,8 @@ public class MediaSessionManager extends BroadcastReceiver {
     }
 
     public void unregister() {
+        if (playbackService != null) playbackService.stopForeground(true);
+
         if (mediaSession != null) {
             mediaSession.setActive(false);
             mediaSession.release();
