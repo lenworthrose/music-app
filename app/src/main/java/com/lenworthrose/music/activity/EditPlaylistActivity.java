@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -30,6 +31,9 @@ public class EditPlaylistActivity extends AppCompatActivity implements ServiceCo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_edit_playlist);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
     }

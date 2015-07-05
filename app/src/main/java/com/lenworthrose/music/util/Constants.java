@@ -40,6 +40,8 @@ public class Constants {
     public static final String SETTING_AUTO_HIDE_PLAYING_NOW_OVERLAYS = "auto_hide_playing_now_overlays";
     public static final String SETTING_REPEAT_MODE = "repeat_mode";
 
+    public static final long ALL = Long.MIN_VALUE;
+
     public enum PlaybackState {
         STOPPED,
         PAUSED,

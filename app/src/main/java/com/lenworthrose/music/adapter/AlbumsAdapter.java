@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
@@ -34,7 +35,7 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     private long parentId;
 
     public AlbumsAdapter(Context context, boolean isGrid) {
-        this(context, isGrid, null, Long.MIN_VALUE);
+        this(context, isGrid, null, Constants.ALL);
     }
 
     public AlbumsAdapter(Context context, boolean isGrid, IdType type, long parentId) {
@@ -44,25 +45,23 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     }
 
     public static CursorLoader getAlbums(Context context, IdType type, long id) {
-        String where;
-        String[] whereVars = { String.valueOf(id) };
+        String where = null;
+        String[] whereVars = null;
 
-        switch (type) {
-            case ARTIST:
-                where = MediaStore.Audio.Media.ARTIST_ID;
-                break;
-            case GENRE:
-                //TODO: How do I get a list of albums from a genre? MediaStore maps individual files to genres...
-                where = null;
-                whereVars = null;
-                break;
-            case ALBUM:
-                where = MediaStore.Audio.Albums._ID;
-                break;
-            default:
-                where = null;
-                whereVars = null;
-                break;
+        if (type != null) {
+            switch (type) {
+                case ARTIST:
+                    where = MediaStore.Audio.Media.ARTIST_ID;
+                    whereVars = new String[] { String.valueOf(id) };
+                    break;
+                case GENRE:
+                    //TODO: How do I get a list of albums from a genre? MediaStore maps individual files to genres...
+                    break;
+                case ALBUM:
+                    where = MediaStore.Audio.Albums._ID;
+                    whereVars = new String[] { String.valueOf(id) };
+                    break;
+            }
         }
 
         if (where != null) where += "= ?";

@@ -18,6 +18,8 @@
         android:background="@color/playing_now_content_background"
         android:orientation="vertical">
 
+        <include layout="@layout/toolbar" />
+
         <include
             android:id="@+id/pn_root_tabs"
             layout="@layout/pager_tabs" />

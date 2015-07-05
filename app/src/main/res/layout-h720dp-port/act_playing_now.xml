@@ -18,6 +18,8 @@
         android:background="@color/playing_now_content_background"
         android:orientation="vertical">
 
+        <include layout="@layout/toolbar" />
+
         <fragment
             android:id="@+id/playing_item"
             android:name="com.lenworthrose.music.fragment.PlayingItemFragment"

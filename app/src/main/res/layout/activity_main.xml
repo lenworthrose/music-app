@@ -1,19 +1,37 @@
-<LinearLayout
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/main_drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/root_container"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
 
-    <com.lenworthrose.music.view.NowPlayingBar
-        android:id="@+id/main_now_playing_bar"
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize" />
-</LinearLayout>
+        <include layout="@layout/toolbar" />
+
+        <FrameLayout
+            android:id="@+id/root_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.lenworthrose.music.view.NowPlayingBar
+            android:id="@+id/main_now_playing_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/main_drawer_list_view"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/navigation_drawer_background"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp" />
+</android.support.v4.widget.DrawerLayout>

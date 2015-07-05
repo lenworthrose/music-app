@@ -26,7 +26,7 @@ import com.lenworthrose.music.view.ListHeader;
 /**
  * This Fragment handles the display of information from the media library. It can be configured
  * to display content as either a list or a grid.
- * <p/>
+ * <p>
  * The {@code isGridView()} method is currently used to determine whether the current list should
  * be displayed as a grid or a list. Eventually, this should be determined by user preference, but
  * for now it's hardcoded.
@@ -66,7 +66,7 @@ public class LibraryFragment extends Fragment {
 
         absListView = (AbsListView)view.findViewById(R.id.abs_list_view);
 
-        if (idType != null) {
+        if (id != Constants.ALL) {
             ListHeader header = new ListHeader(getActivity(), idType, id);
 
             if (absListView instanceof HeaderGridView)
@@ -109,11 +109,21 @@ public class LibraryFragment extends Fragment {
     }
 
     private void toggleViewMode() {
-        String toEdit;
+        String toEdit = null;
 
-        if (idType == null)
-            toEdit = SETTING_VIEW_MODE_ARTISTS;
-        else
+        if (id == Constants.ALL) {
+            switch (idType) {
+                case ARTIST:
+                    toEdit = SETTING_VIEW_MODE_ARTISTS;
+                    break;
+                case ALBUM:
+                    toEdit = SETTING_VIEW_MODE_ALBUMS;
+                    break;
+                case SONG:
+                    toEdit = SETTING_VIEW_MODE_SONGS;
+                    break;
+            }
+        } else {
             switch (idType) {
                 case ALBUM:
                     toEdit = SETTING_VIEW_MODE_SONGS;
@@ -125,7 +135,7 @@ public class LibraryFragment extends Fragment {
                     toEdit = null;
                     break;
             }
-
+        }
         if (toEdit != null)
             PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putBoolean(toEdit, !(absListView instanceof HeaderGridView)).commit();
     }
@@ -133,22 +143,31 @@ public class LibraryFragment extends Fragment {
     private boolean isGridView() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        if (idType == null) return prefs.getBoolean(SETTING_VIEW_MODE_ARTISTS, true); //Home screen; assume artists
-
-        switch (idType) {
-            case PLAYLIST:
-                return false;
-            case ALBUM:
-                return prefs.getBoolean(SETTING_VIEW_MODE_SONGS, false);
-            case ARTIST:
-                return prefs.getBoolean(SETTING_VIEW_MODE_ALBUMS, true);
-            default:
-                return true;
+        if (id == Constants.ALL) {
+            switch (idType) {
+                case ARTIST:
+                    return prefs.getBoolean(SETTING_VIEW_MODE_ARTISTS, true);
+                case ALBUM:
+                    return prefs.getBoolean(SETTING_VIEW_MODE_ALBUMS, true);
+                case SONG:
+                    return prefs.getBoolean(SETTING_VIEW_MODE_SONGS, false);
+            }
+        } else {
+            switch (idType) {
+                case PLAYLIST:
+                    return false;
+                case ALBUM:
+                    return prefs.getBoolean(SETTING_VIEW_MODE_SONGS, false);
+                case ARTIST:
+                    return prefs.getBoolean(SETTING_VIEW_MODE_ALBUMS, true);
+            }
         }
+
+        return true;
     }
 
-    public static LibraryFragment createRootInstance() {
-        return createInstance(null, -1);
+    public static LibraryFragment createRootInstance(IdType type) {
+        return createInstance(type, Constants.ALL);
     }
 
     public static LibraryFragment createInstance(IdType type, long id) {

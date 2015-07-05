@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -49,6 +50,9 @@ public class PlayingNowActivity extends AppCompatActivity {
 
         setContentView(R.layout.act_playing_now);
 
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         background = (ImageView)findViewById(R.id.pn_background_image);
         ViewPager pager = (ViewPager)findViewById(R.id.pn_root_container);
 
@@ -57,9 +61,9 @@ public class PlayingNowActivity extends AppCompatActivity {
             ((PagerSlidingTabStrip)findViewById(R.id.pn_root_tabs)).setViewPager(pager);
         }
 
-        if (getActionBar() != null) {
-            getActionBar().setDisplayShowHomeEnabled(true);
-            getActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 
