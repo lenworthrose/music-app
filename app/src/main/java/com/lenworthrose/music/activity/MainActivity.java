@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void onArtistsDbInitialized() {
         //TODO: Pull this from SharedPreferences once start location becomes configurable
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance(IdType.ARTIST)).commit();
+        onItemClick(drawerListView, null, 0, 0);
     }
 
     @Override
@@ -246,6 +246,8 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 startActivity(new Intent(this, SettingsActivity.class));
                 return;
         }
+
+        drawerListView.setItemChecked(position, true);
 
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance(type)).commit();

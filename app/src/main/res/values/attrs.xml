@@ -3,4 +3,5 @@
     <declare-styleable name="SquareImageView" />
     <declare-styleable name="HeaderGridView" />
     <declare-styleable name="NowPlayingBar" />
+    <declare-styleable name="CheckableFrameLayout" />
 </resources>
