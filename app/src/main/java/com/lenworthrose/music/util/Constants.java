@@ -15,7 +15,7 @@ public class Constants {
     public static final String PLAYING_NOW_CHANGED = "com.lenworthrose.music.PlayingNowChanged";
     public static final String EXTRA_ARTIST = "Artist";
     public static final String EXTRA_ALBUM = "Album";
-    public static final String EXTRA_TITLE = "TItle";
+    public static final String EXTRA_TITLE = "Title";
     public static final String EXTRA_TRACK_NUM = "TrackNum";
     public static final String EXTRA_PLAYLIST_POSITION = "PlaylistPosition";
     public static final String EXTRA_PLAYLIST_TOTAL_TRACKS = "PlaylistTotalTracks";
