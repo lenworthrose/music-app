@@ -13,7 +13,6 @@ import android.media.RemoteControlClient;
 import android.media.session.MediaSession;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -246,14 +245,25 @@ public class MediaSessionManager extends BroadcastReceiver {
                 });
 
                 if (!playbackService.isPlaylistEmpty()) { //Update the Notification, esp. to switch Play/Pause icons
-                    Glide.with(playbackService).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
+                    Glide.with(playbackService).load(lastPlayingItemChangedIntent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
                         @Override
-                        public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                            bgHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (mediaSession == null) return;
-                                    updateNotification(intent, resource);
+                                    updateNotification(lastPlayingItemChangedIntent, BitmapFactory.decodeResource(playbackService.getResources(), R.drawable.logo));
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            bgHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (mediaSession == null) return;
+                                    updateNotification(lastPlayingItemChangedIntent, resource);
                                 }
                             });
                         }
@@ -308,8 +318,6 @@ public class MediaSessionManager extends BroadcastReceiver {
     }
 
     public void unregister() {
-        Log.w("Testing", "------------------unregister() - " + Looper.myLooper());
-
         if (mediaSession != null) {
             mediaSession.setActive(false);
             mediaSession.release();
