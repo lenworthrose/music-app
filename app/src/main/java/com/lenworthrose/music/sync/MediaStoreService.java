@@ -57,7 +57,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
                     startArtistsSync();
                     return START_STICKY;
                 case ACTION_UPDATE_ALBUMS:
-                    startUpdatingAlbums();
+                    startUpdatingAlbums(true);
                     return START_STICKY;
             }
         }
@@ -99,10 +99,6 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         if (!isActive()) {
             isSyncingArtists = true;
 
-            String text = getString(R.string.syncing_with_media_store);
-            notificationBuilder.setTicker(text).setContentTitle(text);
-            startForeground(NOTIFICATION_ID, notificationBuilder.build());
-
             String[] projection = {
                     MediaStore.Audio.Artists._ID,
                     MediaStore.Audio.Artists.ARTIST,
@@ -139,7 +135,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
             isGettingArtistInfo = true;
             String text = getString(R.string.fetching_artist_info);
             notificationBuilder.setContentTitle(text).setTicker(text);
-            notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
+            startForeground(NOTIFICATION_ID, notificationBuilder.build());
 
             GetArtistInfoTask infoTask = new GetArtistInfoTask(this, newArtists) {
                 @Override
@@ -169,19 +165,24 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     @Override
     public void onArtistInfoFetchComplete() { }
 
-    private void startUpdatingAlbums() {
+    private void startUpdatingAlbums(final boolean showNotification) {
         if (!isActive()) {
             isUpdatingAlbums = true;
             Log.d("MediaStoreService", "Starting UpdateCoverArtTask");
-            String text = getString(R.string.updating_artist_albums);
-            notificationBuilder.setTicker(text).setContentTitle(text);
-            startForeground(NOTIFICATION_ID, notificationBuilder.build());
+
+            if (showNotification) {
+                String text = getString(R.string.updating_artist_albums);
+                notificationBuilder.setTicker(text).setContentTitle(text);
+                startForeground(NOTIFICATION_ID, notificationBuilder.build());
+            }
 
             UpdateCoverArtTask task = new UpdateCoverArtTask(MediaStoreService.this) {
                 @Override
                 protected void onProgressUpdate(Integer... values) {
-                    notificationBuilder.setProgress(values[1], values[0], false);
-                    notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
+                    if (showNotification) {
+                        notificationBuilder.setProgress(values[1], values[0], false);
+                        notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
+                    }
                 }
 
                 @Override
@@ -189,7 +190,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
                     Log.d("MediaStoreService", "Finished updating albums");
                     LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
                     ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
-                    stopForeground(true);
+                    if (showNotification) stopForeground(true);
                     isUpdatingAlbums = false;
 
                     startPendingTasks();
@@ -228,7 +229,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
             Log.d("MediaStoreService", "Change detected in Albums table! isActive()=" + isActive());
 
             if (!isActive()) {
-                startUpdatingAlbums();
+                startUpdatingAlbums(false);
             } else {
                 isAlbumUpdatePending = true;
             }
@@ -245,7 +246,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
             startArtistsSync();
         } else if (isAlbumUpdatePending) {
             isAlbumUpdatePending = false;
-            startUpdatingAlbums();
+            startUpdatingAlbums(false);
         }
     }
 }
