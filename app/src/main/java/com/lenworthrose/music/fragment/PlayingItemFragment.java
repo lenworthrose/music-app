@@ -358,7 +358,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             case BUFFERING:
                 positionBar.setEnabled(false);
                 playPause.setEnabled(false);
-                playPause.setAlpha(.30f);
+                playPause.setAlpha(.3f);
                 playPause.setImageResource(R.drawable.play);
                 positionDisplay.clearAnimation();
                 break;
@@ -387,7 +387,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void resetToLogo() {
-        coverArt.setAlpha(1f);
+        coverArt.setAlpha(.1f);
         coverArt.setImageResource(R.drawable.logo);
 
         if (getActivity() instanceof PlayingNowActivity)
