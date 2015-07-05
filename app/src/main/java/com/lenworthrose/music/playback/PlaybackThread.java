@@ -30,7 +30,6 @@ import java.util.ArrayList;
 public class PlaybackThread extends Thread implements Handler.Callback, MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
         AudioManager.OnAudioFocusChangeListener, PlaylistStore.InitListener {
-    public static final int RELEASE_PLAYERS = 0;
     public static final int PLAY_FROM_PLAYING_NOW = 1;
     public static final int PLAY_PAUSE = 2;
     public static final int NEXT = 3;
@@ -139,9 +138,6 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 break;
             case PLAY_FROM_PLAYING_NOW:
                 play(msg.arg1);
-                break;
-            case RELEASE_PLAYERS:
-                releaseMediaPlayers(true);
                 break;
             case PLAY_LIST:
                 play(getTypeFrom(msg.arg1), (ArrayList<Long>)msg.obj);
