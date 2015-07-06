@@ -43,14 +43,14 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public static final int SHUFFLE_REMAINING = 11;
     public static final int SEEK = 12;
     public static final int PERFORM_PLAYLIST_ACTIONS = 13;
-    public static final int SET_REPEAT_MODE = 14;
+    public static final int TOGGLE_REPEAT_MODE = 14;
 
     private Handler handler;
     private MediaPlayer currentTrack, nextTrack;
     private BroadcastReceiver noisyReceiver;
     protected Cursor playlistCursor;
     protected int playlistPosition;
-    private Constants.RepeatMode repeatMode = Constants.RepeatMode.OFF;
+    private boolean repeatEnabled;
     private LocalBroadcastManager broadcastMan;
     private AudioManager audioMan;
     private MediaSessionManager mediaSessionManager;
@@ -68,7 +68,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public PlaybackThread(PlaybackService playbackService) {
         this.playbackService = playbackService;
         playbackState = PlaybackState.STOPPED;
-        repeatMode = Constants.RepeatMode.values()[PreferenceManager.getDefaultSharedPreferences(playbackService).getInt(Constants.SETTING_REPEAT_MODE, 0)];
+        repeatEnabled = PreferenceManager.getDefaultSharedPreferences(playbackService).getBoolean(Constants.SETTING_REPEAT_MODE, false);
 
         broadcastMan = LocalBroadcastManager.getInstance(playbackService);
         audioMan = (AudioManager)playbackService.getSystemService(Context.AUDIO_SERVICE);
@@ -170,8 +170,8 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
             case PERFORM_PLAYLIST_ACTIONS:
                 performPlaylistActions((PlayingNowPlaylistAdapter)msg.obj);
                 break;
-            case SET_REPEAT_MODE:
-                setRepeatMode(Constants.RepeatMode.values()[msg.arg1]);
+            case TOGGLE_REPEAT_MODE:
+                toggleRepeatEnabled();
                 break;
         }
 
@@ -393,7 +393,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
     public int getPosition() {
         try {
-            return !isPlaying() && playbackState != PlaybackState.PAUSED  ? 0 : currentTrack.getCurrentPosition();
+            return !isPlaying() && playbackState != PlaybackState.PAUSED ? 0 : currentTrack.getCurrentPosition();
         } catch (IllegalStateException ex) {
             return 0;
         }
@@ -411,30 +411,20 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         return playlistPosition;
     }
 
-    public Constants.RepeatMode getRepeatMode() {
-        return repeatMode;
+    public boolean isRepeatEnabled() {
+        return repeatEnabled;
     }
 
-    public void setRepeatMode(Constants.RepeatMode mode) {
-        repeatMode = mode;
+    private void toggleRepeatEnabled() {
+        repeatEnabled = !repeatEnabled;
+        cancelNextTrack();
 
-        if (isEndOfPlaylist()) {
-            if (mode == Constants.RepeatMode.PLAYLIST || mode == Constants.RepeatMode.TRACK) {
-                if (playlistCursor != null && playlistCursor.getCount() > 0 && isPlaying() && !isNextTrackPlaying()) scheduleNextTrack();
-            } else {
-                cancelNextTrack();
-            }
-        }
+        if (isEndOfPlaylist() && repeatEnabled && playlistCursor != null && playlistCursor.getCount() > 0 && isPlaying())
+            scheduleNextTrack();
 
-        PreferenceManager.getDefaultSharedPreferences(playbackService).edit().putInt(Constants.SETTING_REPEAT_MODE, mode.ordinal()).commit();
-    }
+        PreferenceManager.getDefaultSharedPreferences(playbackService).edit().putBoolean(Constants.SETTING_REPEAT_MODE, repeatEnabled).commit();
 
-    private boolean isNextTrackPlaying() {
-        try {
-            return nextTrack.isPlaying();
-        } catch (IllegalStateException ex) {
-            return false;
-        }
+        Log.d("PlaybackThread", "Repeat mode toggled; enabled: " + repeatEnabled);
     }
 
     private void performPlaylistActions(PlayingNowPlaylistAdapter adapter) {
@@ -469,8 +459,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         int nextTrackIndex;
 
         if (isEndOfPlaylist()) {
-            if (repeatMode == Constants.RepeatMode.OFF || repeatMode == Constants.RepeatMode.STOP
-                    || playlistCursor == null || playlistCursor.getCount() == 0)
+            if (!repeatEnabled || playlistCursor == null || playlistCursor.getCount() == 0)
                 return;
 
             nextTrackIndex = 0;
@@ -517,13 +506,14 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public void onCompletion(MediaPlayer mp) {
         Log.i("PlaybackThread", "Playback complete!");
 
-        if (nextTrack != null) {
-            currentTrack.reset();
+        if (!isEndOfPlaylist() || repeatEnabled) {
+            currentTrack.release();
 
-            playlistPosition = isEndOfPlaylist() ? 0 : playlistPosition + 1; //If next track isn't null and we're at playlist end, RepeatMode must be Playlist. Start at 0!
+            playlistPosition = isEndOfPlaylist() ? 0 : playlistPosition + 1; //Repeat must be enabled; start at 0!
             storePlaylistPosition();
             currentTrack = nextTrack;
             listenOn(currentTrack);
+            nextTrack = new MediaPlayer();
 
             notifyPlayingItemChanged();
             notifyStateChanged(PlaybackState.PLAYING);
@@ -576,10 +566,13 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void cancelNextTrack() {
-        if (nextTrack != null) {
+        try {
             currentTrack.setNextMediaPlayer(null);
+        } catch (IllegalStateException | IllegalArgumentException ex) { /* Ignore */ }
+
+        try {
             nextTrack.reset();
-        }
+        } catch (IllegalStateException ex) { /* Ignore */ }
     }
 
     /**

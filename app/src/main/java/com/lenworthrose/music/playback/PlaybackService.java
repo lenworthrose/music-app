@@ -101,6 +101,11 @@ public class PlaybackService extends Service {
                     }
 
                     break;
+                case Constants.CMD_TOGGLE_REPEAT_MODE:
+                    if (playbackThread.getHandler() != null)
+                        playbackThread.getHandler().obtainMessage(PlaybackThread.TOGGLE_REPEAT_MODE).sendToTarget();
+                    else
+                        pendingCommand = PlaybackThread.TOGGLE_REPEAT_MODE;
             }
         }
 
@@ -169,12 +174,8 @@ public class PlaybackService extends Service {
         playbackThread.getHandler().obtainMessage(PlaybackThread.SHUFFLE_REMAINING).sendToTarget();
     }
 
-    public Constants.RepeatMode getRepeatMode() {
-        return playbackThread.getRepeatMode();
-    }
-
-    public void setRepeatMode(Constants.RepeatMode repeatMode) {
-        playbackThread.getHandler().obtainMessage(PlaybackThread.SET_REPEAT_MODE, repeatMode.ordinal(), 0).sendToTarget();
+    public boolean isRepeatEnabled() {
+        return playbackThread.isRepeatEnabled();
     }
 
     public int getPlaylistSize() {

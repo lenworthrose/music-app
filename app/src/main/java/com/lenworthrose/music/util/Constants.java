@@ -10,6 +10,7 @@ public class Constants {
     public static final String CMD_PREVIOUS = "com.lenworthrose.music.Previous";
     public static final String CMD_ACTIVITY_STARTING = "com.lenworthrose.music.ActivityStarting";
     public static final String CMD_ACTIVITY_CLOSING = "com.lenworthrose.music.ActivityClosing";
+    public static final String CMD_TOGGLE_REPEAT_MODE = "com.lenworthrose.music.ToggleRepeat";
 
     // Actions Broadcast by PlaybackService when changes occur.
     public static final String PLAYING_NOW_CHANGED = "com.lenworthrose.music.PlayingNowChanged";
@@ -48,12 +49,5 @@ public class Constants {
         PAUSED,
         PLAYING,
         BUFFERING
-    }
-
-    public enum RepeatMode {
-        OFF,
-        PLAYLIST,
-        TRACK,
-        STOP
     }
 }

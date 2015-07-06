@@ -23,7 +23,6 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
-import com.lenworthrose.music.fragment.RepeatDialogFragment;
 import com.lenworthrose.music.fragment.ShuffleDialogFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
@@ -86,10 +85,6 @@ public class PlayingNowActivity extends AppCompatActivity {
                     NavUtils.navigateUpTo(this, upIntent);
 
                 return true;
-            case R.id.action_repeat:
-                return true;
-            case R.id.action_shuffle:
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -147,10 +142,6 @@ public class PlayingNowActivity extends AppCompatActivity {
             background.setImageResource(android.R.color.transparent);
 
         if (old != null) old.recycle();
-    }
-
-    public void onRepeatClicked(MenuItem unused) {
-        new RepeatDialogFragment().show(getFragmentManager(), "Repeat");
     }
 
     public void onShuffleClicked(MenuItem unused) {

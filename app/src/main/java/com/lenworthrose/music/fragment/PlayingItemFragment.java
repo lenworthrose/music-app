@@ -21,6 +21,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
@@ -61,6 +64,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private Animation pauseBlinkAnimation = new AlphaAnimation(0f, 1f);
     private PlaybackService playbackService;
     private Handler handler;
+    private MenuItem repeatItem;
+    private boolean isRepeatEnabled;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -148,6 +153,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         pauseBlinkAnimation.setRepeatMode(Animation.REVERSE);
 
         getActivity().bindService(new Intent(getActivity(), PlaybackService.class), this, Context.BIND_AUTO_CREATE);
+
+        setHasOptionsMenu(true); //Required for the system to call onCreateOptionsMenu() to get the Repeat MenuItem
     }
 
     @Override
@@ -210,6 +217,25 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         bottomBackground.setShape(new RectShape());
         bottomBackground.setShaderFactory(bottomShaderFactory);
         bottomDetailContainer.setBackground(bottomBackground);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        repeatItem = menu.findItem(R.id.action_repeat);
+        repeatItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(getActivity(), PlaybackService.class);
+                intent.setAction(Constants.CMD_TOGGLE_REPEAT_MODE);
+                getActivity().startService(intent);
+                isRepeatEnabled = !isRepeatEnabled;
+                onRepeatToggled();
+                return true;
+            }
+        });
+
+        onRepeatToggled();
     }
 
     @Override
@@ -386,6 +412,13 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         playbackService = ((PlaybackService.LocalBinder)service).getService();
         playingItemChanged(playbackService.getPlayingItemIntent());
         playbackStateChanged(playbackService.getPlaybackStateIntent());
+        this.isRepeatEnabled = playbackService.isRepeatEnabled();
+        onRepeatToggled();
+    }
+
+    private void onRepeatToggled() {
+        if (repeatItem == null) return;
+        repeatItem.getIcon().setAlpha(isRepeatEnabled ? 255 : 50);
     }
 
     @Override
