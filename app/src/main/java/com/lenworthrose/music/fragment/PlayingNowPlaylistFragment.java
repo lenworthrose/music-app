@@ -63,23 +63,17 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         getActivity().bindService(new Intent(getActivity(), PlaybackService.class), this, Context.BIND_AUTO_CREATE);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        playingItemChanged();
-    }
-
-    @Override
-    public void onStop() {
+    public void onPause() {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         getActivity().unbindService(this);
-        super.onStop();
+        super.onPause();
     }
 
     public void playlistUpdated() {

@@ -152,8 +152,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         pauseBlinkAnimation.setRepeatCount(Animation.INFINITE);
         pauseBlinkAnimation.setRepeatMode(Animation.REVERSE);
 
-        getActivity().bindService(new Intent(getActivity(), PlaybackService.class), this, Context.BIND_AUTO_CREATE);
-
         setHasOptionsMenu(true); //Required for the system to call onCreateOptionsMenu() to get the Repeat MenuItem
     }
 
@@ -241,12 +239,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     @Override
     public void onResume() {
         super.onResume();
+        getActivity().bindService(new Intent(getActivity(), PlaybackService.class), this, Context.BIND_AUTO_CREATE);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver, Utils.createPlaybackIntentFilter());
-
-        if (playbackService != null) {
-            playingItemChanged(playbackService.getPlayingItemIntent());
-            playbackStateChanged(playbackService.getPlaybackStateIntent());
-        }
     }
 
     @Override
@@ -254,13 +248,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         cancelHideOverlays();
         handler.removeCallbacksAndMessages(null);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
         getActivity().unbindService(this);
-        super.onDestroy();
+        super.onPause();
     }
 
     private void playingItemChanged(Intent intent) {
