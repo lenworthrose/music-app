@@ -67,6 +67,12 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         nowPlayingBar = (NowPlayingBar)findViewById(R.id.main_now_playing_bar);
+        nowPlayingBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
+            }
+        });
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -137,14 +143,14 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.PLAYBACK_MODIFICATION_COMPLETE));
-        nowPlayingBar.setPlaybackService(playbackService);
+        nowPlayingBar.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        nowPlayingBar.setPlaybackService(null);
+        nowPlayingBar.onPause();
     }
 
     @Override
@@ -212,19 +218,14 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         playbackService = ((PlaybackService.LocalBinder)service).getService();
-
         nowPlayingBar.setPlaybackService(playbackService);
-        nowPlayingBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
-            }
-        });
+        nowPlayingBar.onResume();
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         playbackService = null;
+        nowPlayingBar.setPlaybackService(null);
     }
 
     @Override

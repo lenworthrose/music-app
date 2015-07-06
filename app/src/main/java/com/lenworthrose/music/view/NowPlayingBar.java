@@ -24,7 +24,6 @@ import com.lenworthrose.music.util.Constants;
  * the library.
  */
 public class NowPlayingBar extends LinearLayout {
-    private boolean isVisible;
     private TextView title, subtitle;
     private ImageView playPause, coverArt;
     private PlaybackService playbackService;
@@ -60,7 +59,6 @@ public class NowPlayingBar extends LinearLayout {
 
     private void init(Context context) {
         LayoutInflater.from(context).inflate(R.layout.now_playing_bar, this);
-        setAlpha(0f);
         setVisibility(View.GONE);
 
         title = (TextView)findViewById(R.id.np_title);
@@ -82,50 +80,35 @@ public class NowPlayingBar extends LinearLayout {
         });
     }
 
-    public void setPlaybackService(PlaybackService service) {
-        playbackService = service;
+    public void onResume() {
+        IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_CHANGED);
+        filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
 
-        if (service != null) {
-            IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_CHANGED);
-            filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
-            LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
-
+        if (playbackService != null) {
             playingItemChanged(playbackService.getPlayingItemIntent());
             playbackStateChanged(playbackService.getPlaybackStateIntent());
-        } else {
-            LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
         }
     }
 
-    public void playingItemChanged(Intent intent) {
+    public void onPause() {
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+    }
+
+    public void setPlaybackService(PlaybackService service) {
+        playbackService = service;
+    }
+
+    private void playingItemChanged(Intent intent) {
         String titleString = intent.getStringExtra(Constants.EXTRA_TITLE);
 
         if (TextUtils.isEmpty(titleString)) {
-            if (isVisible) {
-                isVisible = false;
-                animate().alpha(0f).setDuration(400).setStartDelay(100).withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        setVisibility(View.GONE);
-                    }
-                });
-            }
-
+            setVisibility(View.GONE);
             title.setText("");
             subtitle.setText("");
             coverArt.setImageResource(android.R.color.transparent);
         } else {
-            if (!isVisible) {
-                isVisible = true;
-                animate().alpha(1f).setDuration(1000).setStartDelay(750).withStartAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        setAlpha(0f);
-                        setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-
+            setVisibility(View.VISIBLE);
             title.setText(titleString);
             String subtitle = intent.getStringExtra(Constants.EXTRA_ARTIST);
             String album = intent.getStringExtra(Constants.EXTRA_ALBUM);
@@ -140,7 +123,7 @@ public class NowPlayingBar extends LinearLayout {
         }
     }
 
-    public void playbackStateChanged(Intent intent) {
+    private void playbackStateChanged(Intent intent) {
         Constants.PlaybackState state = (Constants.PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
 
         switch (state) {
