@@ -20,9 +20,8 @@
 
         <include layout="@layout/toolbar" />
 
-        <fragment
-            android:id="@+id/playing_item"
-            android:name="com.lenworthrose.music.fragment.PlayingItemFragment"
+        <FrameLayout
+            android:id="@+id/pn_placeholder"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="9" />
@@ -30,11 +29,10 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="#666" />
+            android:background="?colorAccent" />
 
-        <fragment
-            android:id="@+id/playing_now_playlist"
-            android:name="com.lenworthrose.music.fragment.PlayingNowPlaylistFragment"
+        <FrameLayout
+            android:id="@+id/pnp_placeholder"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="4" />

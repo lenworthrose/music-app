@@ -38,19 +38,16 @@ public class PlayingNowActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-        Intent intent = new Intent(this, PlaybackService.class);
-        intent.setAction(Constants.CMD_ACTIVITY_STARTING);
-        startService(intent);
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.SETTING_KEEP_SCREEN_ON, false))
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.act_playing_now);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        Intent intent = new Intent(this, PlaybackService.class);
+        intent.setAction(Constants.CMD_ACTIVITY_STARTING);
+        startService(intent);
 
         background = (ImageView)findViewById(R.id.pn_background_image);
         ViewPager pager = (ViewPager)findViewById(R.id.pn_root_container);
@@ -58,7 +55,15 @@ public class PlayingNowActivity extends AppCompatActivity {
         if (pager != null) {
             pager.setAdapter(new PlayingNowTabPagerAdapter(getSupportFragmentManager()));
             ((PagerSlidingTabStrip)findViewById(R.id.pn_root_tabs)).setViewPager(pager);
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.pn_placeholder, new PlayingItemFragment())
+                    .replace(R.id.pnp_placeholder, new PlayingNowPlaylistFragment())
+                    .commit();
         }
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -98,6 +103,25 @@ public class PlayingNowActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    public void setBackgroundImage(Bitmap bitmap) {
+        Bitmap old = background.getDrawable() instanceof BitmapDrawable ? ((BitmapDrawable)background.getDrawable()).getBitmap() : null;
+
+        if (bitmap != null)
+            background.setImageBitmap(bitmap);
+        else
+            background.setImageResource(android.R.color.transparent);
+
+        if (old != null) old.recycle();
+    }
+
+    public void onShuffleClicked(MenuItem unused) {
+        new ShuffleDialogFragment().show(getFragmentManager(), "Shuffle");
+    }
+
+    public void onEditPlaylistClicked(MenuItem unused) {
+        startActivity(new Intent(this, EditPlaylistActivity.class));
+    }
+
     private class PlayingNowTabPagerAdapter extends FragmentPagerAdapter {
         public PlayingNowTabPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -131,24 +155,5 @@ public class PlayingNowActivity extends AppCompatActivity {
         public int getCount() {
             return 2;
         }
-    }
-
-    public void setBackgroundImage(Bitmap bitmap) {
-        Bitmap old = background.getDrawable() instanceof BitmapDrawable ? ((BitmapDrawable)background.getDrawable()).getBitmap() : null;
-
-        if (bitmap != null)
-            background.setImageBitmap(bitmap);
-        else
-            background.setImageResource(android.R.color.transparent);
-
-        if (old != null) old.recycle();
-    }
-
-    public void onShuffleClicked(MenuItem unused) {
-        new ShuffleDialogFragment().show(getFragmentManager(), "Shuffle");
-    }
-
-    public void onEditPlaylistClicked(MenuItem unused) {
-        startActivity(new Intent(this, EditPlaylistActivity.class));
     }
 }

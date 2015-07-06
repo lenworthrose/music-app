@@ -15,6 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/playing_now_content_background"
         android:orientation="vertical">
 
         <include layout="@layout/toolbar" />
@@ -27,9 +28,8 @@
             android:baselineAligned="false"
             android:orientation="horizontal">
 
-            <fragment
-                android:id="@+id/playing_now_playlist"
-                android:name="com.lenworthrose.music.fragment.PlayingNowPlaylistFragment"
+            <FrameLayout
+                android:id="@+id/pnp_placeholder"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -37,11 +37,11 @@
 
             <View
                 android:layout_width="2dp"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="?colorAccent" />
 
-            <fragment
-                android:id="@+id/playing_item"
-                android:name="com.lenworthrose.music.fragment.PlayingItemFragment"
+            <FrameLayout
+                android:id="@+id/pn_placeholder"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />

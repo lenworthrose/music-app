@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -18,9 +17,9 @@ import android.widget.ListView;
 
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
+import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Utils;
-import com.lenworthrose.music.playback.PlaybackService;
 import com.mobeta.android.dslv.DragSortListView;
 
 /**
@@ -46,13 +45,6 @@ public class PlayingNowPlaylistFragment extends Fragment implements AdapterView.
             }
         }
     };
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        setHasOptionsMenu(true);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
