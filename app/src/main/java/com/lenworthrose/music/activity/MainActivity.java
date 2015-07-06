@@ -45,10 +45,10 @@ import java.util.ArrayList;
 /**
  * The main Activity for the application. Implements {@link NavigationListener} so it can handle navigation
  * events. Manages the {@link LibraryFragment}s that display the media library.
- * <p>
+ * <p/>
  * Responsible for starting and stopping the {@link PlaybackService}. Also binds to the Service so it can
  * modify the Playing Now playlist.
- * <p>
+ * <p/>
  * Responsible for starting the {@link MediaStoreService}.
  */
 public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, ArtistsStore.InitListener, AdapterView.OnItemClickListener {
@@ -201,6 +201,9 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void onArtistsDbInitialized() {
+        if (getSupportFragmentManager().getFragments() != null && getSupportFragmentManager().getFragments().size() > 0)
+            return;
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         selectedDrawerPosition = Integer.parseInt(prefs.getString(Constants.SETTING_START_LOCATION, "0"));
         onItemClick(drawerListView, null, selectedDrawerPosition, selectedDrawerPosition);
