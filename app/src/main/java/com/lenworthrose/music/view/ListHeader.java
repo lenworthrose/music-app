@@ -3,6 +3,7 @@ package com.lenworthrose.music.view;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.Html;
@@ -71,7 +72,10 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
 
     @Override
     public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
-        if (data.getCount() == 0 || !data.moveToFirst()) return;
+        if (data.getCount() == 0 || !data.moveToFirst()) {
+            setVisibility(View.GONE);
+            return;
+        }
 
         switch (type) {
             case ARTIST:
@@ -95,6 +99,9 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
                 break;
         }
 
+        if (year.getText().length() == 0) year.setVisibility(View.GONE);
+        if (album.getText().length() == 0) album.setVisibility(View.GONE);
+
         data.close();
     }
 
@@ -111,6 +118,12 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
                         background.animate().alpha(1f).setDuration(300).start();
                     }
                 });
+            }
+
+            @Override
+            public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                coverArt.setVisibility(View.GONE);
+                background.setVisibility(View.GONE);
             }
         });
     }
