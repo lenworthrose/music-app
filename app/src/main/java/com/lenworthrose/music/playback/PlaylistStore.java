@@ -31,13 +31,10 @@ public class PlaylistStore {
     private InitTask initTask;
     private InitListener initListener;
 
-    public void init(Context context) {
+    public void init(Context context, InitListener listener) {
+        initListener = listener;
         initTask = new InitTask(context);
         initTask.execute();
-    }
-
-    public void setListener(InitListener listener) {
-        this.initListener = listener;
     }
 
     public Cursor read() {

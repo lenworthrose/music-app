@@ -73,8 +73,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         broadcastMan = LocalBroadcastManager.getInstance(playbackService);
         audioMan = (AudioManager)playbackService.getSystemService(Context.AUDIO_SERVICE);
         playlistStore = new PlaylistStore();
-        playlistStore.setListener(this);
-        playlistStore.init(playbackService);
+        playlistStore.init(playbackService, this);
     }
 
     @Override
