@@ -66,10 +66,10 @@
     <string name="refresh_artists">Refresh Artists</string>
     <string name="refresh_artists_desc">Search for new artists in the media store</string>
     <string name="refresh_albums">Refresh Albums</string>
-    <string name="refresh_albums_desc">Refresh the cover art for all albums. Will also remove artists that have no albums.</string>
+    <string name="refresh_albums_desc">Refresh the cover art for all albums; will also remove artists that have no albums</string>
     <string name="app_settings">App Settings</string>
-    <string name="auto_hide_overlays_desc">Automatically hide overlays after 5 seconds, if playing.</string>
-    <string name="auto_hide_overlays">Auto-hide Playing Now Overlays</string>
+    <string name="auto_hide_overlays_desc">Automatically hide overlays after 5 seconds when playing</string>
+    <string name="auto_hide_overlays">Hide Playing Now Overlays</string>
     <string name="start_location">Start Location</string>
     <string name="last_fm_integration_desc">Retrieve artist information from Last.fm</string>
     <string name="last_fm_integration">Enable Last.fm integration</string>
