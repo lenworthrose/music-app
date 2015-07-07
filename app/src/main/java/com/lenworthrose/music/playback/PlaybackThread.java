@@ -382,9 +382,9 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         return playlistPosition >= playlistCursor.getCount() - 1;
     }
 
-    public int getDuration() {
+    private int getDuration() {
         try {
-            return isPlayingOrPaused() ? currentTrack.getDuration() : -1;
+            return currentTrack.getDuration();
         } catch (IllegalStateException ex) {
             return -1;
         }
@@ -394,9 +394,9 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         return playbackState;
     }
 
-    public int getPosition() {
+    private int getPosition() {
         try {
-            return !isPlayingOrPaused() ? 0 : currentTrack.getCurrentPosition();
+            return currentTrack.getCurrentPosition();
         } catch (IllegalStateException ex) {
             return 0;
         }

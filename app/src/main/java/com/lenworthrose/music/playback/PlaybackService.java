@@ -186,10 +186,6 @@ public class PlaybackService extends Service {
         return playbackThread.getPlaybackState();
     }
 
-    public int getPosition() {
-        return playbackThread.getPosition();
-    }
-
     public int getPlaylistPosition() {
         return playbackThread.getPlaylistPosition();
     }
