@@ -27,5 +27,10 @@
             android:key="refresh_albums"
             android:summary="@string/refresh_albums_desc"
             android:title="@string/refresh_albums" />
+        <Preference
+            android:dependency="last_fm_integration"
+            android:key="last_fm_update"
+            android:summary="Retrieve missing artist information from Last.fm"
+            android:title="Retrieve Artist Info" />
     </PreferenceCategory>
 </PreferenceScreen>

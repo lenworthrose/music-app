@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Handler;
@@ -21,22 +22,28 @@ import com.lenworthrose.music.util.Constants;
 
 import java.util.List;
 
+import fm.last.api.LastFmServer;
+import fm.last.api.LastFmServerFactory;
+
 /**
  * A {@link Service} that listens for changes to the {@link android.provider.MediaStore} database. It will also perform the first
  * sync with the MediaStore database to build the app's own Artist database.
  */
-public class MediaStoreService extends Service implements ArtistsStore.InitListener, ArtistsStore.ArtistsStoreListener {
+public class MediaStoreService extends Service implements ArtistsStore.InitListener, ArtistsStore.ArtistsStoreListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String ACTION_MEDIA_STORE_SYNC_COMPLETE = "com.lenworthrose.music.sync.MediaStoreService.SYNC_COMPLETE";
     public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.sync.MediaStoreService.SYNC";
     public static final String ACTION_UPDATE_ALBUMS = "com.lenworthrose.music.sync.MediaStoreService.UPDATE_ALBUMS";
+    public static final String ACTION_LAST_FM_FETCH = "com.lenworthrose.music.sync.MediaStoreService.LAST_FM_FETCH";
 
     private static final int NOTIFICATION_ID = 36663;
     private static final String SETTING_HAS_COMPLETED_INITIAL_SYNC = "HasCompletedInitialSync";
 
-    private boolean isObservingMediaStore, isSyncingArtists, isGettingArtistInfo, isUpdatingAlbums, isArtistSyncPending, isAlbumUpdatePending;
+    private boolean isObservingMediaStore, isTaskActive, isArtistSyncPending, isAlbumUpdatePending;
     private ContentObserver artistsObserver, albumsObserver;
     private NotificationManager notifyMan;
     private Notification.Builder notificationBuilder;
+    private LastFmServer lastFm;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -48,6 +55,10 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         super.onCreate();
         notifyMan = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationBuilder = new Notification.Builder(this).setSmallIcon(R.drawable.sync);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+        if (prefs.getBoolean(Constants.SETTING_LAST_FM_INTEGRATION, false)) lastFm = createLastFmServer();
     }
 
     @Override
@@ -59,6 +70,9 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
                     return START_STICKY;
                 case ACTION_UPDATE_ALBUMS:
                     startUpdatingAlbums(true);
+                    return START_STICKY;
+                case ACTION_LAST_FM_FETCH:
+                    startLastFmUpdate();
                     return START_STICKY;
             }
         }
@@ -97,8 +111,8 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     }
 
     private void startArtistsSync() {
-        if (!isActive()) {
-            isSyncingArtists = true;
+        if (!isTaskActive) {
+            isTaskActive = true;
 
             String[] projection = {
                     MediaStore.Audio.Artists._ID,
@@ -129,17 +143,16 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         Log.d("MediaStoreService", "MediaStore sync complete! New artist count: " + newArtists.size());
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).commit();
         ArtistsStore.getInstance().removeListener(MediaStoreService.this);
-        isSyncingArtists = false;
+        isTaskActive = false;
 
         if (!newArtists.isEmpty()) {
-            boolean lastFmEnabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.SETTING_LAST_FM_INTEGRATION, false);
-            Log.d("MediaStoreService", "Starting GetArtistInfoTask. lastFmEnabled=" + lastFmEnabled);
-            isGettingArtistInfo = true;
+            Log.d("MediaStoreService", "Starting GetArtistInfoTask. lastFmEnabled=" + (lastFm != null));
+            isTaskActive = true;
             String text = getString(R.string.fetching_artist_info);
             notificationBuilder.setContentTitle(text).setTicker(text);
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
 
-            GetArtistInfoTask infoTask = new GetArtistInfoTask(this, newArtists, lastFmEnabled) {
+            GetArtistInfoTask infoTask = new GetArtistInfoTask(this, lastFm, newArtists) {
                 @Override
                 protected void onProgressUpdate(Integer... values) {
                     notificationBuilder.setProgress(values[1], values[0], false);
@@ -152,7 +165,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
                     stopForeground(true);
                     LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
                     ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
-                    isGettingArtistInfo = false;
+                    isTaskActive = false;
 
                     startPendingTasks();
                 }
@@ -168,8 +181,8 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     public void onArtistInfoFetchComplete() { }
 
     private void startUpdatingAlbums(final boolean showNotification) {
-        if (!isActive()) {
-            isUpdatingAlbums = true;
+        if (!isTaskActive) {
+            isTaskActive = true;
             Log.d("MediaStoreService", "Starting UpdateCoverArtTask");
 
             if (showNotification) {
@@ -193,8 +206,35 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
                     LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
                     ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
                     if (showNotification) stopForeground(true);
-                    isUpdatingAlbums = false;
+                    isTaskActive = false;
 
+                    startPendingTasks();
+                }
+            };
+
+            task.execute();
+        }
+    }
+
+    private void startLastFmUpdate() {
+        if (!isTaskActive && lastFm != null) {
+            String text = getString(R.string.fetching_artist_info);
+            notificationBuilder.setTicker(text).setContentTitle(text);
+            startForeground(NOTIFICATION_ID, notificationBuilder.build());
+
+            LastFmFetchTask task = new LastFmFetchTask(this, lastFm) {
+                @Override
+                protected void onProgressUpdate(Integer... values) {
+                    notificationBuilder.setProgress(values[1], values[0], false);
+                    notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    Log.d("MediaStoreService", "Finished user requested Last.fm update");
+                    ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
+                    stopForeground(true);
+                    isTaskActive = false;
                     startPendingTasks();
                 }
             };
@@ -206,7 +246,30 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     @Override
     public void onDestroy() {
         stopObservingMediaStore();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (Constants.SETTING_LAST_FM_INTEGRATION.equals(key))
+            lastFm = sharedPreferences.getBoolean(key, false) ? createLastFmServer() : null;
+    }
+
+    private static LastFmServer createLastFmServer() {
+        return LastFmServerFactory.getServer("http://ws.audioscrobbler.com/2.0/",
+                "31cf9ad7f222197a94a63d614d28b267",
+                "76a5de88fc74f512700849e718567c35");
+    }
+
+    private void startPendingTasks() {
+        if (isArtistSyncPending) {
+            isArtistSyncPending = false;
+            startArtistsSync();
+        } else if (isAlbumUpdatePending) {
+            isAlbumUpdatePending = false;
+            startUpdatingAlbums(false);
+        }
     }
 
     private class ArtistsContentObserver extends ContentObserver {
@@ -216,7 +279,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
         @Override
         public void onChange(boolean selfChange) {
-            Log.d("MediaStoreService", "Change detected in Artists table! isActive()=" + isActive());
+            Log.d("MediaStoreService", "Change detected in Artists table! isActive()=" + isTaskActive);
             startArtistsSync();
         }
     }
@@ -228,27 +291,13 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
         @Override
         public void onChange(boolean selfChange) {
-            Log.d("MediaStoreService", "Change detected in Albums table! isActive()=" + isActive());
+            Log.d("MediaStoreService", "Change detected in Albums table! isActive()=" + isTaskActive);
 
-            if (!isActive()) {
+            if (!isTaskActive) {
                 startUpdatingAlbums(false);
             } else {
                 isAlbumUpdatePending = true;
             }
-        }
-    }
-
-    private boolean isActive() {
-        return isSyncingArtists || isUpdatingAlbums || isGettingArtistInfo;
-    }
-
-    private void startPendingTasks() {
-        if (isArtistSyncPending) {
-            isArtistSyncPending = false;
-            startArtistsSync();
-        } else if (isAlbumUpdatePending) {
-            isAlbumUpdatePending = false;
-            startUpdatingAlbums(false);
         }
     }
 }

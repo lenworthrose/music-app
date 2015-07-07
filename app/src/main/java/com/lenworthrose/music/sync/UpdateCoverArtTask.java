@@ -44,7 +44,7 @@ public class UpdateCoverArtTask extends AsyncTask<Void, Integer, Void> {
                             albumArt[i++] = albumsCursor.getString(0);
                     } while (albumsCursor.moveToNext() && i < 4);
 
-                    ArtistsStore.getInstance().updateArtist(artistId, albumArt);
+                    ArtistsStore.getInstance().updateArtistAlbumArt(artistId, albumArt);
                 } else {
                     ArtistsStore.getInstance().removeArtist(artistsCursor.getString(1));
                 }

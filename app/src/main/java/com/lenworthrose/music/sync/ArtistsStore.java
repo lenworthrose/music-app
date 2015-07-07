@@ -101,6 +101,16 @@ public class ArtistsStore {
                 ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
     }
 
+    public Cursor getArtistsWithoutInfo() {
+        return db.query(TABLE_NAME,
+                PROJECTION_ALL,
+                ArtistsStoreContract.ArtistEntry.COLUMN_BIO + " IS NULL",
+                null,
+                null,
+                null,
+                ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
+    }
+
     public CursorLoader getArtistInfo(Context context, final long id) {
         return new CursorLoader(context) {
             @Override
@@ -130,7 +140,16 @@ public class ArtistsStore {
         db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
     }
 
-    void updateArtist(long id, String... albumArtUris) {
+    void updateArtistLastFmInfo(long id, String musicBrainzId, String bio, String artistImgUrl) {
+        ContentValues values = new ContentValues();
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_ID, musicBrainzId);
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_BIO, bio);
+        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ARTIST_ART_FILE_URL, artistImgUrl);
+
+        db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
+    }
+
+    void updateArtistAlbumArt(long id, String... albumArtUris) {
         ContentValues values = new ContentValues();
 
         if (albumArtUris != null) {
