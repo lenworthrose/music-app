@@ -184,7 +184,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void playPause() {
-        if (!isPlaying() && playbackState != PlaybackState.PAUSED) {
+        if (!isPlayingOrPaused()) {
             play(playlistPosition);
         } else {
             if (currentTrack.isPlaying())
@@ -227,7 +227,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void seek(int position) {
-        if (isPlaying() || playbackState == PlaybackState.PAUSED) {
+        if (isPlayingOrPaused()) {
             try {
                 currentTrack.seekTo(position);
                 notifyStateChanged(PlaybackState.BUFFERING);
@@ -374,13 +374,17 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         return playbackState == PlaybackState.PLAYING;
     }
 
+    private boolean isPlayingOrPaused() {
+        return isPlaying() || playbackState == PlaybackState.PAUSED;
+    }
+
     private boolean isEndOfPlaylist() {
         return playlistPosition >= playlistCursor.getCount() - 1;
     }
 
     public int getDuration() {
         try {
-            return playbackState == PlaybackState.PLAYING || playbackState == PlaybackState.PAUSED ? currentTrack.getDuration() : -1;
+            return isPlayingOrPaused() ? currentTrack.getDuration() : -1;
         } catch (IllegalStateException ex) {
             return -1;
         }
@@ -392,7 +396,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
     public int getPosition() {
         try {
-            return !isPlaying() && playbackState != PlaybackState.PAUSED ? 0 : currentTrack.getCurrentPosition();
+            return !isPlayingOrPaused() ? 0 : currentTrack.getCurrentPosition();
         } catch (IllegalStateException ex) {
             return 0;
         }
@@ -453,7 +457,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void scheduleNextTrack() {
-        if (!isPlaying() && playbackState != PlaybackState.PAUSED) return;
+        if (!isPlayingOrPaused()) return;
 
         int nextTrackIndex;
 
@@ -658,7 +662,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public Intent getPlaybackStateIntent() {
         Intent intent = new Intent(Constants.PLAYBACK_STATE_CHANGED);
         intent.putExtra(Constants.EXTRA_STATE, playbackState);
-        if (playbackState == PlaybackState.PLAYING || playbackState == PlaybackState.PAUSED) intent.putExtra(Constants.EXTRA_DURATION, getDuration());
+        if (isPlayingOrPaused()) intent.putExtra(Constants.EXTRA_DURATION, getDuration());
         return intent;
     }
 
