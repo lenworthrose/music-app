@@ -316,6 +316,30 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         int duration = intent.getIntExtra(Constants.EXTRA_DURATION, -1);
 
         switch (state) {
+            case BUFFERING:
+                positionDisplay.clearAnimation();
+                positionBar.setEnabled(false);
+                playPause.setAlpha(.3f);
+                playPause.setImageResource(R.drawable.play);
+                playPause.setEnabled(false);
+                break;
+            case PLAYING:
+                positionDisplay.clearAnimation();
+                durationDisplay.setText(Utils.longToTimeDisplay(duration));
+                positionBar.setMax(duration);
+                playPause.setAlpha(1f);
+                playPause.setImageResource(R.drawable.pause);
+                playPause.setEnabled(true);
+                scheduleHideOverlays();
+                updatePosition(intent.getIntExtra(Constants.EXTRA_POSITION, 0));
+                handler.postDelayed(new UpdatePositionRunnable(), 1000);
+            break;
+            case PAUSED:
+                positionDisplay.startAnimation(pauseBlinkAnimation);
+                durationDisplay.setText(Utils.longToTimeDisplay(duration));
+                positionBar.setMax(duration);
+                updatePosition(intent.getIntExtra(Constants.EXTRA_POSITION, 0));
+                break;
             case STOPPED:
                 positionDisplay.setText(R.string.blank_time);
                 durationDisplay.setText(R.string.blank_time);
@@ -324,36 +348,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 playPause.setEnabled(true);
                 playPause.setAlpha(1f);
                 positionDisplay.clearAnimation();
-                break;
-            case PLAYING:
-                positionBar.setEnabled(true);
-                positionBar.setMax(duration);
-                playPause.setAlpha(1f);
-                playPause.setImageResource(R.drawable.pause);
-                playPause.setEnabled(true);
-                scheduleHideOverlays();
-                positionDisplay.clearAnimation();
-                durationDisplay.setText(Utils.longToTimeDisplay(duration));
-
-                updatePosition(intent.getIntExtra(Constants.EXTRA_POSITION, 0));
-
-                handler.postDelayed(new UpdatePositionRunnable(), 1000);
-
-                break;
-            case BUFFERING:
-                positionBar.setEnabled(false);
-                playPause.setEnabled(false);
-                playPause.setAlpha(.3f);
-                playPause.setImageResource(R.drawable.play);
-                positionDisplay.clearAnimation();
-                break;
-            case PAUSED:
-                positionDisplay.setText(Utils.longToTimeDisplay(intent.getIntExtra(Constants.EXTRA_POSITION, 0)));
-
-                positionBar.setMax(duration);
-                durationDisplay.setText(Utils.longToTimeDisplay(duration));
-
-                positionDisplay.startAnimation(pauseBlinkAnimation);
                 break;
         }
 
