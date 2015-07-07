@@ -191,7 +191,14 @@ public class ArtistsStore {
         @Override
         protected void onPostExecute(List<ArtistModel> newArtists) {
             for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
-                WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
+                WeakReference<ArtistsStoreListener> listener;
+
+                try {
+                    listener = artistsStoreListeners.get(i);
+                } catch (IndexOutOfBoundsException ex) {
+                    continue;
+                }
+
                 if (listener.get() != null) listener.get().onMediaStoreSyncComplete(newArtists);
             }
         }
