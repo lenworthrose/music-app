@@ -507,14 +507,16 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         Log.i("PlaybackThread", "Playback complete!");
 
         if (!isEndOfPlaylist() || repeatEnabled) {
-            currentTrack.release();
+            currentTrack.reset();
 
             playlistPosition = isEndOfPlaylist() ? 0 : playlistPosition + 1; //Repeat must be enabled; start at 0!
             storePlaylistPosition();
-            currentTrack = nextTrack;
-            listenOn(currentTrack);
-            nextTrack = new MediaPlayer();
 
+            MediaPlayer temp = currentTrack;
+            currentTrack = nextTrack;
+            nextTrack = temp;
+
+            listenOn(currentTrack);
             notifyPlayingItemChanged();
             notifyStateChanged(PlaybackState.PLAYING);
 
