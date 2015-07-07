@@ -66,6 +66,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private Handler handler;
     private MenuItem repeatItem;
     private boolean isRepeatEnabled;
+    private int position;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -253,6 +254,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void playingItemChanged(Intent intent) {
+        handler.removeCallbacksAndMessages(null);
         if (isDetached() || playbackService == null) return;
         if (autoHideOverlays) setOverlaysVisible(true);
 
@@ -306,6 +308,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void playbackStateChanged(Intent intent) {
+        handler.removeCallbacksAndMessages(null);
         if (isDetached() || playbackService == null) return;
 
         PlaybackState state = (PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
@@ -324,24 +327,17 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 break;
             case PLAYING:
                 positionBar.setEnabled(true);
+                positionBar.setMax(duration);
                 playPause.setAlpha(1f);
                 playPause.setImageResource(R.drawable.pause);
                 playPause.setEnabled(true);
                 scheduleHideOverlays();
                 positionDisplay.clearAnimation();
+                durationDisplay.setText(Utils.longToTimeDisplay(duration));
 
-                if (duration < 0) {
-                    positionBar.setProgress(0);
-                    positionBar.setEnabled(false);
+                updatePosition(intent.getIntExtra(Constants.EXTRA_POSITION, 0));
 
-                    durationDisplay.setText(R.string.blank_time);
-                } else {
-                    updatePosition();
-                    positionBar.setMax(duration);
-                    durationDisplay.setText(Utils.longToTimeDisplay(duration));
-                }
-
-                handler.postDelayed(new UpdatePositionRunnable(), 333);
+                handler.postDelayed(new UpdatePositionRunnable(), 1000);
 
                 break;
             case BUFFERING:
@@ -352,7 +348,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 positionDisplay.clearAnimation();
                 break;
             case PAUSED:
-                positionDisplay.setText(Utils.longToTimeDisplay(playbackService.getPosition()));
+                positionDisplay.setText(Utils.longToTimeDisplay(intent.getIntExtra(Constants.EXTRA_POSITION, 0)));
 
                 positionBar.setMax(duration);
                 durationDisplay.setText(Utils.longToTimeDisplay(duration));
@@ -387,9 +383,10 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             ((PlayingNowActivity)getActivity()).setBackgroundImage(null);
     }
 
-    private void updatePosition() {
+    private void updatePosition(int position) {
+        this.position = position;
+
         if (!isPositionBarTouched) {
-            int position = playbackService.getPosition();
             positionBar.setProgress(position);
             positionBar.setEnabled(true);
             positionDisplay.setText(Utils.longToTimeDisplay(position));
@@ -483,7 +480,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         @Override
         public void run() {
             if (playbackService.getState() == PlaybackState.PLAYING) {
-                updatePosition();
+                updatePosition(position + 1000);
                 handler.postDelayed(new UpdatePositionRunnable(), 1000);
             }
         }

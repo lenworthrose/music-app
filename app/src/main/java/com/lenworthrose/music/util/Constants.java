@@ -27,6 +27,7 @@ public class Constants {
     public static final String PLAYBACK_STATE_CHANGED = "com.lenworthrose.music.PlaybackStateChanged";
     public static final String EXTRA_STATE = "State";
     public static final String EXTRA_DURATION = "Duration";
+    public static final String EXTRA_POSITION = "Position";
 
     public static final String PLAYBACK_MODIFICATION_COMPLETE = "com.lenworthrose.music.PlaybackModificationComplete";
     public static final String EXTRA_MODIFICATION_TYPE = "WHICH";

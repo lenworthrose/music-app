@@ -175,11 +175,11 @@ public class MediaSessionManager extends BroadcastReceiver {
                 break;
             case PLAYING:
                 state = PlaybackStateCompat.STATE_PLAYING;
-                position = playbackService.getPosition();
+                position = intent.getIntExtra(Constants.EXTRA_POSITION, 0);
                 break;
             case PAUSED:
                 state = PlaybackStateCompat.STATE_PAUSED;
-                position = playbackService.getPosition();
+                position = intent.getIntExtra(Constants.EXTRA_POSITION, 0);
                 break;
             default:
                 state = PlaybackStateCompat.STATE_NONE;

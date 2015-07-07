@@ -196,6 +196,8 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void next() {
+        if (playbackState == PlaybackState.BUFFERING) return;
+
         if (!isPlaying()) {
             if (!isEndOfPlaylist()) {
                 playlistPosition++;
@@ -208,6 +210,8 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void previous() {
+        if (playbackState == PlaybackState.BUFFERING) return;
+
         if (!isPlaying()) {
             if (playlistPosition > 0) {
                 playlistPosition--;
@@ -244,33 +248,29 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
         this.playlistPosition = playlistPosition;
         playlistCursor.moveToPosition(playlistPosition);
+        Uri mediaUri = getUriFromCursor(playlistCursor);
         storePlaylistPosition();
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (audioMan.requestAudioFocus(PlaybackThread.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                        currentTrack.setWakeMode(playbackService, PowerManager.PARTIAL_WAKE_LOCK);
-                        currentTrack.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        listenOn(currentTrack);
-                        currentTrack.setDataSource(playbackService, getUriFromCursor(playlistCursor));
-                        currentTrack.prepareAsync();
-                        playbackState = PlaybackState.BUFFERING;
+        try {
+            if (audioMan.requestAudioFocus(PlaybackThread.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                currentTrack.setWakeMode(playbackService, PowerManager.PARTIAL_WAKE_LOCK);
+                currentTrack.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                listenOn(currentTrack);
+                currentTrack.setDataSource(playbackService, mediaUri);
+                currentTrack.prepareAsync();
+                playbackState = PlaybackState.BUFFERING;
 
-                        registerNoisyReceiver();
-                        if (mediaSessionManager != null) mediaSessionManager.register();
-                    } else {
-                        Log.e("PlaybackThread", "Unable to start device playback - AudioManager wouldn't allow us focus!");
-                        //TODO: Show some sort of error dialog/toast
-                    }
-
-                    notifyPlayingItemChanged();
-                } catch (IOException ex) {
-                    Log.e("PlaybackThread", "IOException attempting to start playback.", ex);
-                }
+                registerNoisyReceiver();
+                if (mediaSessionManager != null) mediaSessionManager.register();
+            } else {
+                Log.e("PlaybackThread", "Unable to start device playback - AudioManager wouldn't allow us focus!");
+                //TODO: Show some sort of error dialog/toast
             }
-        });
+
+            notifyPlayingItemChanged();
+        } catch (IOException ex) {
+            Log.e("PlaybackThread", "IOException attempting to start playback.", ex);
+        }
     }
 
     private void play(Cursor songsCursor, int from) {
@@ -662,7 +662,12 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public Intent getPlaybackStateIntent() {
         Intent intent = new Intent(Constants.PLAYBACK_STATE_CHANGED);
         intent.putExtra(Constants.EXTRA_STATE, playbackState);
-        if (isPlayingOrPaused()) intent.putExtra(Constants.EXTRA_DURATION, getDuration());
+
+        if (isPlayingOrPaused()) {
+            intent.putExtra(Constants.EXTRA_DURATION, getDuration());
+            intent.putExtra(Constants.EXTRA_POSITION, getPosition());
+        }
+
         return intent;
     }
 
