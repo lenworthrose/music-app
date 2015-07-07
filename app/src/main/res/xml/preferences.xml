@@ -12,6 +12,11 @@
             android:key="auto_hide_playing_now_overlays"
             android:summary="@string/auto_hide_overlays_desc"
             android:title="@string/auto_hide_overlays" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="last_fm_integration"
+            android:summary="@string/last_fm_integration_desc"
+            android:title="@string/last_fm_integration" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/library_refresh">
         <Preference

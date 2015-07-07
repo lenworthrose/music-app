@@ -17,6 +17,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.util.Constants;
 
 import java.util.List;
 
@@ -131,13 +132,14 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         isSyncingArtists = false;
 
         if (!newArtists.isEmpty()) {
-            Log.d("MediaStoreService", "Starting GetArtistInfoTask");
+            boolean lastFmEnabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.SETTING_LAST_FM_INTEGRATION, false);
+            Log.d("MediaStoreService", "Starting GetArtistInfoTask. lastFmEnabled=" + lastFmEnabled);
             isGettingArtistInfo = true;
             String text = getString(R.string.fetching_artist_info);
             notificationBuilder.setContentTitle(text).setTicker(text);
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
 
-            GetArtistInfoTask infoTask = new GetArtistInfoTask(this, newArtists) {
+            GetArtistInfoTask infoTask = new GetArtistInfoTask(this, newArtists, lastFmEnabled) {
                 @Override
                 protected void onProgressUpdate(Integer... values) {
                     notificationBuilder.setProgress(values[1], values[0], false);

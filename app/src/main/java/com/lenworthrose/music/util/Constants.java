@@ -42,6 +42,7 @@ public class Constants {
     public static final String SETTING_AUTO_HIDE_PLAYING_NOW_OVERLAYS = "auto_hide_playing_now_overlays";
     public static final String SETTING_REPEAT_MODE = "repeat_mode";
     public static final String SETTING_START_LOCATION = "start_location";
+    public static final String SETTING_LAST_FM_INTEGRATION = "last_fm_integration";
 
     public static final long ALL = Long.MIN_VALUE;
 

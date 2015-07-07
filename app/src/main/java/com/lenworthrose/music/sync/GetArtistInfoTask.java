@@ -27,10 +27,15 @@ public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
     private Context context;
     private LastFmServer lastFm;
 
-    public GetArtistInfoTask(Context context, List<ArtistModel> newArtists) {
+    public GetArtistInfoTask(Context context, List<ArtistModel> newArtists, boolean lastFmEnabled) {
         this.context = context;
         this.newArtists = newArtists;
-        lastFm = LastFmServerFactory.getServer("http://ws.audioscrobbler.com/2.0/", "31cf9ad7f222197a94a63d614d28b267", "76a5de88fc74f512700849e718567c35");
+
+        if (lastFmEnabled) {
+            lastFm = LastFmServerFactory.getServer("http://ws.audioscrobbler.com/2.0/",
+                    "31cf9ad7f222197a94a63d614d28b267",
+                    "76a5de88fc74f512700849e718567c35");
+        }
     }
 
     @Override
@@ -40,6 +45,8 @@ public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
         for (ArtistModel artist : newArtists) {
             publishProgress(current++, newArtists.size());
             String[] albumArt = getAlbumArtUrls(context, artist.getId());
+
+            if (lastFm == null) continue;
 
             String mbid = null, bio = null, imgPath = null;
 
