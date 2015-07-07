@@ -454,7 +454,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void scheduleNextTrack() {
-        if (!isPlaying()) return;
+        if (!isPlaying() && playbackState != PlaybackState.PAUSED) return;
 
         int nextTrackIndex;
 
@@ -468,11 +468,12 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         }
 
         playlistCursor.moveToPosition(nextTrackIndex);
+        Uri mediaUri = getUriFromCursor(playlistCursor);
 
         try {
             nextTrack.setWakeMode(playbackService, PowerManager.PARTIAL_WAKE_LOCK);
             nextTrack.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            nextTrack.setDataSource(playbackService, getUriFromCursor(playlistCursor));
+            nextTrack.setDataSource(playbackService, mediaUri);
             nextTrack.setOnPreparedListener(nextTrackPreparedListener);
             nextTrack.prepareAsync();
         } catch (IOException ex) {
