@@ -44,7 +44,7 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
 
     @Override
     public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
-        loader.forceLoad();
+        if (loader != null) loader.forceLoad();
     }
 
     @Override
