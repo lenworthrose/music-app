@@ -49,7 +49,7 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
 
     @Override
     public void onArtistInfoFetchComplete() {
-        loader.forceLoad();
+        if (loader != null) loader.forceLoad();
     }
 
     @Override
