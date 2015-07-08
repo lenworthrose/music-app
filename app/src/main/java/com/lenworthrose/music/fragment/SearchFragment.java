@@ -27,6 +27,47 @@ public class SearchFragment extends Fragment {
     private Handler handler;
     private View loadingSpinner;
 
+    private SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+            handler.removeCallbacksAndMessages(null);
+            SearchFragment.this.query = query;
+            adapter.setQuery(query);
+            searchView.clearFocus();
+            hideLoadingSpinner();
+            return true;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String newText) {
+            handler.removeCallbacksAndMessages(null);
+            query = newText;
+
+            if (!TextUtils.isEmpty(newText)) {
+                if (loadingSpinner.getVisibility() != View.VISIBLE)
+                    showLoadingSpinner();
+
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.setQuery(query);
+                        hideLoadingSpinner();
+                    }
+                }, 400);
+            }
+
+            return true;
+        }
+    };
+
+    private SearchView.OnCloseListener searchCloseListener = new SearchView.OnCloseListener() {
+        @Override
+        public boolean onClose() {
+            searchView.setQuery(null, false);
+            return true;
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,46 +107,8 @@ public class SearchFragment extends Fragment {
             searchView.clearFocus();
         }
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                handler.removeCallbacksAndMessages(null);
-                SearchFragment.this.query = query;
-                adapter.setQuery(query);
-                searchView.clearFocus();
-                hideLoadingSpinner();
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                handler.removeCallbacksAndMessages(null);
-                query = newText;
-
-                if (!TextUtils.isEmpty(newText)) {
-                    if (loadingSpinner.getVisibility() != View.VISIBLE)
-                        showLoadingSpinner();
-
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.setQuery(query);
-                            hideLoadingSpinner();
-                        }
-                    }, 400);
-                }
-
-                return true;
-            }
-        });
-
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                searchView.setQuery(null, false);
-                return true;
-            }
-        });
+        searchView.setOnQueryTextListener(queryTextListener);
+        searchView.setOnCloseListener(searchCloseListener);
     }
 
     private void hideLoadingSpinner() {
