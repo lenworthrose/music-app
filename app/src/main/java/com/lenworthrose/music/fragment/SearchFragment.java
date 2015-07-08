@@ -73,5 +73,13 @@ public class SearchFragment extends Fragment {
                 return true;
             }
         });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchView.setQuery(null, false);
+                return true;
+            }
+        });
     }
 }
