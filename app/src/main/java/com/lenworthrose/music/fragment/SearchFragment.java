@@ -39,9 +39,8 @@ public class SearchFragment extends Fragment {
         }
 
         @Override
-        public boolean onQueryTextChange(String newText) {
+        public boolean onQueryTextChange(final String newText) {
             handler.removeCallbacksAndMessages(null);
-            query = newText;
 
             if (!TextUtils.isEmpty(newText)) {
                 if (loadingSpinner.getVisibility() != View.VISIBLE)
@@ -50,7 +49,7 @@ public class SearchFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        adapter.setQuery(query);
+                        adapter.setQuery(newText);
                         hideLoadingSpinner();
                     }
                 }, 400);
@@ -109,6 +108,16 @@ public class SearchFragment extends Fragment {
 
         searchView.setOnQueryTextListener(queryTextListener);
         searchView.setOnCloseListener(searchCloseListener);
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (searchView != null) {
+            query = searchView.getQuery().toString();
+            searchView.clearFocus();
+        }
+
+        super.onDestroyView();
     }
 
     private void hideLoadingSpinner() {
