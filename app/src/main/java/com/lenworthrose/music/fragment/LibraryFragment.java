@@ -93,6 +93,7 @@ public class LibraryFragment extends Fragment {
         inflater.inflate(R.menu.menu_library_fragment, menu);
         menu.findItem(R.id.action_toggle_view_mode).setIcon(isGridView() ? R.drawable.playlists : R.drawable.grid);
         searchView = (SearchView)menu.findItem(R.id.action_filter).getActionView();
+        searchView.setQueryHint(getString(R.string.filter_hint_text));
 
         if (filter != null) {
             searchView.setQuery(filter, false);

@@ -12,6 +12,8 @@
     <string name="open_drawer">Open Drawer</string>
     <string name="close_drawer">Close Drawer</string>
     <string name="filter">Filter</string>
+    <string name="filter_hint_text">Filter this list</string>
+    <string name="search_hint_text">Search all music</string>
 
     <plurals name="num_of_albums">
         <item quantity="one">%1$d album</item>

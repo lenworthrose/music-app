@@ -99,6 +99,7 @@ public class SearchFragment extends Fragment {
         inflater.inflate(R.menu.menu_search_fragment, menu);
 
         searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        searchView.setQueryHint(getString(R.string.search_hint_text));
         searchView.setIconified(false);
 
         if (query != null) {
