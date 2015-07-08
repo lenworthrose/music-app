@@ -33,6 +33,7 @@ import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.NavigationDrawerAdapter;
 import com.lenworthrose.music.fragment.LibraryFragment;
+import com.lenworthrose.music.fragment.SearchFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.sync.MediaStoreService;
@@ -243,10 +244,15 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 type = IdType.SONG;
                 break;
             case 3:
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                getSupportFragmentManager().beginTransaction().replace(R.id.root_container, new SearchFragment()).commit();
+                drawerLayout.closeDrawers();
+                return;
+            case 4:
                 postCloseDrawer();
                 startActivity(new Intent(this, PlayingNowActivity.class));
                 return;
-            case 4:
+            case 5:
                 postCloseDrawer();
                 startActivity(new Intent(this, SettingsActivity.class));
                 return;

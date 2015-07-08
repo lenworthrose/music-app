@@ -26,6 +26,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
     compile 'com.github.bumptech.glide:glide:3.6.0'
+    compile 'com.tonicartos:stickygridheaders:1.0.1'
     compile project(':drag-sort-listview')
     compile project(':lastFmAPI')
 }

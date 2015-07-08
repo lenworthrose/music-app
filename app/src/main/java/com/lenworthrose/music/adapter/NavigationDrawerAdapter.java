@@ -60,12 +60,15 @@ public class NavigationDrawerAdapter extends BaseAdapter {
                 break;
             case 2:
                 drawableId = R.drawable.songs;
-                ((View)convertView.getTag(R.id.nav_divider)).setVisibility(View.VISIBLE);
                 break;
             case 3:
-                drawableId = R.drawable.playing_now;
+                drawableId = R.drawable.search;
+                ((View)convertView.getTag(R.id.nav_divider)).setVisibility(View.VISIBLE);
                 break;
             case 4:
+                drawableId = R.drawable.playing_now;
+                break;
+            case 5:
                 drawableId = R.drawable.settings;
                 break;
         }

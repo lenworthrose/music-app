@@ -4,6 +4,7 @@
         <item>Artists</item>
         <item>Albums</item>
         <item>Songs</item>
+        <item>Search</item>
         <item>Playing Now</item>
         <item>Settings</item>
     </string-array>
