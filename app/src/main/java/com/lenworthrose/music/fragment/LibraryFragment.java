@@ -43,6 +43,7 @@ public class LibraryFragment extends Fragment {
     private IdType idType;
     private long id;
     private SearchView searchView;
+    private String filter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,8 +52,11 @@ public class LibraryFragment extends Fragment {
         if (savedInstanceState == null) savedInstanceState = getArguments();
         idType = (IdType)savedInstanceState.getSerializable(Constants.TYPE);
         id = savedInstanceState.getLong(Constants.ID);
-        adapter = AdapterFactory.createAdapter(getActivity(), isGridView(), idType, id);
-        getLoaderManager().initLoader(0, null, adapter);
+
+        if (adapter == null) {
+            adapter = AdapterFactory.createAdapter(getActivity(), isGridView(), idType, id);
+            getLoaderManager().initLoader(0, null, adapter);
+        }
 
         setHasOptionsMenu(true);
     }
@@ -87,10 +91,15 @@ public class LibraryFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_library_fragment, menu);
-
         menu.findItem(R.id.action_toggle_view_mode).setIcon(isGridView() ? R.drawable.playlists : R.drawable.grid);
-
         searchView = (SearchView)menu.findItem(R.id.action_filter).getActionView();
+
+        if (filter != null) {
+            searchView.setQuery(filter, false);
+            searchView.setIconified(false);
+            searchView.clearFocus();
+        }
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -111,6 +120,21 @@ public class LibraryFragment extends Fragment {
                 return true;
             }
         });
+
+        //Without this onCloseListener, the keyboard will appear after closing an inactive SearchView
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchView.clearFocus();
+                    }
+                });
+
+                return false;
+            }
+        });
     }
 
     @Override
@@ -128,7 +152,7 @@ public class LibraryFragment extends Fragment {
     @Override
     public void onDestroyView() {
         if (searchView != null) {
-            searchView.setIconified(true);
+            filter = searchView.getQuery().toString();
             searchView.clearFocus();
         }
 
