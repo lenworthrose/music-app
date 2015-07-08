@@ -10,6 +10,7 @@
         android:choiceMode="none"
         android:columnWidth="@dimen/grid_view_item_width"
         android:drawSelectorOnTop="true"
+        android:fastScrollEnabled="true"
         android:gravity="center"
         android:horizontalSpacing="3dp"
         android:numColumns="auto_fit"
