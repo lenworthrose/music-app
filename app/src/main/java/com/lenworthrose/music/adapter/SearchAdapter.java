@@ -6,24 +6,30 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.GridItem;
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersSimpleAdapter;
 
+import java.util.ArrayList;
+
 /**
  * Adapter for use in the {@link com.lenworthrose.music.fragment.SearchFragment}.
  */
-public class SearchAdapter extends CursorAdapter implements StickyGridHeadersSimpleAdapter, LoaderManager.LoaderCallbacks<Cursor> {
+public class SearchAdapter extends BaseAdapter implements StickyGridHeadersSimpleAdapter, LoaderManager.LoaderCallbacks<Cursor>,
+        AdapterView.OnItemClickListener {
     private static final int ARTISTS_ID = 0, ALBUMS_ID = 1, SONGS_ID = 2;
 
     private Cursor[] cursors;
@@ -32,7 +38,6 @@ public class SearchAdapter extends CursorAdapter implements StickyGridHeadersSim
     private LoaderManager loaderManager;
 
     public SearchAdapter(Context context, LoaderManager loaderManager) {
-        super(context, null, 0);
         this.context = context;
         this.loaderManager = loaderManager;
         cursors = new Cursor[3]; // Artists, Albums, Songs
@@ -107,14 +112,31 @@ public class SearchAdapter extends CursorAdapter implements StickyGridHeadersSim
 
     @Override
     public long getItemId(int position) {
-        int curId = getCursorForPosition(position);
-        Cursor cursor = cursors[curId];
-        return cursor.getLong(0);
+        return getRecordForPosition(position).getLong(0);
     }
 
     @Override
     public boolean hasStableIds() {
         return true;
+    }
+
+    private Cursor getRecordForPosition(int position) {
+        return getRecordForPosition(position, getCursorForPosition(position));
+    }
+
+    private Cursor getRecordForPosition(int position, int curId) {
+        Cursor cursor = cursors[curId];
+        cursor.moveToPosition(getPositionInCursor(position, curId));
+        return cursor;
+    }
+
+    private int getPositionInCursor(int position, int curId) {
+        int curTotal = 0;
+
+        for (int i = 0; i < curId; i++)
+            curTotal += cursors[i] == null ? 0 : cursors[i].getCount();
+
+        return position - curTotal;
     }
 
     @Override
@@ -123,15 +145,8 @@ public class SearchAdapter extends CursorAdapter implements StickyGridHeadersSim
         if (item == null) item = new GridItem(context);
 
         int curId = getCursorForPosition(position);
-        Cursor cursor = cursors[curId];
+        Cursor cursor = getRecordForPosition(position, curId);
         String imageUrl = null;
-
-        int curTotal = 0;
-
-        for (int i = 0; i < curId; i++)
-            curTotal += cursors[i] == null ? 0 : cursors[i].getCount();
-
-        cursor.moveToPosition(position - curTotal);
 
         switch (curId) {
             case ARTISTS_ID:
@@ -151,16 +166,6 @@ public class SearchAdapter extends CursorAdapter implements StickyGridHeadersSim
         Glide.with(context).load(imageUrl).into(item.getImageView());
 
         return item;
-    }
-
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return null; //Not used.
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        //Not used.
     }
 
     @Override
@@ -207,5 +212,25 @@ public class SearchAdapter extends CursorAdapter implements StickyGridHeadersSim
     public void onLoaderReset(Loader<Cursor> loader) {
         cursors[loader.getId()] = null;
         notifyDataSetInvalidated();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        NavigationListener navListener = (NavigationListener)context;
+        int curId = getCursorForPosition(position);
+
+        switch (curId) {
+            case ARTISTS_ID:
+                navListener.onNavigate(IdType.ARTIST, id);
+                break;
+            case ALBUMS_ID:
+                navListener.onNavigate(IdType.ALBUM, id);
+                break;
+            case SONGS_ID:
+                ArrayList<Long> temp = new ArrayList<>(1);
+                temp.add(id);
+                navListener.play(IdType.SONG, temp);
+                break;
+        }
     }
 }

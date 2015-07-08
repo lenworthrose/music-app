@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -42,6 +40,7 @@ public class SearchFragment extends Fragment {
         adapter = new SearchAdapter(getActivity(), getActivity().getSupportLoaderManager());
         StickyGridHeadersGridView gridView = (StickyGridHeadersGridView)view.findViewById(R.id.search_grid_view);
         gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener(adapter);
     }
 
     @Override
