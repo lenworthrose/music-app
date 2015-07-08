@@ -29,7 +29,7 @@ public class EditPlaylistActivity extends AppCompatActivity implements ServiceCo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_edit_playlist);
+        setContentView(R.layout.activity_edit_playlist);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);

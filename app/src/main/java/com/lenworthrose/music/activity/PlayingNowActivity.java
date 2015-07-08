@@ -42,7 +42,7 @@ public class PlayingNowActivity extends AppCompatActivity {
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Constants.SETTING_KEEP_SCREEN_ON, false))
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(R.layout.act_playing_now);
+        setContentView(R.layout.activity_playing_now);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         Intent intent = new Intent(this, PlaybackService.class);
