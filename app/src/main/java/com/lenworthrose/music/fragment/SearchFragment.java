@@ -20,6 +20,7 @@ import com.tonicartos.widget.stickygridheaders.StickyGridHeadersGridView;
 public class SearchFragment extends Fragment {
     private SearchAdapter adapter;
     private SearchView searchView;
+    private String query;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,7 +38,9 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        adapter = new SearchAdapter(getActivity(), getActivity().getSupportLoaderManager());
+        if (adapter == null)
+            adapter = new SearchAdapter(getActivity(), getActivity().getSupportLoaderManager());
+
         StickyGridHeadersGridView gridView = (StickyGridHeadersGridView)view.findViewById(R.id.search_grid_view);
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(adapter);
@@ -50,9 +53,16 @@ public class SearchFragment extends Fragment {
 
         searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
         searchView.setIconified(false);
+
+        if (query != null) {
+            searchView.setQuery(query, false);
+            searchView.clearFocus();
+        }
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                SearchFragment.this.query = query;
                 adapter.setQuery(query);
                 searchView.clearFocus();
                 return true;
