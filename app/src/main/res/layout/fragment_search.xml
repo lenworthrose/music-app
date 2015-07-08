@@ -17,4 +17,18 @@
         android:stretchMode="columnWidth"
         android:textFilterEnabled="true"
         android:verticalSpacing="3dp" />
+
+    <FrameLayout
+        android:id="@+id/search_loading_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#a000"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:indeterminateOnly="true" />
+    </FrameLayout>
 </FrameLayout>
