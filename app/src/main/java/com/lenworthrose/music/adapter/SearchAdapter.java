@@ -1,12 +1,16 @@
 package com.lenworthrose.music.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -29,7 +33,7 @@ import java.util.ArrayList;
  * Adapter for use in the {@link com.lenworthrose.music.fragment.SearchFragment}.
  */
 public class SearchAdapter extends BaseAdapter implements StickyGridHeadersSimpleAdapter, LoaderManager.LoaderCallbacks<Cursor>,
-        AdapterView.OnItemClickListener {
+        AdapterView.OnItemClickListener, View.OnCreateContextMenuListener {
     private static final int ARTISTS_ID = 0, ALBUMS_ID = 1, SONGS_ID = 2;
 
     private Cursor[] cursors;
@@ -163,6 +167,7 @@ public class SearchAdapter extends BaseAdapter implements StickyGridHeadersSimpl
                 break;
         }
 
+        item.setTag(curId + "/" + position);
         Glide.with(context).load(imageUrl).error(R.drawable.logo).fallback(R.drawable.logo).into(item.getImageView());
 
         return item;
@@ -232,5 +237,64 @@ public class SearchAdapter extends BaseAdapter implements StickyGridHeadersSimpl
                 navListener.play(IdType.SONG, temp);
                 break;
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(final ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        AdapterView.AdapterContextMenuInfo adapterMenuInfo = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        ((Activity)context).getMenuInflater().inflate(R.menu.menu_multi_select, menu);
+        String[] info = adapterMenuInfo.targetView.getTag().toString().split("/");
+        int curId = Integer.parseInt(info[0]);
+        int position = Integer.parseInt(info[1]);
+        Cursor cursor = getRecordForPosition(position, curId);
+        String title = null;
+        IdType type = null;
+
+        switch (curId) {
+            case ARTISTS_ID:
+                title = cursor.getString(2);
+                type = IdType.ARTIST;
+                break;
+            case ALBUMS_ID:
+                title = cursor.getString(1);
+                type = IdType.ALBUM;
+                break;
+            case SONGS_ID:
+                title = cursor.getString(1);
+                type = IdType.SONG;
+                break;
+        }
+
+        menu.setHeaderTitle(title);
+        configureMenu(menu, type, cursor.getLong(0));
+    }
+
+    private void configureMenu(Menu menu, final IdType type, long id) {
+        final ArrayList<Long> list = new ArrayList<>(1);
+        list.add(id);
+
+        menu.findItem(R.id.action_play).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                ((NavigationListener)context).play(type, list);
+                return true;
+            }
+        });
+
+        menu.findItem(R.id.action_add).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                ((NavigationListener)context).add(type, list);
+                return true;
+            }
+        });
+
+        menu.findItem(R.id.action_add_as_next).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                ((NavigationListener)context).addAsNext(type, list);
+                return true;
+            }
+        });
     }
 }

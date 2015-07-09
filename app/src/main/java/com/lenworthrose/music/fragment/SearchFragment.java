@@ -91,6 +91,7 @@ public class SearchFragment extends Fragment {
         StickyGridHeadersGridView gridView = (StickyGridHeadersGridView)view.findViewById(R.id.search_grid_view);
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(adapter);
+        gridView.setOnCreateContextMenuListener(adapter);
     }
 
     @Override
