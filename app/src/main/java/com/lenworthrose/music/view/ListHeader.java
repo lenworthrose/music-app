@@ -81,8 +81,9 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
 
         switch (type) {
             case ARTIST:
+                String bio = data.getString(6) == null ? "" : data.getString(6);
                 album.setText(data.getString(2));
-                year.setText(Html.fromHtml(data.getString(6)).toString());
+                year.setText(Html.fromHtml(bio).toString());
                 year.setSingleLine(false);
                 year.setMaxLines(5);
                 artist.setVisibility(View.GONE);
