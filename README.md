@@ -1,4 +1,4 @@
-# music-app
+# muZak
 
 muZak is a music player for Android. It allows playback of content located on your device, and renders content from
 the device's MediaStore.
