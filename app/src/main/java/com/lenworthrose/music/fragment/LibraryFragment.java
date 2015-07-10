@@ -44,6 +44,7 @@ public class LibraryFragment extends Fragment {
     private long id;
     private SearchView searchView;
     private String filter;
+    private ListHeader listHeader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,12 +75,15 @@ public class LibraryFragment extends Fragment {
         absListView = (AbsListView)view.findViewById(R.id.abs_list_view);
 
         if (id != Constants.ALL) {
-            ListHeader header = new ListHeader(getActivity(), idType, id);
+            if (listHeader == null)
+                listHeader = new ListHeader(getActivity(), idType, id);
+            else if (listHeader.getParent() != null)
+                ((ViewGroup)listHeader.getParent()).removeView(listHeader);
 
             if (absListView instanceof HeaderGridView)
-                ((HeaderGridView)absListView).addHeaderView(header, null, false);
+                ((HeaderGridView)absListView).addHeaderView(listHeader, null, false);
             else
-                ((ListView)absListView).addHeaderView(header, null, false);
+                ((ListView)absListView).addHeaderView(listHeader, null, false);
         }
 
         absListView.setAdapter(adapter);
