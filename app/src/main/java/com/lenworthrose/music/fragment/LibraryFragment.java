@@ -198,7 +198,7 @@ public class LibraryFragment extends Fragment {
         }
 
         if (toEdit != null)
-            PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putBoolean(toEdit, !(absListView instanceof HeaderGridView)).commit();
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putBoolean(toEdit, !(absListView instanceof HeaderGridView)).apply();
     }
 
     private boolean isGridView() {

@@ -141,7 +141,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     @Override
     public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
         Log.d("MediaStoreService", "MediaStore sync complete! New artist count: " + newArtists.size());
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).commit();
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).apply();
         ArtistsStore.getInstance().removeListener(MediaStoreService.this);
         isTaskActive = false;
 

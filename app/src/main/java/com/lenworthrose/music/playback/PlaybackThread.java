@@ -425,7 +425,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         if (isEndOfPlaylist() && repeatEnabled && playlistCursor != null && playlistCursor.getCount() > 0 && isPlaying())
             scheduleNextTrack();
 
-        PreferenceManager.getDefaultSharedPreferences(playbackService).edit().putBoolean(Constants.SETTING_REPEAT_MODE, repeatEnabled).commit();
+        PreferenceManager.getDefaultSharedPreferences(playbackService).edit().putBoolean(Constants.SETTING_REPEAT_MODE, repeatEnabled).apply();
 
         Log.d("PlaybackThread", "Repeat mode toggled; enabled: " + repeatEnabled);
     }
