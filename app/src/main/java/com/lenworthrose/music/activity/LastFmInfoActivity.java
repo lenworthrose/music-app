@@ -8,6 +8,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -66,6 +67,7 @@ public class LastFmInfoActivity extends AppCompatActivity implements Loader.OnLo
         if (data.moveToFirst()) {
             name.setText(data.getString(2));
             bio.setText(Html.fromHtml(data.getString(6)));
+            bio.setMovementMethod(LinkMovementMethod.getInstance());
             Glide.with(this).load(data.getString(4)).into(image);
         }
     }
