@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         };
 
         new AlertDialog.Builder(this).setTitle(R.string.welcome_dialog_title).setMessage(R.string.welcome_dialog_message)
-                .setPositiveButton(android.R.string.ok, buttonListener).setNegativeButton(android.R.string.cancel, buttonListener)
+                .setPositiveButton(android.R.string.yes, buttonListener).setNegativeButton(android.R.string.no, buttonListener)
                 .show();
     }
 }
