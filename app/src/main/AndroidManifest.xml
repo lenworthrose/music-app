@@ -38,6 +38,11 @@
             android:name=".activity.EditPlaylistActivity"
             android:label="@string/edit_playlist" />
 
+        <activity
+            android:name=".activity.LastFmInfoActivity"
+            android:label="@string/last_fm_info"
+            android:parentActivityName=".activity.MainActivity" />
+
         <service
             android:name=".playback.PlaybackService" />
 

@@ -14,6 +14,7 @@
     <string name="filter">Filter</string>
     <string name="filter_hint_text">Filter this list</string>
     <string name="search_hint_text">Search all music</string>
+    <string name="last_fm_info">Last.fm Information</string>
 
     <plurals name="num_of_albums">
         <item quantity="one">%1$d album</item>

@@ -1,6 +1,7 @@
 package com.lenworthrose.music.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -19,6 +20,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.activity.LastFmInfoActivity;
 import com.lenworthrose.music.adapter.AlbumsAdapter;
 import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.util.Utils;
@@ -86,6 +88,16 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
                 artist.setVisibility(View.GONE);
                 tracksDuration.setVisibility(View.GONE);
                 setImages(data.getString(4));
+                final long artistId = data.getLong(0);
+
+                setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getContext(), LastFmInfoActivity.class);
+                        intent.putExtra(LastFmInfoActivity.EXTRA_ID, artistId);
+                        getContext().startActivity(intent);
+                    }
+                });
                 break;
             case ALBUM:
                 artist.setText(data.getString(5));
