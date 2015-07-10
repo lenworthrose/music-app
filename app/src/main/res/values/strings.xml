@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">muZak</string>
+    <string name="welcome_dialog_title">Welcome to muZak!</string>
+    <string name="welcome_dialog_message">muZak can automatically download artist information from Last.fm. Would you like to enable this feature?\n\n(This can be changed later in Settings.)</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

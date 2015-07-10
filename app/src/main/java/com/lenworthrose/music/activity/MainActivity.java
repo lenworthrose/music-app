@@ -3,6 +3,7 @@ package com.lenworthrose.music.activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -20,6 +21,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -89,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         startService(intent);
 
         ArtistsStore.getInstance().init(this, this);
-        startService(new Intent(this, MediaStoreService.class));
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -107,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 }
             }
         };
+
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("FIRST_LAUNCH", true))
+            showWelcomeDialog();
+        else
+            startService(new Intent(MainActivity.this, MediaStoreService.class));
     }
 
     @Override
@@ -274,5 +280,21 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 drawerLayout.closeDrawers();
             }
         }, 1000);
+    }
+
+    private void showWelcomeDialog() {
+        DialogInterface.OnClickListener buttonListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                boolean lastFmEnabled = which == DialogInterface.BUTTON_POSITIVE;
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();
+                editor.putBoolean("FIRST_LAUNCH", false).putBoolean(Constants.SETTING_LAST_FM_INTEGRATION, lastFmEnabled).apply();
+                startService(new Intent(MainActivity.this, MediaStoreService.class));
+            }
+        };
+
+        new AlertDialog.Builder(this).setTitle(R.string.welcome_dialog_title).setMessage(R.string.welcome_dialog_message)
+                .setPositiveButton(android.R.string.ok, buttonListener).setNegativeButton(android.R.string.cancel, buttonListener)
+                .show();
     }
 }
