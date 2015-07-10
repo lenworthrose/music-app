@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.lenworthrose.music.R;
 import com.lenworthrose.music.playback.PlaylistAction;
 import com.lenworthrose.music.util.Utils;
 import com.lenworthrose.music.view.ListItem;
@@ -50,7 +51,7 @@ public class PlayingNowPlaylistAdapter extends DragSortCursorAdapter {
         item.setStatus(Utils.longToTimeDisplay(cursor.getLong(7)));
         item.setImageVisible(true);
         item.setEditModeEnabled(isEditModeEnabled);
-        Glide.with(context).load(cursor.getString(8)).into(item.getImageView());
+        Glide.with(context).load(cursor.getString(8)).fallback(R.drawable.logo).error(R.drawable.logo).into(item.getImageView());
     }
 
     public void setEditModeEnabled(boolean enabled) {
