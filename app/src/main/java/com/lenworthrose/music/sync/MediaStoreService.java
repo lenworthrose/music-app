@@ -148,7 +148,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
         if (!newArtists.isEmpty()) {
             Log.d("MediaStoreService", "Starting GetArtistInfoTask. lastFmEnabled=" + (lastFm != null));
             isTaskActive = true;
-            String text = getString(R.string.fetching_artist_info);
+            String text = lastFm == null ? getString(R.string.updating_artist_albums) : getString(R.string.fetching_artist_info);
             notificationBuilder.setContentTitle(text).setTicker(text);
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
 
