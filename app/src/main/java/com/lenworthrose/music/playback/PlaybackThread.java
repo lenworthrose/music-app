@@ -379,6 +379,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private boolean isEndOfPlaylist() {
+        if (playlistCursor == null) return true;
         return playlistPosition >= playlistCursor.getCount() - 1;
     }
 
