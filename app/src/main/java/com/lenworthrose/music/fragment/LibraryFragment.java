@@ -95,7 +95,7 @@ public class LibraryFragment extends Fragment {
         searchView = (SearchView)menu.findItem(R.id.action_filter).getActionView();
         searchView.setQueryHint(getString(R.string.filter_hint_text));
 
-        if (filter != null) {
+        if (!TextUtils.isEmpty(filter)) {
             searchView.setQuery(filter, false);
             searchView.setIconified(false);
             searchView.clearFocus();
@@ -196,6 +196,7 @@ public class LibraryFragment extends Fragment {
                     break;
             }
         }
+
         if (toEdit != null)
             PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putBoolean(toEdit, !(absListView instanceof HeaderGridView)).commit();
     }
