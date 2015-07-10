@@ -11,12 +11,30 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    Properties props = new Properties()
+
+    if (project.hasProperty("music.signing") && new File(project.property("music.signing").toString()).exists()) {
+        props.load(new FileInputStream(file(project.property("music.signing"))))
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(props['keystoreLoc'].toString())
+            storePassword props['keyPassword']
+            keyAlias "release-key"
+            keyPassword props['keyPassword']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
+
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_7
     }
