@@ -47,7 +47,7 @@
 
         <ImageView
             android:id="@+id/np_play_pause"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/playing_now_control_size"
             android:layout_height="match_parent"
             android:layout_marginRight="5dp"
             android:background="@drawable/list_item_selector"
@@ -57,7 +57,7 @@
 
         <ImageView
             android:id="@+id/np_next"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/playing_now_control_size"
             android:layout_height="match_parent"
             android:background="@drawable/list_item_selector"
             android:scaleType="centerInside"
