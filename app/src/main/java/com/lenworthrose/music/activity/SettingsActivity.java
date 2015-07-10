@@ -2,6 +2,7 @@ package com.lenworthrose.music.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -19,6 +20,12 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         getFragmentManager().beginTransaction().replace(R.id.main_content, new SettingsFragment()).commit();
     }
 
@@ -27,6 +34,17 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = NavUtils.getParentActivityIntent(this);
+            NavUtils.navigateUpTo(this, intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void onAboutClicked(MenuItem unused) {

@@ -32,11 +32,13 @@
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/action_settings" />
+            android:label="@string/action_settings"
+            android:parentActivityName=".activity.MainActivity" />
 
         <activity
             android:name=".activity.EditPlaylistActivity"
-            android:label="@string/edit_playlist" />
+            android:label="@string/edit_playlist"
+            android:parentActivityName=".activity.PlayingNowActivity" />
 
         <activity
             android:name=".activity.LastFmInfoActivity"
