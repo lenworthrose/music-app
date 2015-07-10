@@ -43,6 +43,11 @@
             android:label="@string/last_fm_info"
             android:parentActivityName=".activity.MainActivity" />
 
+        <activity
+            android:name=".activity.AboutActivity"
+            android:label="@string/about"
+            android:parentActivityName=".activity.SettingsActivity" />
+
         <service
             android:name=".playback.PlaybackService" />
 
