@@ -156,4 +156,8 @@ public class PlayingNowActivity extends AppCompatActivity {
             return 2;
         }
     }
+
+    public void onEqualizerClicked(MenuItem unused) {
+        startActivity(new Intent(this, EqualizerActivity.class));
+    }
 }

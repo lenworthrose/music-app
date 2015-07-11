@@ -32,7 +32,7 @@
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="@string/action_settings"
+            android:label="@string/settings"
             android:parentActivityName=".activity.MainActivity" />
 
         <activity
@@ -49,6 +49,11 @@
             android:name=".activity.AboutActivity"
             android:label="@string/about"
             android:parentActivityName=".activity.SettingsActivity" />
+
+        <activity
+            android:name=".activity.EqualizerActivity"
+            android:label="@string/equalizer"
+            android:parentActivityName=".activity.PlayingNowActivity" />
 
         <service
             android:name=".playback.PlaybackService" />

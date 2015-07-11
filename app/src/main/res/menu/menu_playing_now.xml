@@ -20,4 +20,11 @@
         android:onClick="onEditPlaylistClicked"
         android:title="@string/edit_playlist"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_equalizer"
+        android:icon="@drawable/equalizer"
+        android:onClick="onEqualizerClicked"
+        android:title="@string/equalizer"
+        app:showAsAction="ifRoom" />
 </menu>

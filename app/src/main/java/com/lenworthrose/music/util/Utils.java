@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
@@ -17,7 +18,6 @@ import android.os.Build;
 import android.util.Log;
 
 import com.lenworthrose.music.activity.PlayingNowActivity;
-import com.lenworthrose.music.playback.PlaylistStoreContract;
 
 public class Utils {
     public static IntentFilter createPlaybackIntentFilter() {
@@ -394,5 +394,30 @@ public class Utils {
         Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
         albumArtUri = ContentUris.withAppendedId(albumArtUri, albumId);
         return albumArtUri.toString();
+    }
+
+    public static short[] getEqualizerSettings(SharedPreferences sharedPreferences) {
+        int bandCount = sharedPreferences.getInt(Constants.SETTING_EQUALIZER_BAND_COUNT, 0);
+
+        if (bandCount > 0) {
+            short[] levels = new short[bandCount];
+
+            for (int i = 0; i < levels.length; i++)
+                levels[i] = (short)sharedPreferences.getInt(Constants.SETTING_EQUALIZER_BAND + i, 0);
+
+            return levels;
+        }
+
+        return null;
+    }
+
+    public static void storeEqualizerSettings(SharedPreferences sharedPreferences, short[] levels) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(Constants.SETTING_EQUALIZER_BAND_COUNT, levels.length);
+
+        for (int i = 0; i < levels.length; i++)
+            editor.putInt(Constants.SETTING_EQUALIZER_BAND + i, levels[i]);
+
+        editor.apply();
     }
 }

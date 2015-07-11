@@ -4,7 +4,8 @@
     <string name="welcome_dialog_message">muZak can automatically download artist information from Last.fm. Would you like to enable this feature?\n\n(This can be changed later in Settings.)</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="settings">Settings</string>
+    <string name="equalizer">Equalizer</string>
     <string name="play">Play</string>
     <string name="add">Add</string>
     <string name="add_as_next">Add As Next</string>
@@ -17,6 +18,7 @@
     <string name="filter_hint_text">Filter this list</string>
     <string name="search_hint_text">Search all music</string>
     <string name="last_fm_info">Last.fm Information</string>
+    <string name="enabled">Enabled</string>
 
     <plurals name="num_of_albums">
         <item quantity="one">%1$d album</item>

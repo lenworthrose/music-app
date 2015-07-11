@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.media.audiofx.Equalizer;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -208,6 +209,10 @@ public class PlaybackService extends Service {
 
     public Intent getPlaybackStateIntent() {
         return playbackThread.getPlaybackStateIntent();
+    }
+
+    public Equalizer getEqualizer() {
+        return playbackThread.getEqualizer();
     }
 
     void onPlaybackThreadInitialized() {

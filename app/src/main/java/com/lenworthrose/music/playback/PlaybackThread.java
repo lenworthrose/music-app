@@ -5,9 +5,11 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.Equalizer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,6 +25,7 @@ import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
 import com.lenworthrose.music.adapter.SongsAdapter;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Constants.PlaybackState;
+import com.lenworthrose.music.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,6 +60,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     private PlaylistStore playlistStore;
     private PlaybackService playbackService;
     private PlaybackState playbackState;
+    private Equalizer equalizer;
 
     private MediaPlayer.OnPreparedListener nextTrackPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
@@ -85,6 +89,16 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
             public void run() {
                 currentTrack = new MediaPlayer();
                 nextTrack = new MediaPlayer();
+                equalizer = new Equalizer(0, currentTrack.getAudioSessionId());
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(playbackService);
+                short[] levels = Utils.getEqualizerSettings(prefs);
+
+                if (levels != null)
+                    for (short i = 0; i < levels.length; i++)
+                        equalizer.setBandLevel(i, levels[i]);
+
+                equalizer.setEnabled(prefs.getBoolean(Constants.SETTING_EQUALIZER_ENABLED, false));
 
                 mediaSessionManager = new MediaSessionManager(playbackService, handler);
                 IntentFilter intentFilter = new IntentFilter(Constants.PLAYBACK_STATE_CHANGED);
@@ -676,6 +690,10 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         }
 
         return intent;
+    }
+
+    public Equalizer getEqualizer() {
+        return equalizer;
     }
 
     private void notifyPlaylistChanged() {
