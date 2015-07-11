@@ -29,7 +29,7 @@ public class LastFmInfoActivity extends AppCompatActivity implements Loader.OnLo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_last_fm_info);
+        setContentView(R.layout.activity_last_fm_info);
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
