@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
@@ -23,18 +22,11 @@ import java.util.Random;
 public class PlaylistStore {
     public static final String TABLE_NAME = "playlist";
 
-    public interface InitListener {
-        void onInitComplete();
-    }
-
     private SQLiteDatabase db;
-    private InitTask initTask;
-    private InitListener initListener;
 
-    public void init(Context context, InitListener listener) {
-        initListener = listener;
-        initTask = new InitTask(context);
-        initTask.execute();
+    public void init(Context context) {
+        PlaylistStoreDbHelper helper = new PlaylistStoreDbHelper(context);
+        db = helper.getReadableDatabase();
     }
 
     public Cursor read() {
@@ -266,30 +258,5 @@ public class PlaylistStore {
                 PlaylistEntry.COLUMN_TRACK_NUM + "," +
                 PlaylistEntry.COLUMN_ALBUM_ART_URL
                 + " FROM " + tempTableName;
-    }
-
-    private class InitTask extends AsyncTask<Void, Void, Void> {
-        private Context context;
-
-        public InitTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            PlaylistStoreDbHelper helper = new PlaylistStoreDbHelper(context);
-            db = helper.getReadableDatabase();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            initTask = null;
-
-            if (initListener != null) {
-                initListener.onInitComplete();
-                initListener = null;
-            }
-        }
     }
 }

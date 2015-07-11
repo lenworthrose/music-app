@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 public class PlaybackThread extends Thread implements Handler.Callback, MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
-        AudioManager.OnAudioFocusChangeListener, PlaylistStore.InitListener {
+        AudioManager.OnAudioFocusChangeListener {
     public static final int PLAY_FROM_PLAYING_NOW = 1;
     public static final int PLAY_PAUSE = 2;
     public static final int NEXT = 3;
@@ -73,7 +73,6 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         broadcastMan = LocalBroadcastManager.getInstance(playbackService);
         audioMan = (AudioManager)playbackService.getSystemService(Context.AUDIO_SERVICE);
         playlistStore = new PlaylistStore();
-        playlistStore.init(playbackService, this);
     }
 
     @Override
@@ -91,6 +90,14 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 IntentFilter intentFilter = new IntentFilter(Constants.PLAYBACK_STATE_CHANGED);
                 intentFilter.addAction(Constants.PLAYING_NOW_CHANGED);
                 broadcastMan.registerReceiver(mediaSessionManager, intentFilter);
+
+                playlistStore.init(playbackService);
+                playlistCursor = playlistStore.read();
+                playlistPosition = getStoredPlaylistPosition();
+                if (playlistPosition >= playlistCursor.getCount()) playlistPosition = 0;
+
+                notifyPlaylistChanged();
+                notifyPlayingItemChanged();
 
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
@@ -379,8 +386,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private boolean isEndOfPlaylist() {
-        if (playlistCursor == null) return true;
-        return playlistPosition >= playlistCursor.getCount() - 1;
+        return playlistCursor == null || playlistPosition >= playlistCursor.getCount() - 1;
     }
 
     private int getDuration() {
@@ -693,15 +699,5 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
     private Uri getUriForMedia(long id) {
         return ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-    }
-
-    @Override
-    public void onInitComplete() {
-        playlistCursor = playlistStore.read();
-        playlistPosition = getStoredPlaylistPosition();
-        if (playlistPosition >= playlistCursor.getCount()) playlistPosition = 0;
-
-        notifyPlaylistChanged();
-        notifyPlayingItemChanged();
     }
 }
