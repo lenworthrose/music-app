@@ -19,6 +19,7 @@
     <string name="search_hint_text">Search all music</string>
     <string name="last_fm_info">Last.fm Information</string>
     <string name="enabled">Enabled</string>
+    <string name="sound_settings">Sound Settings</string>
 
     <plurals name="num_of_albums">
         <item quantity="one">%1$d album</item>

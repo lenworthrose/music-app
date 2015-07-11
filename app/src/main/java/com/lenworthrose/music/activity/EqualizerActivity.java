@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -48,6 +50,12 @@ public class EqualizerActivity extends AppCompatActivity implements ServiceConne
         setSupportActionBar(toolbar);
 
         bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_equalizer, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -138,5 +146,9 @@ public class EqualizerActivity extends AppCompatActivity implements ServiceConne
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         equalizer.setEnabled(isChecked);
         sharedPreferences.edit().putBoolean(Constants.SETTING_EQUALIZER_ENABLED, isChecked).apply();
+    }
+
+    public void onSoundSettingsClicked(MenuItem unused) {
+        startActivity(new Intent(android.provider.Settings.ACTION_SOUND_SETTINGS));
     }
 }
