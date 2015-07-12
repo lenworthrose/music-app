@@ -12,7 +12,8 @@
         android:layout_width="?actionBarSize"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        tools:ignore="ContentDescription" />
+        android:transitionName="now_playing"
+        tools:ignore="ContentDescription,UnusedAttribute" />
 
     <LinearLayout
         android:layout_width="0dp"

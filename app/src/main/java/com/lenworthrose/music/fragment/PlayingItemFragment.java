@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -67,6 +68,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private MenuItem repeatItem;
     private boolean isRepeatEnabled;
     private int position;
+    private boolean isActivityTransitionDone;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -256,7 +258,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private void playingItemChanged(Intent intent) {
         handler.removeCallbacksAndMessages(null);
         if (isDetached() || playbackService == null) return;
-        if (autoHideOverlays) setOverlaysVisible(true);
+        if (autoHideOverlays && isActivityTransitionDone) setOverlaysVisible(true);
 
         artist.setText(intent.getStringExtra(Constants.EXTRA_ARTIST));
         album.setText(intent.getStringExtra(Constants.EXTRA_ALBUM));
@@ -282,7 +284,21 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                             @Override
                             public void onBitmapReady(Bitmap bitmap) {
                                 coverArt.setImageBitmap(bitmap);
-                                coverArt.animate().alpha(1f).setDuration(175);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) getActivity().startPostponedEnterTransition();
+                                coverArt.animate().alpha(1f).setDuration(175).withEndAction(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (!isActivityTransitionDone) {
+                                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    isActivityTransitionDone = true;
+                                                    setOverlaysVisible(true);
+                                                }
+                                            }, 300);
+                                        }
+                                    }
+                                });
                             }
                         });
 
@@ -333,7 +349,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 scheduleHideOverlays();
                 updatePosition(intent.getIntExtra(Constants.EXTRA_POSITION, 0));
                 handler.postDelayed(new UpdatePositionRunnable(), 1000);
-            break;
+                break;
             case PAUSED:
                 positionDisplay.startAnimation(pauseBlinkAnimation);
                 durationDisplay.setText(Utils.longToTimeDisplay(duration));
@@ -353,7 +369,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
         if (state != PlaybackState.PLAYING) {
             cancelHideOverlays();
-            setOverlaysVisible(true);
+            if (isActivityTransitionDone) setOverlaysVisible(true);
         }
     }
 

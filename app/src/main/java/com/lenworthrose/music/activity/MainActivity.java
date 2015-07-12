@@ -1,5 +1,6 @@
 package com.lenworthrose.music.activity;
 
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         nowPlayingBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
+                showPlayingNow();
             }
         });
 
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
         switch (item.getItemId()) {
             case R.id.action_playing_now:
-                startActivity(new Intent(this, PlayingNowActivity.class));
+                showPlayingNow();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -298,5 +300,14 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         new AlertDialog.Builder(this).setTitle(R.string.welcome_dialog_title).setMessage(R.string.welcome_dialog_message)
                 .setPositiveButton(android.R.string.yes, buttonListener).setNegativeButton(android.R.string.no, buttonListener)
                 .show();
+    }
+
+    private void showPlayingNow() {
+        Bundle options = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, nowPlayingBar.findViewById(R.id.np_cover), "now_playing").toBundle();
+
+        startActivity(new Intent(MainActivity.this, PlayingNowActivity.class), options);
     }
 }

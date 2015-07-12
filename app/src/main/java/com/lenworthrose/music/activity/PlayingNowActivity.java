@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -29,7 +30,7 @@ import com.lenworthrose.music.util.Constants;
 
 /**
  * The Playing Now page for the application. Displays the {@link PlayingItemFragment} and {@link PlayingNowPlaylistFragment}.
- *
+ * <p/>
  * Contains an ImageView for displaying a shared background, which is used when displaying the two Fragments in a ViewPager.
  */
 public class PlayingNowActivity extends AppCompatActivity {
@@ -44,6 +45,7 @@ public class PlayingNowActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_playing_now);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) postponeEnterTransition();
 
         Intent intent = new Intent(this, PlaybackService.class);
         intent.setAction(Constants.CMD_ACTIVITY_STARTING);

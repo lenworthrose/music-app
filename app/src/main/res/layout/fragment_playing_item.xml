@@ -11,7 +11,8 @@
         android:layout_above="@+id/pn_playback_control_container"
         android:layout_alignParentTop="true"
         android:scaleType="fitCenter"
-        tools:ignore="ContentDescription" />
+        android:transitionName="now_playing"
+        tools:ignore="ContentDescription,UnusedAttribute" />
 
     <LinearLayout
         android:id="@+id/pn_top_detail_container"
@@ -21,7 +22,8 @@
         android:orientation="vertical"
         android:paddingBottom="2dp"
         android:paddingLeft="4dp"
-        android:paddingRight="4dp">
+        android:paddingRight="4dp"
+        android:visibility="invisible">
 
         <LinearLayout
             android:id="@+id/pn_artist_album_container"
@@ -76,7 +78,8 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:orientation="vertical"
-        android:paddingTop="1.5dp">
+        android:paddingTop="1.5dp"
+        android:visibility="invisible">
 
         <LinearLayout
             android:layout_width="match_parent"
