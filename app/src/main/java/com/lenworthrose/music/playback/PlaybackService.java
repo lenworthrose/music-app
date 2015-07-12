@@ -28,6 +28,8 @@ import java.util.ArrayList;
  * See {@link Constants} for the action strings used.
  */
 public class PlaybackService extends Service {
+    private static final String CMD_SHUTDOWN = "com.lenworthrose.music.playback.PlaybackService.Shutdown";
+
     private final IBinder binder = new LocalBinder();
     private PlaybackThread playbackThread;
     private Handler handler;
@@ -93,7 +95,14 @@ public class PlaybackService extends Service {
                     activityCount--;
 
                     if (activityCount <= 0)
-                        stopSelf();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(PlaybackService.this, PlaybackService.class);
+                                intent.setAction(CMD_SHUTDOWN);
+                                startService(intent);
+                            }
+                        }, 750);
 
                     break;
                 case Constants.CMD_TOGGLE_REPEAT_MODE:
@@ -101,6 +110,9 @@ public class PlaybackService extends Service {
                         playbackThread.getHandler().obtainMessage(PlaybackThread.TOGGLE_REPEAT_MODE).sendToTarget();
                     else
                         pendingCommand = PlaybackThread.TOGGLE_REPEAT_MODE;
+                case CMD_SHUTDOWN:
+                    stopSelf();
+                    break;
             }
         }
 
