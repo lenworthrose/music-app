@@ -126,25 +126,38 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     public void quit() {
-        broadcastMan.unregisterReceiver(mediaSessionManager);
-        unregisterNoisyReceiver();
+        final Object lock = new Object();
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    currentTrack.release();
-                    nextTrack.release();
-                } catch (IllegalStateException ex) {
-                    Log.w("PlaybackThread", "IllegalStateException occurred attempting to release MediaPlayers in quit()");
+        synchronized (lock) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    releaseMediaPlayers(true);
+                    broadcastMan.unregisterReceiver(mediaSessionManager);
+
+                    try {
+                        currentTrack.release();
+                        nextTrack.release();
+                    } catch (IllegalStateException ex) {
+                        Log.w("PlaybackThread", "IllegalStateException occurred attempting to release MediaPlayers in quit()");
+                    }
+
+                    Looper.myLooper().quit();
+
+                    synchronized (lock) {
+                        lock.notify();
+                    }
                 }
+            });
 
-                Looper.myLooper().quit();
-            }
-        });
+            try {
+                lock.wait(2000);
+            } catch (InterruptedException ex) { /* Do nothing. */ }
+        }
+
     }
 
-    public Handler getHandler() {
+    Handler getHandler() {
         return handler;
     }
 

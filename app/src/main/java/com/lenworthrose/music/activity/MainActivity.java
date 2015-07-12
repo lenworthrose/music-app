@@ -155,15 +155,17 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     protected void onPause() {
-        super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         nowPlayingBar.onPause();
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
-        super.onStop();
         unbindService(this);
+        playbackService = null;
+        nowPlayingBar.setPlaybackService(null);
+        super.onStop();
     }
 
     @Override

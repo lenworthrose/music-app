@@ -92,14 +92,8 @@ public class PlaybackService extends Service {
                 case Constants.CMD_ACTIVITY_CLOSING:
                     activityCount--;
 
-                    if (activityCount <= 0) {
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                stopSelf();
-                            }
-                        }, 750);
-                    }
+                    if (activityCount <= 0)
+                        stopSelf();
 
                     break;
                 case Constants.CMD_TOGGLE_REPEAT_MODE:
