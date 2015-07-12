@@ -17,7 +17,7 @@ import com.lenworthrose.music.R;
  */
 public class GridItem extends CheckableFrameLayout {
     private TextView label;
-    private SquareImageView imgView;
+    private SquareImageView big, imgView1, imgView2, imgView3, imgView4;
 
     public GridItem(Context context) {
         super(context);
@@ -26,7 +26,12 @@ public class GridItem extends CheckableFrameLayout {
         inflate(getContext(), R.layout.grid_item, this);
         setPadding(5, 5, 5, 5);
         label = (TextView)findViewById(R.id.grid_label);
-        imgView = (SquareImageView)findViewById(R.id.grid_image);
+        big = (SquareImageView)findViewById(R.id.grid_big_image);
+        imgView1 = (SquareImageView)findViewById(R.id.grid_image1);
+        imgView2 = (SquareImageView)findViewById(R.id.grid_image2);
+        imgView3 = (SquareImageView)findViewById(R.id.grid_image3);
+        imgView4 = (SquareImageView)findViewById(R.id.grid_image4);
+
 
         ShapeDrawable.ShaderFactory shaderFactory = new ShapeDrawable.ShaderFactory() {
             @Override
@@ -48,7 +53,31 @@ public class GridItem extends CheckableFrameLayout {
         label.setText(text);
     }
 
-    public ImageView getImageView() {
-        return imgView;
+    public ImageView getBigImageView() {
+        return big;
+    }
+
+    public ImageView getImageView1() {
+        return imgView1;
+    }
+
+    public ImageView getImageView2() {
+        return imgView2;
+    }
+
+    public ImageView getImageView3() {
+        return imgView3;
+    }
+
+    public ImageView getImageView4() {
+        return imgView4;
+    }
+
+    public void resetImages() {
+        big.setImageResource(android.R.color.transparent);
+        imgView1.setImageResource(android.R.color.transparent);
+        imgView2.setImageResource(android.R.color.transparent);
+        imgView3.setImageResource(android.R.color.transparent);
+        imgView4.setImageResource(android.R.color.transparent);
     }
 }

@@ -168,7 +168,7 @@ public class SearchAdapter extends BaseAdapter implements StickyGridHeadersSimpl
         }
 
         item.setTag(curId + "/" + position);
-        Glide.with(context).load(imageUrl).error(R.drawable.logo).fallback(R.drawable.logo).into(item.getImageView());
+        Glide.with(context).load(imageUrl).error(R.drawable.logo).fallback(R.drawable.logo).into(item.getBigImageView());
 
         return item;
     }

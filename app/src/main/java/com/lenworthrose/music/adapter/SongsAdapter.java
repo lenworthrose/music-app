@@ -65,7 +65,7 @@ public class SongsAdapter extends BaseSwitchableAdapter {
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(buildTitle(cursor));
-        Glide.with(context).load(Utils.buildAlbumArtUrl(cursor.getLong(6))).into(view.getImageView());
+        Glide.with(context).load(Utils.buildAlbumArtUrl(cursor.getLong(6))).into(view.getBigImageView());
     }
 
     protected String buildTitle(Cursor cursor) {

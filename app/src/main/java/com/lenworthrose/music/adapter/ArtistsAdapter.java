@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -66,7 +67,16 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(2));
-        Glide.with(getContext()).load(cursor.getString(5)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
+        view.resetImages();
+
+        if (TextUtils.isEmpty(cursor.getString(8))) {
+            Glide.with(getContext()).load(cursor.getString(5)).fallback(R.drawable.logo).error(R.drawable.logo).into(view.getBigImageView());
+        } else {
+            Glide.with(getContext()).load(cursor.getString(5)).into(view.getImageView1());
+            Glide.with(getContext()).load(cursor.getString(6)).into(view.getImageView2());
+            Glide.with(getContext()).load(cursor.getString(7)).into(view.getImageView3());
+            Glide.with(getContext()).load(cursor.getString(8)).into(view.getImageView4());
+        }
     }
 
     @Override

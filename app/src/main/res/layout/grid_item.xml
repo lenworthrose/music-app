@@ -1,10 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.lenworthrose.music.view.SquareImageView
-        android:id="@+id/grid_image"
+        android:id="@+id/grid_big_image"
         android:layout_width="match_parent"
         android:layout_height="0dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.lenworthrose.music.view.SquareImageView
+            android:id="@+id/grid_image1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_above="@+id/grid_space"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/grid_space"
+            tools:ignore="RtlHardcoded" />
+
+        <com.lenworthrose.music.view.SquareImageView
+            android:id="@+id/grid_image2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_above="@id/grid_space"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/grid_space"
+            tools:ignore="RtlHardcoded" />
+
+        <com.lenworthrose.music.view.SquareImageView
+            android:id="@+id/grid_image3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/grid_space"
+            android:layout_toLeftOf="@id/grid_space"
+            tools:ignore="RtlHardcoded" />
+
+        <com.lenworthrose.music.view.SquareImageView
+            android:id="@+id/grid_image4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/grid_space"
+            android:layout_toRightOf="@id/grid_space"
+            tools:ignore="RtlHardcoded" />
+
+        <Space
+            android:id="@id/grid_space"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/grid_label"

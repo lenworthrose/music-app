@@ -106,7 +106,7 @@ public class AlbumsAdapter extends BaseSwitchableAdapter {
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(1));
-        Glide.with(context).load(cursor.getString(4)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
+        Glide.with(context).load(cursor.getString(4)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getBigImageView());
     }
 
     @Override
