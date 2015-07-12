@@ -82,8 +82,9 @@ public class EqualizerActivity extends AppCompatActivity implements ServiceConne
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         equalizer = ((PlaybackService.LocalBinder)service).getService().getEqualizer();
+        bandLevels = getBandLevelsFromEqualizer(equalizer);
         configureEqualizerUi();
-        setEqualizerBars(getBandLevelsFromEqualizer(equalizer));
+        setEqualizerBars(bandLevels);
     }
 
     @Override
@@ -103,7 +104,6 @@ public class EqualizerActivity extends AppCompatActivity implements ServiceConne
         });
 
         short bands = equalizer.getNumberOfBands();
-        bandLevels = new short[bands];
         short maxLevel = equalizer.getBandLevelRange()[1];
         minLevel = equalizer.getBandLevelRange()[0];
         seekBars = new SeekBar[bands];
