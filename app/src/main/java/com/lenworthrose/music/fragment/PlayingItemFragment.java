@@ -282,13 +282,13 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                                     @Override
                                     public void run() {
                                         if (!isActivityTransitionDone) {
-                                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                            overlayHandler.postDelayed(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     isActivityTransitionDone = true;
                                                     setOverlaysVisible(true);
                                                 }
-                                            }, 300);
+                                            }, 150);
                                         }
                                     }
                                 });
@@ -462,6 +462,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
         @Override
         public void run() {
+            if (visible) view.setAlpha(0f);
             view.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }

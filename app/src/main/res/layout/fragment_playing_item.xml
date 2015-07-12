@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:alpha="0"
         android:orientation="vertical"
         android:paddingBottom="2dp"
         android:paddingLeft="4dp"
@@ -77,6 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
+        android:alpha="0"
         android:orientation="vertical"
         android:paddingTop="1.5dp"
         android:visibility="invisible">
