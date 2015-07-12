@@ -193,6 +193,9 @@ public class EqualizerActivity extends AppCompatActivity implements ServiceConne
         } else {
             short[] customLevels = Utils.getCustomEqualizerLevels(sharedPreferences);
             bandLevels = customLevels != null ? customLevels : new short[equalizer.getNumberOfBands()];
+
+            for (short i = 0; i < bandLevels.length; i++)
+                equalizer.setBandLevel(i, bandLevels[i]);
         }
 
         setEqualizerBars(bandLevels);
