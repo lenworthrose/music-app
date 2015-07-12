@@ -73,7 +73,7 @@ public class EqualizerActivity extends AppCompatActivity implements ServiceConne
         sharedPreferences.edit().putInt(Constants.SETTING_EQUALIZER_PRESET, selectedPreset).apply();
 
         if (selectedPreset == presetAdapter.getCustomPresetIndex())
-            Utils.storeEqualizerSettings(sharedPreferences, bandLevels);
+            Utils.storeCustomEqualizerLevels(sharedPreferences, bandLevels);
 
         unbindService(this);
         super.onDestroy();

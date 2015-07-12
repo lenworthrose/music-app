@@ -411,7 +411,7 @@ public class Utils {
         return null;
     }
 
-    public static void storeEqualizerSettings(SharedPreferences sharedPreferences, short[] levels) {
+    public static void storeCustomEqualizerLevels(SharedPreferences sharedPreferences, short[] levels) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(Constants.SETTING_EQUALIZER_BAND_COUNT, levels.length);
 

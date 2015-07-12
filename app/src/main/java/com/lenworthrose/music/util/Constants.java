@@ -43,8 +43,8 @@ public class Constants {
     public static final String SETTING_REPEAT_MODE = "repeat_mode";
     public static final String SETTING_START_LOCATION = "start_location";
     public static final String SETTING_LAST_FM_INTEGRATION = "last_fm_integration";
-    public static final String SETTING_EQUALIZER_ENABLED = "equalizer_enabled";
 
+    public static final String SETTING_EQUALIZER_ENABLED = "equalizer_enabled";
     public static final String SETTING_EQUALIZER_BAND_COUNT = "equalizer_band_count";
     public static final String SETTING_EQUALIZER_BAND = "equalizer_band";
     public static final String SETTING_EQUALIZER_PRESET = "equalizer_preset";
