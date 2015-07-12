@@ -44,11 +44,6 @@ import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Constants.PlaybackState;
 import com.lenworthrose.music.util.Utils;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 /**
  * This Fragment displays information about the currently playing track (Artist, Album, Title, Cover
  * Art, etc). It also provides playback controls (Play/Pause, Next, Previous, Stop).
@@ -59,14 +54,12 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private ImageView coverArt, playPause;
     private View artistAlbumContainer, topDetailContainer, bottomDetailContainer;
     private boolean isPositionBarTouched, autoHideOverlays;
-    private ScheduledExecutorService scheduleService;
-    private ScheduledFuture<?> hideOverlaysFuture;
     private boolean areOverlaysVisible = true;
     private Animation pauseBlinkAnimation = new AlphaAnimation(0f, 1f);
     private PlaybackService playbackService;
-    private Handler handler;
     private MenuItem repeatItem;
     private boolean isRepeatEnabled;
+    private Handler positionHandler, overlayHandler;
     private int position;
     private boolean isActivityTransitionDone;
 
@@ -146,9 +139,9 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         autoHideOverlays = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(Constants.SETTING_AUTO_HIDE_PLAYING_NOW_OVERLAYS, false);
-        handler = new Handler(Looper.getMainLooper());
+        positionHandler = new Handler(Looper.getMainLooper());
+        overlayHandler = new Handler(Looper.getMainLooper());
 
-        if (autoHideOverlays) scheduleService = Executors.newSingleThreadScheduledExecutor();
         setHasOptionsMenu(true);
         pauseBlinkAnimation.setDuration(375);
         pauseBlinkAnimation.setStartOffset(250);
@@ -249,14 +242,14 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     @Override
     public void onPause() {
         cancelHideOverlays();
-        handler.removeCallbacksAndMessages(null);
+        positionHandler.removeCallbacksAndMessages(null);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
         getActivity().unbindService(this);
         super.onPause();
     }
 
     private void playingItemChanged(Intent intent) {
-        handler.removeCallbacksAndMessages(null);
+        positionHandler.removeCallbacksAndMessages(null);
         if (isDetached() || playbackService == null) return;
         if (autoHideOverlays && isActivityTransitionDone) setOverlaysVisible(true);
 
@@ -324,7 +317,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void playbackStateChanged(Intent intent) {
-        handler.removeCallbacksAndMessages(null);
+        positionHandler.removeCallbacksAndMessages(null);
         if (isDetached() || playbackService == null) return;
 
         PlaybackState state = (PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
@@ -348,7 +341,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 playPause.setEnabled(true);
                 scheduleHideOverlays();
                 updatePosition(intent.getIntExtra(Constants.EXTRA_POSITION, 0));
-                handler.postDelayed(new UpdatePositionRunnable(), 1000);
+                positionHandler.postDelayed(new UpdatePositionRunnable(), 1000);
                 break;
             case PAUSED:
                 positionDisplay.startAnimation(pauseBlinkAnimation);
@@ -425,17 +418,17 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     private void scheduleHideOverlays() {
         if (!autoHideOverlays || playbackService.getState() != PlaybackState.PLAYING) return;
 
-        if (hideOverlaysFuture != null)
-            hideOverlaysFuture.cancel(false);
-
-        hideOverlaysFuture = scheduleService.schedule(new HideOverlaysTask(), 5, TimeUnit.SECONDS);
+        overlayHandler.removeCallbacksAndMessages(null);
+        overlayHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setOverlaysVisible(false);
+            }
+        }, 5000);
     }
 
     private void cancelHideOverlays() {
-        if (hideOverlaysFuture != null) {
-            hideOverlaysFuture.cancel(false);
-            hideOverlaysFuture = null;
-        }
+        overlayHandler.removeCallbacksAndMessages(null);
     }
 
     private void setOverlaysVisible(boolean visible) {
@@ -458,19 +451,6 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         areOverlaysVisible = visible;
     }
 
-    private class HideOverlaysTask implements Runnable {
-        @Override
-        public void run() {
-            topDetailContainer.post(new Runnable() {
-                @Override
-                public void run() {
-                    setOverlaysVisible(false);
-                    hideOverlaysFuture = null;
-                }
-            });
-        }
-    }
-
     private static class SetVisibilityRunnable implements Runnable {
         private View view;
         private boolean visible;
@@ -491,7 +471,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         public void run() {
             if (playbackService.getState() == PlaybackState.PLAYING) {
                 updatePosition(position + 1000);
-                handler.postDelayed(new UpdatePositionRunnable(), 1000);
+                positionHandler.postDelayed(new UpdatePositionRunnable(), 1000);
             }
         }
     }
