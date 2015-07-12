@@ -396,7 +396,7 @@ public class Utils {
         return albumArtUri.toString();
     }
 
-    public static short[] getEqualizerSettings(SharedPreferences sharedPreferences) {
+    public static short[] getCustomEqualizerLevels(SharedPreferences sharedPreferences) {
         int bandCount = sharedPreferences.getInt(Constants.SETTING_EQUALIZER_BAND_COUNT, 0);
 
         if (bandCount > 0) {

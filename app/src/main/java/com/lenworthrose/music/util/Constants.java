@@ -47,6 +47,7 @@ public class Constants {
 
     public static final String SETTING_EQUALIZER_BAND_COUNT = "equalizer_band_count";
     public static final String SETTING_EQUALIZER_BAND = "equalizer_band";
+    public static final String SETTING_EQUALIZER_PRESET = "equalizer_preset";
 
     public static final long ALL = Long.MIN_VALUE;
 

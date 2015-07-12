@@ -92,11 +92,19 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 equalizer = new Equalizer(0, currentTrack.getAudioSessionId());
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(playbackService);
-                short[] levels = Utils.getEqualizerSettings(prefs);
+                int savedEqPreset = prefs.getInt(Constants.SETTING_EQUALIZER_PRESET, -1);
 
-                if (levels != null)
-                    for (short i = 0; i < levels.length; i++)
-                        equalizer.setBandLevel(i, levels[i]);
+                if (savedEqPreset != -1) {
+                    if (savedEqPreset == equalizer.getNumberOfPresets()) { //Custom preset; load levels from SharedPreferences
+                        short[] levels = Utils.getCustomEqualizerLevels(prefs);
+
+                        if (levels != null)
+                            for (short i = 0; i < levels.length; i++)
+                                equalizer.setBandLevel(i, levels[i]);
+                    } else {
+                        equalizer.usePreset((short)savedEqPreset);
+                    }
+                }
 
                 equalizer.setEnabled(prefs.getBoolean(Constants.SETTING_EQUALIZER_ENABLED, false));
 
