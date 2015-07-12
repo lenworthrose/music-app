@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -16,13 +17,14 @@ import android.widget.RemoteViews;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.AppWidgetTarget;
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Constants.PlaybackState;
 
 /**
  * Service responsible for updating Widgets.
  */
-public class WidgetService extends Service {
+public class WidgetService extends Service implements ServiceConnection {
     public static final String ACTION_REFRESH = "com.lenworthrose.music.widget.WidgetService.REFRESH";
 
     private BroadcastReceiver receiver;
@@ -86,9 +88,8 @@ public class WidgetService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && ACTION_REFRESH.equals(intent.getAction())) {
-            //TODO: how do I get the initial content to display? Don't want to bind to service...
-        }
+        if (intent != null && ACTION_REFRESH.equals(intent.getAction()))
+            bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
 
         return START_STICKY;
     }
@@ -98,4 +99,15 @@ public class WidgetService extends Service {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onDestroy();
     }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        PlaybackService playbackService = ((PlaybackService.LocalBinder)service).getService();
+        receiver.onReceive(this, playbackService.getPlayingItemIntent());
+        receiver.onReceive(this, playbackService.getPlaybackStateIntent());
+        unbindService(this);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) { }
 }

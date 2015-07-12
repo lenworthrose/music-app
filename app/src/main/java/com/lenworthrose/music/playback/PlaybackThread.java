@@ -154,7 +154,6 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 lock.wait(2000);
             } catch (InterruptedException ex) { /* Do nothing. */ }
         }
-
     }
 
     Handler getHandler() {
