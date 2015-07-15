@@ -53,6 +53,7 @@ public class WidgetService extends Service implements ServiceConnection {
                             rv.setTextViewText(R.id.widget_title, intent.getStringExtra(Constants.EXTRA_TITLE));
                             rv.setTextViewText(R.id.widget_subtitle, artist);
                             rv.setViewVisibility(R.id.widget_subtitle, TextUtils.isEmpty(artist) ? View.GONE : View.VISIBLE);
+                            WidgetProvider.setOnClickIntents(context, rv);
                             appMan.partiallyUpdateAppWidget(appWidgetId, rv);
 
                             Glide.with(context).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().fallback(R.drawable.logo)
@@ -63,6 +64,7 @@ public class WidgetService extends Service implements ServiceConnection {
                     case Constants.PLAYBACK_STATE_CHANGED:
                         PlaybackState state = (PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
                         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_view);
+                        WidgetProvider.setOnClickIntents(context, rv);
 
                         switch (state) {
                             case PLAYING:
