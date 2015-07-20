@@ -425,14 +425,11 @@ public class Utils {
     }
 
     public static String[] getAlbumArtUrls(Context context, long artistId) {
-        String[] projection = {
-                MediaStore.Audio.Albums.ALBUM_ART
-        };
-
         int i = 0;
         String[] albumArt = null;
+
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                projection,
+                new String[] { MediaStore.Audio.Albums.ALBUM_ART },
                 MediaStore.Audio.Media.ARTIST_ID + "=?",
                 new String[] { String.valueOf(artistId) },
                 MediaStore.Audio.Albums.ALBUM_KEY + " DESC");
