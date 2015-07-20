@@ -150,6 +150,7 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
                     broadcastMediaStoreSyncComplete();
                     isTaskActive = false;
 
+                    startObservingMediaStore();
                     startPendingTasks();
                 }
             };
@@ -157,6 +158,7 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
             infoTask.execute();
         } else {
             stopForeground(true);
+            startObservingMediaStore();
         }
     }
 
