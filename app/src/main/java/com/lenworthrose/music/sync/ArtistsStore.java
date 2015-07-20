@@ -1,12 +1,10 @@
 package com.lenworthrose.music.sync;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.content.CursorLoader;
-import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -102,7 +100,7 @@ public class ArtistsStore {
                 ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
     }
 
-    public Cursor getArtistsWithoutInfo() {
+    public Cursor getArtistsWithoutLastFmInfo() {
         return db.query(TABLE_NAME,
                 PROJECTION_ALL,
                 ArtistsStoreContract.ArtistEntry.COLUMN_BIO + " IS NULL",
@@ -112,59 +110,19 @@ public class ArtistsStore {
                 ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY);
     }
 
-    public CursorLoader getArtistInfo(Context context, final long id) {
+    public CursorLoader getArtistInfo(Context context, final long artistId) {
         return new CursorLoader(context) {
             @Override
             public Cursor loadInBackground() {
-                return db.query(TABLE_NAME, PROJECTION_ONE, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) }, null, null, null);
+                return db.query(TABLE_NAME,
+                        PROJECTION_ONE,
+                        ArtistsStoreContract.ArtistEntry._ID + "=?",
+                        new String[] { String.valueOf(artistId) },
+                        null,
+                        null,
+                        null);
             }
         };
-    }
-
-    void updateArtist(long id, String musicBrainzId, String lastFmInfo, String artistImgUrl, String... albumArtUris) {
-        ContentValues values = new ContentValues();
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_ID, musicBrainzId);
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_BIO, lastFmInfo);
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ARTIST_ART_FILE_URL, artistImgUrl);
-
-        if (albumArtUris != null) {
-            try {
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1, albumArtUris[0]);
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2, albumArtUris[1]);
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
-            } catch (IndexOutOfBoundsException ex) {
-                Log.d("ArtistsStore", "IndexOutOfBoundsException occurred attempting to add album art to ContentValues: albumArtUris.length=" + albumArtUris.length);
-            }
-        }
-
-        db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
-    }
-
-    void updateArtistLastFmInfo(long id, String musicBrainzId, String bio, String artistImgUrl) {
-        ContentValues values = new ContentValues();
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MUSICBRAINZ_ID, musicBrainzId);
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_BIO, bio);
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ARTIST_ART_FILE_URL, artistImgUrl);
-
-        db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
-    }
-
-    void updateArtistAlbumArt(long id, String... albumArtUris) {
-        ContentValues values = new ContentValues();
-
-        if (albumArtUris != null) {
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1, albumArtUris[0]);
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2, albumArtUris[1]);
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
-        }
-
-        db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
-    }
-
-    void removeArtist(long artistId) {
-        db.delete(TABLE_NAME, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(artistId) });
     }
 
     void syncFromMediaStore(Cursor artistsCursor) {
