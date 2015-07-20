@@ -31,7 +31,7 @@ public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         int current = 0;
-        db.beginTransaction();
+        db.beginTransactionNonExclusive();
 
         try {
             for (ArtistModel artist : newArtists) {

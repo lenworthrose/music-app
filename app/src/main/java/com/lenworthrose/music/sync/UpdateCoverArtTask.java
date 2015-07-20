@@ -27,7 +27,7 @@ public class UpdateCoverArtTask extends AsyncTask<Void, Integer, Void> {
 
         if (artistsCursor.moveToFirst()) {
             int current = 0, total = artistsCursor.getCount();
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
 
              try {
                  do {

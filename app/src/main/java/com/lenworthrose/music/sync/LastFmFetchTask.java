@@ -27,7 +27,7 @@ class LastFmFetchTask extends AsyncTask<Void, Integer, Void> {
         Cursor artistsCursor = ArtistsStore.getInstance().getArtistsWithoutLastFmInfo();
 
         if (artistsCursor.moveToFirst()) {
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
 
             try {
                 int count = artistsCursor.getCount(), current = 0;

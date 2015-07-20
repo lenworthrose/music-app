@@ -41,7 +41,7 @@ class MediaStoreMigrationTask extends AsyncTask<Void, Void, List<ArtistModel>> {
         List<ArtistModel> newArtists = new ArrayList<>();
 
         if (artistsCursor.moveToFirst()) {
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
 
             try {
                 do {
