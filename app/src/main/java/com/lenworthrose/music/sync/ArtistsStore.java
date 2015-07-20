@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Manages the Artists database.
- *
+ * <p/>
  * Note: the primary key "_ID" for our artists table is the same as the primary key "_ID" in MediaStore's
  * Artists table!
  */
@@ -36,7 +36,7 @@ public class ArtistsStore {
         return LazyHolder.INSTANCE;
     }
 
-    private static final String TABLE_NAME = "artists";
+    static final String TABLE_NAME = "artists";
 
     private static final String[] PROJECTION_ALL = {
             ArtistsStoreContract.ArtistEntry._ID,
@@ -168,7 +168,23 @@ public class ArtistsStore {
     }
 
     void syncFromMediaStore(Cursor artistsCursor) {
-        MediaStoreMigrationTask task = new MediaStoreMigrationTask();
+        MediaStoreMigrationTask task = new MediaStoreMigrationTask(db) {
+            @Override
+            protected void onPostExecute(List<ArtistModel> newArtists) {
+                for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
+                    WeakReference<ArtistsStoreListener> listener;
+
+                    try {
+                        listener = artistsStoreListeners.get(i);
+                    } catch (IndexOutOfBoundsException ex) {
+                        continue;
+                    }
+
+                    if (listener.get() != null) listener.get().onMediaStoreSyncComplete(newArtists);
+                }
+            }
+        };
+
         task.execute(artistsCursor);
     }
 
@@ -176,48 +192,6 @@ public class ArtistsStore {
         for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
             WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
             if (listener.get() != null) listener.get().onArtistInfoFetchComplete();
-        }
-    }
-
-    private class MediaStoreMigrationTask extends AsyncTask<Cursor, Void, List<ArtistModel>> {
-        @Override
-        protected List<ArtistModel> doInBackground(Cursor... params) {
-            Cursor artistsCursor = params[0];
-            List<ArtistModel> newArtists = new ArrayList<>();
-
-            if (artistsCursor.moveToFirst()) {
-                db.beginTransaction();
-
-                try {
-                    do {
-                        //The JavaDoc for this function is incorrect: it will return -1 when using CONFLICT_IGNORE if the row already exists!
-                        long id = db.insertWithOnConflict(TABLE_NAME, null, createContentValuesFrom(artistsCursor), SQLiteDatabase.CONFLICT_IGNORE);
-                        if (id != -1) newArtists.add(new ArtistModel(id, artistsCursor.getString(1)));
-                    } while (artistsCursor.moveToNext());
-
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
-                }
-            }
-
-            artistsCursor.close();
-            return newArtists;
-        }
-
-        @Override
-        protected void onPostExecute(List<ArtistModel> newArtists) {
-            for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
-                WeakReference<ArtistsStoreListener> listener;
-
-                try {
-                    listener = artistsStoreListeners.get(i);
-                } catch (IndexOutOfBoundsException ex) {
-                    continue;
-                }
-
-                if (listener.get() != null) listener.get().onMediaStoreSyncComplete(newArtists);
-            }
         }
     }
 
@@ -252,14 +226,5 @@ public class ArtistsStore {
 
             initListeners.clear();
         }
-    }
-
-    private static ContentValues createContentValuesFrom(Cursor artistsCursor) {
-        ContentValues values = new ContentValues();
-        values.put(ArtistsStoreContract.ArtistEntry._ID, artistsCursor.getLong(0));
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY, artistsCursor.getString(3));
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NAME, artistsCursor.getString(1));
-        values.put(ArtistsStoreContract.ArtistEntry.COLUMN_NUM_ALBUMS, artistsCursor.getInt(2));
-        return values;
     }
 }
