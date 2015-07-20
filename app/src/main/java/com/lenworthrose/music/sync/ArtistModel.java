@@ -12,6 +12,9 @@ public class ArtistModel {
         this.name = name;
     }
 
+    /**
+     * @return ArtistStore's database ID for this Artist.
+     */
     public long getId() {
         return id;
     }

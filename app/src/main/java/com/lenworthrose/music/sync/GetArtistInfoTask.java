@@ -1,9 +1,9 @@
 package com.lenworthrose.music.sync;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
+
+import com.lenworthrose.music.util.Utils;
 
 import java.util.List;
 
@@ -29,41 +29,20 @@ public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
 
         for (ArtistModel artist : newArtists) {
             publishProgress(current++, newArtists.size());
-            String[] albumArt = getAlbumArtUrls(context, artist.getId());
-            String mbid = null, bio = null, imgPath = null;
+            String mbid = null, bio = null, artistImgPath = null;
 
             if (lastFm != null) {
                 LastFmHelper helper = new LastFmHelper(context, lastFm, artist.getName());
                 helper.retrieveInfo();
                 mbid = helper.getMusicBrainzId();
                 bio = helper.getBio();
-                imgPath = helper.getArtistImageUrl();
+                artistImgPath = helper.getArtistImageUrl();
             }
 
-            ArtistsStore.getInstance().updateArtist(artist.getId(), mbid, bio, imgPath, albumArt);
+            String[] albumArt = Utils.getAlbumArtUrls(context, artist.getId());
+            ArtistsStore.getInstance().updateArtist(artist.getId(), mbid, bio, artistImgPath, albumArt);
         }
 
         return null;
-    }
-
-    private static String[] getAlbumArtUrls(Context context, long artistId) {
-        String[] projection = {
-                MediaStore.Audio.Albums.ALBUM_ART
-        };
-
-        int i = 0;
-        String[] albumArt = new String[4];
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, projection,
-                MediaStore.Audio.Media.ARTIST_ID + "=?", new String[] { String.valueOf(artistId) }, MediaStore.Audio.Albums.ALBUM_KEY + " DESC");
-
-        if (cursor.moveToFirst())
-            do {
-                if (cursor.getString(0) != null)
-                    albumArt[i++] = cursor.getString(0);
-            } while (cursor.moveToNext() && i < 4);
-
-        cursor.close();
-
-        return albumArt;
     }
 }

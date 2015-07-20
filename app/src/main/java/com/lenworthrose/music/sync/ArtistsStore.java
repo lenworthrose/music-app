@@ -14,6 +14,9 @@ import java.util.List;
 
 /**
  * Manages the Artists database.
+ *
+ * Note: the primary key "_ID" for our artists table is the same as the primary key "_ID" in MediaStore's
+ * Artists table!
  */
 public class ArtistsStore {
     public interface InitListener {
@@ -153,21 +156,17 @@ public class ArtistsStore {
         ContentValues values = new ContentValues();
 
         if (albumArtUris != null) {
-            try {
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1, albumArtUris[0]);
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2, albumArtUris[1]);
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
-                values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
-            } catch (IndexOutOfBoundsException ex) {
-                Log.d("ArtistsStore", "IndexOutOfBoundsException occurred attempting to add album art to ContentValues: albumArtUris.length=" + albumArtUris.length);
-            }
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1, albumArtUris[0]);
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2, albumArtUris[1]);
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
         }
 
         db.update(TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
     }
 
-    void removeArtist(String artistKey) {
-        db.delete(TABLE_NAME, ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY + "=?", new String[] { artistKey });
+    void removeArtist(long artistId) {
+        db.delete(TABLE_NAME, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(artistId) });
     }
 
     void syncFromMediaStore(Cursor artistsCursor) {
@@ -193,6 +192,7 @@ public class ArtistsStore {
 
                 try {
                     do {
+                        //The JavaDoc for this function is incorrect: it will return -1 when using CONFLICT_IGNORE if the row already exists!
                         long id = db.insertWithOnConflict(TABLE_NAME, null, createContentValuesFrom(artistsCursor), SQLiteDatabase.CONFLICT_IGNORE);
                         if (id != -1) newArtists.add(new ArtistModel(id, artistsCursor.getString(1)));
                     } while (artistsCursor.moveToNext());

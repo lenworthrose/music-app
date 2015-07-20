@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
@@ -15,6 +16,8 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.lenworthrose.music.activity.PlayingNowActivity;
@@ -419,5 +422,31 @@ public class Utils {
             editor.putInt(Constants.SETTING_EQUALIZER_BAND + i, levels[i]);
 
         editor.apply();
+    }
+
+    public static String[] getAlbumArtUrls(Context context, long artistId) {
+        String[] projection = {
+                MediaStore.Audio.Albums.ALBUM_ART
+        };
+
+        int i = 0;
+        String[] albumArt = null;
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                projection,
+                MediaStore.Audio.Media.ARTIST_ID + "=?",
+                new String[] { String.valueOf(artistId) },
+                MediaStore.Audio.Albums.ALBUM_KEY + " DESC");
+
+        if (cursor.moveToFirst()) {
+            albumArt = new String[4];
+
+            do {
+                if (!TextUtils.isEmpty(cursor.getString(0)))
+                    albumArt[i++] = cursor.getString(0);
+            } while (cursor.moveToNext() && i < 4);
+        }
+
+        cursor.close();
+        return albumArt;
     }
 }
