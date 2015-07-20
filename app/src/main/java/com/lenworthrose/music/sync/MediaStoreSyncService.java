@@ -114,7 +114,7 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
                 @Override
                 protected void onPostExecute(List<ArtistModel> newArtists) {
                     onMediaStoreSyncComplete(newArtists);
-                    LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+                    broadcastMediaStoreSyncComplete();
                 }
             };
 
@@ -147,7 +147,7 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
                 protected void onPostExecute(Void aVoid) {
                     Log.d("MediaStoreSyncService", "GetArtistInfoTask complete!");
                     stopForeground(true);
-                    LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+                    broadcastMediaStoreSyncComplete();
                     isTaskActive = false;
 
                     startPendingTasks();
@@ -183,7 +183,7 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     Log.d("MediaStoreSyncService", "Finished updating albums");
-                    LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+                    broadcastMediaStoreSyncComplete();
                     if (showNotification) stopForeground(true);
                     isTaskActive = false;
 
@@ -211,7 +211,7 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
                 @Override
                 protected void onPostExecute(Void aVoid) {
                     Log.d("MediaStoreSyncService", "Finished user requested Last.fm update");
-                    LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+                    broadcastMediaStoreSyncComplete();
                     stopForeground(true);
                     isTaskActive = false;
                     startPendingTasks();
@@ -249,6 +249,10 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
             isAlbumUpdatePending = false;
             startUpdatingAlbums(false);
         }
+    }
+
+    private void broadcastMediaStoreSyncComplete() {
+        LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
     }
 
     private class ArtistsContentObserver extends ContentObserver {
