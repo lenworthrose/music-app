@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.content.CursorLoader;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,11 +18,6 @@ import java.util.List;
 public class ArtistsStore {
     public interface InitListener {
         void onArtistsDbInitialized();
-    }
-
-    public interface ArtistsStoreListener {
-        void onMediaStoreSyncComplete(List<ArtistModel> newArtists);
-        void onArtistInfoFetchComplete();
     }
 
     private static final class LazyHolder {
@@ -60,7 +54,6 @@ public class ArtistsStore {
     private InitTask initTask;
     private boolean isInitializing, isInitialized;
     private List<InitListener> initListeners = new ArrayList<>(3);
-    private List<WeakReference<ArtistsStoreListener>> artistsStoreListeners = new ArrayList<>(3);
 
     private ArtistsStore() { }
 
@@ -125,45 +118,8 @@ public class ArtistsStore {
         };
     }
 
-    void syncFromMediaStore(Cursor artistsCursor) {
-        MediaStoreMigrationTask task = new MediaStoreMigrationTask(db) {
-            @Override
-            protected void onPostExecute(List<ArtistModel> newArtists) {
-                for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
-                    WeakReference<ArtistsStoreListener> listener;
-
-                    try {
-                        listener = artistsStoreListeners.get(i);
-                    } catch (IndexOutOfBoundsException ex) {
-                        continue;
-                    }
-
-                    if (listener.get() != null) listener.get().onMediaStoreSyncComplete(newArtists);
-                }
-            }
-        };
-
-        task.execute(artistsCursor);
-    }
-
-    void notifyArtistInfoFetchComplete() {
-        for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
-            WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
-            if (listener.get() != null) listener.get().onArtistInfoFetchComplete();
-        }
-    }
-
-    public void addListener(ArtistsStoreListener listener) {
-        artistsStoreListeners.add(new WeakReference<>(listener));
-    }
-
-    public void removeListener(ArtistsStoreListener artistsStoreListener) {
-        for (int i = artistsStoreListeners.size() - 1; i >= 0; i--) {
-            WeakReference<ArtistsStoreListener> listener = artistsStoreListeners.get(i);
-
-            if (listener.get() == null || listener.get() == artistsStoreListener)
-                artistsStoreListeners.remove(i);
-        }
+    SQLiteDatabase getDatabase() {
+        return db;
     }
 
     private class InitTask extends AsyncTask<Context, Void, Void> {

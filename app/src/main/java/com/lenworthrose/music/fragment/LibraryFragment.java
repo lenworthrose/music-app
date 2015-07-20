@@ -1,10 +1,15 @@
 package com.lenworthrose.music.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,6 +25,7 @@ import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.AdapterFactory;
 import com.lenworthrose.music.adapter.BaseSwitchableAdapter;
+import com.lenworthrose.music.sync.MediaStoreSyncService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.view.HeaderGridView;
@@ -45,6 +51,7 @@ public class LibraryFragment extends Fragment {
     private SearchView searchView;
     private String filter;
     private ListHeader listHeader;
+    private BroadcastReceiver databaseChangeReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,13 @@ public class LibraryFragment extends Fragment {
             adapter = AdapterFactory.createAdapter(getActivity(), isGridView(), idType, id);
             getLoaderManager().initLoader(0, null, adapter);
         }
+
+        databaseChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                getLoaderManager().restartLoader(0, null, adapter);
+            }
+        };
 
         setHasOptionsMenu(true);
     }
@@ -152,6 +166,19 @@ public class LibraryFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(MediaStoreSyncService.ACTION_MEDIA_STORE_SYNC_COMPLETE);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(databaseChangeReceiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(databaseChangeReceiver);
+        super.onPause();
     }
 
     @Override

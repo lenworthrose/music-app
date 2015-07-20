@@ -12,45 +12,28 @@ import android.widget.AdapterView;
 import com.bumptech.glide.Glide;
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.sync.ArtistModel;
 import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Artists.
  */
-public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStore.ArtistsStoreListener {
-    private CursorLoader loader;
-
+public class ArtistsAdapter extends BaseSwitchableAdapter {
     public ArtistsAdapter(Context context, boolean isGrid) {
         super(context, isGrid);
-        ArtistsStore.getInstance().addListener(this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        loader = new CursorLoader(getContext()) {
+        return new CursorLoader(getContext()) {
             @Override
             public Cursor loadInBackground() {
                 return ArtistsStore.getInstance().getArtists(getFilterQuery());
             }
         };
-
-        return loader;
-    }
-
-    @Override
-    public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
-        if (loader != null) loader.forceLoad();
-    }
-
-    @Override
-    public void onArtistInfoFetchComplete() {
-        if (loader != null) loader.forceLoad();
     }
 
     @Override
