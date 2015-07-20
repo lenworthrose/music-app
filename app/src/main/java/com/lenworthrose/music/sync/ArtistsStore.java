@@ -126,7 +126,8 @@ public class ArtistsStore {
         @Override
         protected Void doInBackground(Context... params) {
             ArtistsStoreDbHelper helper = new ArtistsStoreDbHelper(params[0]);
-            db = helper.getReadableDatabase();
+            db = helper.getWritableDatabase();
+            db.enableWriteAheadLogging();
             return null;
         }
 
