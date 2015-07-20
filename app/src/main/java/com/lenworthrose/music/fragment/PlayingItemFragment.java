@@ -264,47 +264,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
             coverArt.animate().alpha(0.08f).setDuration(75);
 
-            Glide.with(this).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
-                @Override
-                public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                    resetToLogo();
-                }
-
-                @Override
-                public void onResourceReady(Bitmap art, GlideAnimation<? super Bitmap> glideAnimation) {
-                    if (art != null) {
-                        Utils.createDropShadowBitmap(art, new Utils.BitmapCallback() {
-                            @Override
-                            public void onBitmapReady(Bitmap bitmap) {
-                                coverArt.setImageBitmap(bitmap);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) getActivity().startPostponedEnterTransition();
-                                coverArt.animate().alpha(1f).setDuration(175).withEndAction(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (!isActivityTransitionDone) {
-                                            overlayHandler.postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    isActivityTransitionDone = true;
-                                                    setOverlaysVisible(true);
-                                                }
-                                            }, 150);
-                                        }
-                                    }
-                                });
-                            }
-                        });
-
-                        if (getActivity() instanceof PlayingNowActivity)
-                            Utils.createBlurredBitmap(art, new Utils.BitmapCallback() {
-                                @Override
-                                public void onBitmapReady(Bitmap bitmap) {
-                                    ((PlayingNowActivity)getActivity()).setBackgroundImage(bitmap);
-                                }
-                            });
-                    }
-                }
-            });
+            Glide.with(this).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new CoverArtTarget());
         } else {
             resetToLogo();
             positionBar.setEnabled(false);
@@ -379,6 +339,11 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
     }
 
     private void resetToLogo() {
+        if (!isActivityTransitionDone) {
+            startEnterTransition();
+            isActivityTransitionDone = true;
+        }
+
         coverArt.setAlpha(.1f);
         coverArt.setImageResource(R.drawable.logo);
 
@@ -394,6 +359,10 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             positionBar.setEnabled(true);
             positionDisplay.setText(Utils.longToTimeDisplay(position));
         }
+    }
+
+    private void startEnterTransition() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) getActivity().startPostponedEnterTransition();
     }
 
     @Override
@@ -474,6 +443,49 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
                 updatePosition(position + 1000);
                 positionHandler.postDelayed(new UpdatePositionRunnable(), 1000);
             }
+        }
+    }
+
+    private class CoverArtTarget extends SimpleTarget<Bitmap> {
+        @Override
+        public void onResourceReady(Bitmap art, GlideAnimation<? super Bitmap> glideAnimation) {
+            Utils.createDropShadowBitmap(art, new Utils.BitmapCallback() {
+                @Override
+                public void onBitmapReady(Bitmap bitmap) {
+                    coverArt.setImageBitmap(bitmap);
+                    ViewPropertyAnimator animator = coverArt.animate().alpha(1f).setDuration(175);
+
+                    if (!isActivityTransitionDone) {
+                        startEnterTransition();
+
+                        animator.withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                overlayHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        isActivityTransitionDone = true;
+                                        setOverlaysVisible(true);
+                                    }
+                                }, 150);
+                            }
+                        });
+                    }
+                }
+            });
+
+            if (getActivity() instanceof PlayingNowActivity)
+                Utils.createBlurredBitmap(art, new Utils.BitmapCallback() {
+                    @Override
+                    public void onBitmapReady(Bitmap bitmap) {
+                        ((PlayingNowActivity)getActivity()).setBackgroundImage(bitmap);
+                    }
+                });
+        }
+
+        @Override
+        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+            resetToLogo();
         }
     }
 }
