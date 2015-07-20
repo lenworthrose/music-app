@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -271,6 +272,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
             positionBar.setProgress(0);
             playlistPosition.setText("0");
             playlistTracks.setText("0");
+            title.setText(getString(R.string.app_name));
         }
 
         artistAlbumContainer.setVisibility(artist.getText().toString().isEmpty() && album.getText().toString().isEmpty() ? View.GONE : View.VISIBLE);
