@@ -40,7 +40,6 @@ public class ArtistsStore {
 
     private static final String[] PROJECTION_ALL = {
             ArtistsStoreContract.ArtistEntry._ID,
-            ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY,
             ArtistsStoreContract.ArtistEntry.COLUMN_NAME,
             ArtistsStoreContract.ArtistEntry.COLUMN_NUM_ALBUMS,
             ArtistsStoreContract.ArtistEntry.COLUMN_ARTIST_ART_FILE_URL,
@@ -52,7 +51,6 @@ public class ArtistsStore {
 
     private static final String[] PROJECTION_ONE = {
             ArtistsStoreContract.ArtistEntry._ID,
-            ArtistsStoreContract.ArtistEntry.COLUMN_MEDIASTORE_KEY,
             ArtistsStoreContract.ArtistEntry.COLUMN_NAME,
             ArtistsStoreContract.ArtistEntry.COLUMN_NUM_ALBUMS,
             ArtistsStoreContract.ArtistEntry.COLUMN_ARTIST_ART_FILE_URL,

@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -81,14 +82,14 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
 
         switch (type) {
             case ARTIST:
-                String bio = data.getString(6) == null ? "" : data.getString(6);
-                album.setText(data.getString(2));
+                String bio = TextUtils.isEmpty(data.getString(5)) ? "" : data.getString(5);
+                album.setText(data.getString(1));
                 year.setText(Html.fromHtml(bio).toString());
                 year.setSingleLine(false);
                 year.setMaxLines(5);
                 artist.setVisibility(View.GONE);
                 tracksDuration.setVisibility(View.GONE);
-                setImages(data.getString(4));
+                setImages(data.getString(3));
                 final long artistId = data.getLong(0);
 
                 setOnClickListener(new OnClickListener() {

@@ -55,27 +55,27 @@ public class ArtistsAdapter extends BaseSwitchableAdapter implements ArtistsStor
 
     @Override
     protected void updateListItem(ListItem view, Context context, Cursor cursor) {
-        view.setTitle(cursor.getString(2));
+        view.setTitle(cursor.getString(1));
 
-        int albumCount = cursor.getInt(3);
+        int albumCount = cursor.getInt(2);
         view.setStatus(context.getResources().getQuantityString(R.plurals.num_of_albums, albumCount, albumCount));
 
         view.setImageVisible(true);
-        Glide.with(getContext()).load(cursor.getString(4)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
+        Glide.with(getContext()).load(cursor.getString(3)).error(R.drawable.logo).fallback(R.drawable.logo).into(view.getImageView());
     }
 
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
-        view.setText(cursor.getString(2));
+        view.setText(cursor.getString(1));
         view.resetImages();
 
-        if (TextUtils.isEmpty(cursor.getString(8))) {
-            Glide.with(getContext()).load(cursor.getString(5)).fallback(R.drawable.logo).error(R.drawable.logo).into(view.getBigImageView());
+        if (TextUtils.isEmpty(cursor.getString(7))) {
+            Glide.with(getContext()).load(cursor.getString(4)).fallback(R.drawable.logo).error(R.drawable.logo).into(view.getBigImageView());
         } else {
-            Glide.with(getContext()).load(cursor.getString(5)).into(view.getImageView1());
-            Glide.with(getContext()).load(cursor.getString(6)).into(view.getImageView2());
-            Glide.with(getContext()).load(cursor.getString(7)).into(view.getImageView3());
-            Glide.with(getContext()).load(cursor.getString(8)).into(view.getImageView4());
+            Glide.with(getContext()).load(cursor.getString(4)).into(view.getImageView1());
+            Glide.with(getContext()).load(cursor.getString(5)).into(view.getImageView2());
+            Glide.with(getContext()).load(cursor.getString(6)).into(view.getImageView3());
+            Glide.with(getContext()).load(cursor.getString(7)).into(view.getImageView4());
         }
     }
 

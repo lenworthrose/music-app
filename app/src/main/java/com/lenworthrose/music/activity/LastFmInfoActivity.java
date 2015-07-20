@@ -65,10 +65,10 @@ public class LastFmInfoActivity extends AppCompatActivity implements Loader.OnLo
     @Override
     public void onLoadComplete(Loader<Cursor> loader, final Cursor data) {
         if (data.moveToFirst()) {
-            name.setText(data.getString(2));
-            bio.setText(Html.fromHtml(data.getString(6)));
+            name.setText(data.getString(1));
+            bio.setText(Html.fromHtml(data.getString(5)));
             bio.setMovementMethod(LinkMovementMethod.getInstance());
-            Glide.with(this).load(data.getString(4)).into(image);
+            Glide.with(this).load(data.getString(3)).into(image);
         }
     }
 }

@@ -154,8 +154,8 @@ public class SearchAdapter extends BaseAdapter implements StickyGridHeadersSimpl
 
         switch (curId) {
             case ARTISTS_ID:
-                item.setText(cursor.getString(2));
-                imageUrl = cursor.getString(4);
+                item.setText(cursor.getString(1));
+                imageUrl = cursor.getString(3);
                 break;
             case ALBUMS_ID:
                 item.setText(cursor.getString(1));
@@ -252,7 +252,7 @@ public class SearchAdapter extends BaseAdapter implements StickyGridHeadersSimpl
 
         switch (curId) {
             case ARTISTS_ID:
-                title = cursor.getString(2);
+                title = cursor.getString(1);
                 type = IdType.ARTIST;
                 break;
             case ALBUMS_ID:
