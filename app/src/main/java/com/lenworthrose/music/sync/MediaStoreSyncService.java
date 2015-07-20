@@ -7,13 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -113,32 +110,15 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
         if (!isTaskActive) {
             isTaskActive = true;
 
-            String[] projection = {
-                    MediaStore.Audio.Artists._ID,
-                    MediaStore.Audio.Artists.ARTIST,
-                    MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
-                    MediaStore.Audio.Artists.ARTIST_KEY
+            MediaStoreMigrationTask task = new MediaStoreMigrationTask(this, ArtistsStore.getInstance().getDatabase()) {
+                @Override
+                protected void onPostExecute(List<ArtistModel> newArtists) {
+                    onMediaStoreSyncComplete(newArtists);
+                    LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+                }
             };
 
-            CursorLoader cursorLoader = new CursorLoader(this, MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-                    projection, null, null, MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
-
-            cursorLoader.registerListener(0, new Loader.OnLoadCompleteListener<Cursor>() {
-                @Override
-                public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
-                    MediaStoreMigrationTask task = new MediaStoreMigrationTask(ArtistsStore.getInstance().getDatabase()) {
-                        @Override
-                        protected void onPostExecute(List<ArtistModel> newArtists) {
-                            onMediaStoreSyncComplete(newArtists);
-                            LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
-                        }
-                    };
-
-                    task.execute(data);
-                }
-            });
-
-            cursorLoader.startLoading();
+            task.execute();
         } else {
             isArtistSyncPending = true;
         }
