@@ -8,7 +8,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import com.lenworthrose.music.R;
-import com.lenworthrose.music.sync.MediaStoreService;
+import com.lenworthrose.music.sync.MediaStoreSyncService;
 import com.lenworthrose.music.util.Constants;
 
 /**
@@ -36,18 +36,18 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
         switch (preference.getKey()) {
             case REFRESH_ARTISTS:
-                action = MediaStoreService.ACTION_SYNC_WITH_MEDIA_STORE;
+                action = MediaStoreSyncService.ACTION_SYNC_WITH_MEDIA_STORE;
                 break;
             case REFRESH_ALBUMS:
-                action = MediaStoreService.ACTION_UPDATE_ALBUMS;
+                action = MediaStoreSyncService.ACTION_UPDATE_ALBUMS;
                 break;
             case LAST_FM_UPDATE:
-                action = MediaStoreService.ACTION_LAST_FM_FETCH;
+                action = MediaStoreSyncService.ACTION_LAST_FM_FETCH;
                 break;
         }
 
         if (action != null) {
-            Intent intent = new Intent(getActivity(), MediaStoreService.class);
+            Intent intent = new Intent(getActivity(), MediaStoreSyncService.class);
             intent.setAction(action);
             getActivity().startService(intent);
         }

@@ -40,7 +40,7 @@ import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.fragment.SearchFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.sync.ArtistsStore;
-import com.lenworthrose.music.sync.MediaStoreService;
+import com.lenworthrose.music.sync.MediaStoreSyncService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.view.NowPlayingBar;
@@ -54,7 +54,7 @@ import java.util.ArrayList;
  * Responsible for starting and stopping the {@link PlaybackService}. Also binds to the Service so it can
  * modify the Playing Now playlist.
  * <p/>
- * Responsible for starting the {@link MediaStoreService}.
+ * Responsible for starting the {@link MediaStoreSyncService}.
  */
 public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, ArtistsStore.InitListener, AdapterView.OnItemClickListener {
     private PlaybackService playbackService;
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("FIRST_LAUNCH", true))
             showWelcomeDialog();
         else
-            startService(new Intent(MainActivity.this, MediaStoreService.class));
+            startService(new Intent(MainActivity.this, MediaStoreSyncService.class));
     }
 
     @Override
@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 boolean lastFmEnabled = which == DialogInterface.BUTTON_POSITIVE;
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();
                 editor.putBoolean("FIRST_LAUNCH", false).putBoolean(Constants.SETTING_LAST_FM_INTEGRATION, lastFmEnabled).apply();
-                startService(new Intent(MainActivity.this, MediaStoreService.class));
+                startService(new Intent(MainActivity.this, MediaStoreSyncService.class));
             }
         };
 

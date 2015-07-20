@@ -29,12 +29,12 @@ import fm.last.api.LastFmServerFactory;
  * A {@link Service} that listens for changes to the {@link android.provider.MediaStore} database. It will also perform the first
  * sync with the MediaStore database to build the app's own Artist database.
  */
-public class MediaStoreService extends Service implements ArtistsStore.InitListener, ArtistsStore.ArtistsStoreListener,
+public class MediaStoreSyncService extends Service implements ArtistsStore.InitListener, ArtistsStore.ArtistsStoreListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
-    public static final String ACTION_MEDIA_STORE_SYNC_COMPLETE = "com.lenworthrose.music.sync.MediaStoreService.SYNC_COMPLETE";
-    public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.sync.MediaStoreService.SYNC";
-    public static final String ACTION_UPDATE_ALBUMS = "com.lenworthrose.music.sync.MediaStoreService.UPDATE_ALBUMS";
-    public static final String ACTION_LAST_FM_FETCH = "com.lenworthrose.music.sync.MediaStoreService.LAST_FM_FETCH";
+    public static final String ACTION_MEDIA_STORE_SYNC_COMPLETE = "com.lenworthrose.music.sync.MediaStoreSyncService.SYNC_COMPLETE";
+    public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.sync.MediaStoreSyncService.SYNC";
+    public static final String ACTION_UPDATE_ALBUMS = "com.lenworthrose.music.sync.MediaStoreSyncService.UPDATE_ALBUMS";
+    public static final String ACTION_LAST_FM_FETCH = "com.lenworthrose.music.sync.MediaStoreSyncService.LAST_FM_FETCH";
 
     private static final int NOTIFICATION_ID = 36663;
     private static final String SETTING_HAS_COMPLETED_INITIAL_SYNC = "HasCompletedInitialSync";
@@ -127,7 +127,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
             cursorLoader.registerListener(0, new Loader.OnLoadCompleteListener<Cursor>() {
                 @Override
                 public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
-                    ArtistsStore.getInstance().addListener(MediaStoreService.this);
+                    ArtistsStore.getInstance().addListener(MediaStoreSyncService.this);
                     ArtistsStore.getInstance().syncFromMediaStore(data);
                 }
             });
@@ -140,13 +140,13 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
     @Override
     public void onMediaStoreSyncComplete(List<ArtistModel> newArtists) {
-        Log.d("MediaStoreService", "MediaStore sync complete! New artist count: " + newArtists.size());
+        Log.d("MediaStoreSyncService", "MediaStore sync complete! New artist count: " + newArtists.size());
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, true).apply();
-        ArtistsStore.getInstance().removeListener(MediaStoreService.this);
+        ArtistsStore.getInstance().removeListener(MediaStoreSyncService.this);
         isTaskActive = false;
 
         if (!newArtists.isEmpty()) {
-            Log.d("MediaStoreService", "Starting GetArtistInfoTask. lastFmEnabled=" + (lastFm != null));
+            Log.d("MediaStoreSyncService", "Starting GetArtistInfoTask. lastFmEnabled=" + (lastFm != null));
             isTaskActive = true;
             String text = lastFm == null ? getString(R.string.updating_artist_albums) : getString(R.string.fetching_artist_info);
             notificationBuilder.setContentTitle(text).setTicker(text);
@@ -161,9 +161,9 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
                 @Override
                 protected void onPostExecute(Void aVoid) {
-                    Log.d("MediaStoreService", "GetArtistInfoTask complete!");
+                    Log.d("MediaStoreSyncService", "GetArtistInfoTask complete!");
                     stopForeground(true);
-                    LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+                    LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
                     ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
                     isTaskActive = false;
 
@@ -183,7 +183,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
     private void startUpdatingAlbums(final boolean showNotification) {
         if (!isTaskActive) {
             isTaskActive = true;
-            Log.d("MediaStoreService", "Starting UpdateCoverArtTask");
+            Log.d("MediaStoreSyncService", "Starting UpdateCoverArtTask");
 
             if (showNotification) {
                 String text = getString(R.string.updating_artist_albums);
@@ -191,7 +191,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
                 startForeground(NOTIFICATION_ID, notificationBuilder.build());
             }
 
-            UpdateCoverArtTask task = new UpdateCoverArtTask(MediaStoreService.this) {
+            UpdateCoverArtTask task = new UpdateCoverArtTask(MediaStoreSyncService.this) {
                 @Override
                 protected void onProgressUpdate(Integer... values) {
                     if (showNotification) {
@@ -202,8 +202,8 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
                 @Override
                 protected void onPostExecute(Void aVoid) {
-                    Log.d("MediaStoreService", "Finished updating albums");
-                    LocalBroadcastManager.getInstance(MediaStoreService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
+                    Log.d("MediaStoreSyncService", "Finished updating albums");
+                    LocalBroadcastManager.getInstance(MediaStoreSyncService.this).sendBroadcast(new Intent(ACTION_MEDIA_STORE_SYNC_COMPLETE));
                     ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
                     if (showNotification) stopForeground(true);
                     isTaskActive = false;
@@ -231,7 +231,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
                 @Override
                 protected void onPostExecute(Void aVoid) {
-                    Log.d("MediaStoreService", "Finished user requested Last.fm update");
+                    Log.d("MediaStoreSyncService", "Finished user requested Last.fm update");
                     ArtistsStore.getInstance().notifyArtistInfoFetchComplete();
                     stopForeground(true);
                     isTaskActive = false;
@@ -279,7 +279,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
         @Override
         public void onChange(boolean selfChange) {
-            Log.d("MediaStoreService", "Change detected in Artists table! isActive()=" + isTaskActive);
+            Log.d("MediaStoreSyncService", "Change detected in Artists table! isActive()=" + isTaskActive);
             startArtistsSync();
         }
     }
@@ -291,7 +291,7 @@ public class MediaStoreService extends Service implements ArtistsStore.InitListe
 
         @Override
         public void onChange(boolean selfChange) {
-            Log.d("MediaStoreService", "Change detected in Albums table! isActive()=" + isTaskActive);
+            Log.d("MediaStoreSyncService", "Change detected in Albums table! isActive()=" + isTaskActive);
 
             if (!isTaskActive) {
                 startUpdatingAlbums(false);

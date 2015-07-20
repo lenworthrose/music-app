@@ -59,7 +59,7 @@
             android:name=".playback.PlaybackService" />
 
         <service
-            android:name=".sync.MediaStoreService" />
+            android:name=".sync.MediaStoreSyncService" />
 
         <service
             android:name=".widget.WidgetService" />
