@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:clickable="true"
+        android:scaleType="centerCrop"
         android:src="@drawable/logo"
         tools:ignore="ContentDescription,RtlHardcoded" />
 
