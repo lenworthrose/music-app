@@ -32,7 +32,6 @@ public class GridItem extends CheckableFrameLayout {
         imgView3 = (SquareImageView)findViewById(R.id.grid_image3);
         imgView4 = (SquareImageView)findViewById(R.id.grid_image4);
 
-
         ShapeDrawable.ShaderFactory shaderFactory = new ShapeDrawable.ShaderFactory() {
             @Override
             public Shader resize(int width, int height) {
