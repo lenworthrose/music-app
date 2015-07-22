@@ -22,6 +22,8 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/widget_image"
         android:orientation="vertical"
+        android:paddingLeft="1dp"
+        android:paddingRight="1dp"
         tools:ignore="RtlHardcoded">
 
         <TextView
