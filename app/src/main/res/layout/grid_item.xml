@@ -5,7 +5,8 @@
     <com.lenworthrose.music.view.SquareImageView
         android:id="@+id/grid_big_image"
         android:layout_width="match_parent"
-        android:layout_height="0dp" />
+        android:layout_height="0dp"
+        android:scaleType="centerCrop" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -19,6 +20,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@id/grid_space"
+            android:scaleType="centerCrop"
             tools:ignore="RtlHardcoded" />
 
         <com.lenworthrose.music.view.SquareImageView
@@ -29,6 +31,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@id/grid_space"
+            android:scaleType="centerCrop"
             tools:ignore="RtlHardcoded" />
 
         <com.lenworthrose.music.view.SquareImageView
@@ -39,6 +42,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@id/grid_space"
             android:layout_toLeftOf="@id/grid_space"
+            android:scaleType="centerCrop"
             tools:ignore="RtlHardcoded" />
 
         <com.lenworthrose.music.view.SquareImageView
@@ -49,6 +53,7 @@
             android:layout_alignParentRight="true"
             android:layout_below="@id/grid_space"
             android:layout_toRightOf="@id/grid_space"
+            android:scaleType="centerCrop"
             tools:ignore="RtlHardcoded" />
 
         <Space
