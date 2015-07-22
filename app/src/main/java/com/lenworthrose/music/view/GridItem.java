@@ -1,11 +1,7 @@
 package com.lenworthrose.music.view;
 
 import android.content.Context;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
 import android.graphics.drawable.PaintDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +14,8 @@ import com.lenworthrose.music.R;
 public class GridItem extends CheckableFrameLayout {
     private TextView label;
     private SquareImageView big, imgView1, imgView2, imgView3, imgView4;
+    private PaintDrawable normalBackground, checkedBackground;
+    private int normalTextColor, checkedTextColor;
 
     public GridItem(Context context) {
         super(context);
@@ -31,21 +29,11 @@ public class GridItem extends CheckableFrameLayout {
         imgView2 = (SquareImageView)findViewById(R.id.grid_image2);
         imgView3 = (SquareImageView)findViewById(R.id.grid_image3);
         imgView4 = (SquareImageView)findViewById(R.id.grid_image4);
-
-        ShapeDrawable.ShaderFactory shaderFactory = new ShapeDrawable.ShaderFactory() {
-            @Override
-            public Shader resize(int width, int height) {
-                return new LinearGradient(0, 0, 0, height,
-                        new int[] { 0x00121212, 0x21121212, 0x3B121212, 0x52121212, 0x70121212, 0x8A121212, 0x9D121212, 0xD0121212 },
-                        new float[] { 0f, .023f, .039f, .056f, .080f, .110f, .165f, 1f },
-                        Shader.TileMode.CLAMP);
-            }
-        };
-
-        PaintDrawable bgDrawable = new PaintDrawable();
-        bgDrawable.setShape(new RectShape());
-        bgDrawable.setShaderFactory(shaderFactory);
-        label.setBackground(bgDrawable);
+        normalBackground = new GradientDrawable(getResources().getColor(R.color.grid_item_label_background));
+        checkedBackground = new GradientDrawable(getResources().getColor(R.color.colorAccentDark));
+        label.setBackground(normalBackground);
+        normalTextColor = getResources().getColor(R.color.textSecondary);
+        checkedTextColor = getResources().getColor(R.color.textPrimary);
     }
 
     public void setText(String text) {
@@ -78,5 +66,18 @@ public class GridItem extends CheckableFrameLayout {
         imgView2.setImageResource(android.R.color.transparent);
         imgView3.setImageResource(android.R.color.transparent);
         imgView4.setImageResource(android.R.color.transparent);
+    }
+
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+
+        if (isChecked()) {
+            label.setBackground(checkedBackground);
+            label.setTextColor(checkedTextColor);
+        } else {
+            label.setBackground(normalBackground);
+            label.setTextColor(normalTextColor);
+        }
     }
 }

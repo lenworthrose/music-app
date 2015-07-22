@@ -11,4 +11,5 @@
     <color name="playing_now_content_background">#B6121212</color>
     <color name="navigation_drawer_background">#E0121212</color>
     <color name="widget_background">#a0000000</color>
+    <color name="grid_item_label_background">#121212</color>
 </resources>
