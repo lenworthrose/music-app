@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lenworthrose.music.R;
+import com.lenworthrose.music.view.GradientDrawable.Type;
 
 /**
  * A {@link android.view.View} displayed in a {@link android.widget.GridView}. Contains a
@@ -29,8 +30,8 @@ public class GridItem extends CheckableFrameLayout {
         imgView2 = (SquareImageView)findViewById(R.id.grid_image2);
         imgView3 = (SquareImageView)findViewById(R.id.grid_image3);
         imgView4 = (SquareImageView)findViewById(R.id.grid_image4);
-        normalBackground = new GradientDrawable(getResources().getColor(R.color.grid_item_label_background));
-        checkedBackground = new GradientDrawable(getResources().getColor(R.color.colorAccentDark));
+        normalBackground = new GradientDrawable(Type.GRID_ITEM, getResources().getColor(R.color.grid_item_label_background));
+        checkedBackground = new GradientDrawable(Type.GRID_ITEM, getResources().getColor(R.color.colorAccentDark));
         label.setBackground(normalBackground);
         normalTextColor = getResources().getColor(R.color.textSecondary);
         checkedTextColor = getResources().getColor(R.color.textPrimary);

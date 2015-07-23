@@ -6,12 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.PaintDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,7 +16,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +38,7 @@ import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Constants.PlaybackState;
 import com.lenworthrose.music.util.Utils;
+import com.lenworthrose.music.view.GradientDrawable;
 
 /**
  * This Fragment displays information about the currently playing track (Artist, Album, Title, Cover
@@ -183,35 +178,8 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         playbackControlContainer.findViewById(R.id.pn_next).setOnClickListener(playbackButtonClickListener);
         playbackControlContainer.findViewById(R.id.pn_stop).setOnClickListener(playbackButtonClickListener);
 
-        ShapeDrawable.ShaderFactory topShaderFactory = new ShapeDrawable.ShaderFactory() {
-            @Override
-            public Shader resize(int width, int height) {
-                return new LinearGradient(0, height, 0, 0,
-                        new int[] { 0x00090909, 0x29090909, 0x49090909, 0x69090909, 0x7C090909, 0x8A090909, 0x9D090909, 0xB2090909 },
-                        new float[] { 0f, .023f, .039f, .056f, .080f, .110f, .165f, 1f },
-                        Shader.TileMode.CLAMP);
-            }
-        };
-
-        PaintDrawable topBackground = new PaintDrawable();
-        topBackground.setShape(new RectShape());
-        topBackground.setShaderFactory(topShaderFactory);
-        topDetailContainer.setBackground(topBackground);
-
-        ShapeDrawable.ShaderFactory bottomShaderFactory = new ShapeDrawable.ShaderFactory() {
-            @Override
-            public Shader resize(int width, int height) {
-                return new LinearGradient(0, 0, 0, height,
-                        new int[] { 0x00090909, 0x4D090909, 0x69090909, 0x72090909, 0x76090909, 0x79090909, 0x87090909, 0x93090909, 0xA6090909, 0xB2090909 },
-                        new float[] { 0f, .040f, .064f, .083f, .090f, .095f, .12f, .15f, .2f, 1f },
-                        Shader.TileMode.CLAMP);
-            }
-        };
-
-        PaintDrawable bottomBackground = new PaintDrawable();
-        bottomBackground.setShape(new RectShape());
-        bottomBackground.setShaderFactory(bottomShaderFactory);
-        bottomDetailContainer.setBackground(bottomBackground);
+        topDetailContainer.setBackground(new GradientDrawable(GradientDrawable.Type.PLAYING_NOW_HEADER, 0x090909));
+        bottomDetailContainer.setBackground(new GradientDrawable(GradientDrawable.Type.PLAYING_NOW_FOOTER, 0x090909));
     }
 
     @Override
