@@ -66,7 +66,7 @@ public class ArtistsStore {
             if (!isInitializing) {
                 isInitializing = true;
                 initTask = new InitTask();
-                initTask.execute(context);
+                initTask.execute(context.getApplicationContext());
             }
         }
     }
