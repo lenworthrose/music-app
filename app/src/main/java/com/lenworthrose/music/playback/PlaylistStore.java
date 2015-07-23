@@ -24,7 +24,7 @@ public class PlaylistStore {
 
     private SQLiteDatabase db;
 
-    public void init(Context context) {
+    public PlaylistStore(Context context) {
         PlaylistStoreDbHelper helper = new PlaylistStoreDbHelper(context);
         db = helper.getReadableDatabase();
     }

@@ -76,7 +76,6 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
         broadcastMan = LocalBroadcastManager.getInstance(playbackService);
         audioMan = (AudioManager)playbackService.getSystemService(Context.AUDIO_SERVICE);
-        playlistStore = new PlaylistStore();
     }
 
     @Override
@@ -113,7 +112,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 intentFilter.addAction(Constants.PLAYING_NOW_CHANGED);
                 broadcastMan.registerReceiver(mediaSessionManager, intentFilter);
 
-                playlistStore.init(playbackService);
+                playlistStore = new PlaylistStore(playbackService);
                 playlistCursor = playlistStore.read();
                 playlistPosition = getStoredPlaylistPosition();
                 if (playlistPosition >= playlistCursor.getCount()) playlistPosition = 0;
@@ -121,12 +120,12 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 notifyPlaylistChanged();
                 notifyPlayingItemChanged();
 
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
                         playbackService.onPlaybackThreadInitialized();
                     }
-                }, 500); //Delay to give PlaylistStore time to init
+                });
             }
         });
 
