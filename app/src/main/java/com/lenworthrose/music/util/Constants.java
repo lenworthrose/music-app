@@ -35,6 +35,8 @@ public class Constants {
     public static final int EXTRA_MODIFICATION_TYPE_ADD = 1;
     public static final int EXTRA_MODIFICATION_TYPE_ADD_AS_NEXT = 2;
 
+    public static final String ARTISTS_STORE_INITIALIZED = "com.lenworthrose.music.ArtistsStoreInitialized";
+
     public static final String TYPE = "Type";
     public static final String ID = "ID";
 

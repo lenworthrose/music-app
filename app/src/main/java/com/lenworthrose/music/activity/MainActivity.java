@@ -39,7 +39,6 @@ import com.lenworthrose.music.adapter.NavigationDrawerAdapter;
 import com.lenworthrose.music.fragment.LibraryFragment;
 import com.lenworthrose.music.fragment.SearchFragment;
 import com.lenworthrose.music.playback.PlaybackService;
-import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.sync.MediaStoreSyncService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.NavigationListener;
@@ -56,14 +55,30 @@ import java.util.ArrayList;
  * <p/>
  * Responsible for starting the {@link MediaStoreSyncService}.
  */
-public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, ArtistsStore.InitListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, AdapterView.OnItemClickListener {
     private PlaybackService playbackService;
     private NowPlayingBar nowPlayingBar;
-    private BroadcastReceiver receiver;
     private ListView drawerListView;
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private int selectedDrawerPosition;
+
+    private BroadcastReceiver modificationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getExtras().getInt(Constants.EXTRA_MODIFICATION_TYPE)) {
+                case Constants.EXTRA_MODIFICATION_TYPE_PLAY:
+                    startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
+                    break;
+                case Constants.EXTRA_MODIFICATION_TYPE_ADD:
+                    Toast.makeText(MainActivity.this, R.string.added, Toast.LENGTH_SHORT).show();
+                    break;
+                case Constants.EXTRA_MODIFICATION_TYPE_ADD_AS_NEXT:
+                    Toast.makeText(MainActivity.this, R.string.added_as_next, Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,24 +107,22 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         intent.setAction(Constants.CMD_ACTIVITY_STARTING);
         startService(intent);
 
-        ArtistsStore.getInstance().init(this, this);
+        final boolean isRecreated = savedInstanceState != null;
 
-        receiver = new BroadcastReceiver() {
+        BroadcastReceiver artistsStoreInitReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                switch (intent.getExtras().getInt(Constants.EXTRA_MODIFICATION_TYPE)) {
-                    case Constants.EXTRA_MODIFICATION_TYPE_PLAY:
-                        startActivity(new Intent(MainActivity.this, PlayingNowActivity.class));
-                        break;
-                    case Constants.EXTRA_MODIFICATION_TYPE_ADD:
-                        Toast.makeText(MainActivity.this, R.string.added, Toast.LENGTH_SHORT).show();
-                        break;
-                    case Constants.EXTRA_MODIFICATION_TYPE_ADD_AS_NEXT:
-                        Toast.makeText(MainActivity.this, R.string.added_as_next, Toast.LENGTH_SHORT).show();
-                        break;
+                LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+
+                if (!isRecreated && !isFinishing() && !isDestroyed()) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    selectedDrawerPosition = Integer.parseInt(prefs.getString(Constants.SETTING_START_LOCATION, "0"));
+                    onItemClick(drawerListView, null, selectedDrawerPosition, selectedDrawerPosition);
                 }
             }
         };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(artistsStoreInitReceiver, new IntentFilter(Constants.ARTISTS_STORE_INITIALIZED));
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("FIRST_LAUNCH", true))
             showWelcomeDialog();
@@ -151,13 +164,13 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.PLAYBACK_MODIFICATION_COMPLETE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(modificationReceiver, new IntentFilter(Constants.PLAYBACK_MODIFICATION_COMPLETE));
         nowPlayingBar.onResume();
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(modificationReceiver);
         nowPlayingBar.onPause();
         super.onPause();
     }
@@ -214,16 +227,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     public void addAsNext(IdType type, ArrayList<Long> ids) {
         playbackService.addAsNext(type, ids);
-    }
-
-    @Override
-    public void onArtistsDbInitialized() {
-        if (getSupportFragmentManager().getFragments() != null && getSupportFragmentManager().getFragments().size() > 0)
-            return;
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        selectedDrawerPosition = Integer.parseInt(prefs.getString(Constants.SETTING_START_LOCATION, "0"));
-        onItemClick(drawerListView, null, selectedDrawerPosition, selectedDrawerPosition);
     }
 
     @Override

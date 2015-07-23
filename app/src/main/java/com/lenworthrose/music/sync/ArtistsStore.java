@@ -1,13 +1,14 @@
 package com.lenworthrose.music.sync;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.content.CursorLoader;
+import android.support.v4.content.LocalBroadcastManager;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.lenworthrose.music.util.Constants;
 
 /**
  * Manages the Artists database.
@@ -16,10 +17,6 @@ import java.util.List;
  * Artists table!
  */
 public class ArtistsStore {
-    public interface InitListener {
-        void onArtistsDbInitialized();
-    }
-
     private static final class LazyHolder {
         static ArtistsStore INSTANCE = new ArtistsStore();
     }
@@ -53,20 +50,17 @@ public class ArtistsStore {
     private SQLiteDatabase db;
     private InitTask initTask;
     private boolean isInitializing, isInitialized;
-    private List<InitListener> initListeners = new ArrayList<>(3);
 
     private ArtistsStore() { }
 
-    public void init(Context context, InitListener listener) {
+    public void init(Context context) {
         if (isInitialized) {
-            listener.onArtistsDbInitialized();
+            sendInitCompleteBroadcast(context);
         } else {
-            initListeners.add(listener);
-
             if (!isInitializing) {
                 isInitializing = true;
-                initTask = new InitTask();
-                initTask.execute(context.getApplicationContext());
+                initTask = new InitTask(context.getApplicationContext());
+                initTask.execute();
             }
         }
     }
@@ -122,10 +116,20 @@ public class ArtistsStore {
         return db;
     }
 
-    private class InitTask extends AsyncTask<Context, Void, Void> {
+    private static void sendInitCompleteBroadcast(Context context) {
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(Constants.ARTISTS_STORE_INITIALIZED));
+    }
+
+    private class InitTask extends AsyncTask<Void, Void, Void> {
+        private Context context;
+
+        public InitTask(Context context) {
+            this.context = context;
+        }
+
         @Override
-        protected Void doInBackground(Context... params) {
-            ArtistsStoreDbHelper helper = new ArtistsStoreDbHelper(params[0]);
+        protected Void doInBackground(Void... params) {
+            ArtistsStoreDbHelper helper = new ArtistsStoreDbHelper(context);
             db = helper.getWritableDatabase();
             db.enableWriteAheadLogging();
             return null;
@@ -135,11 +139,7 @@ public class ArtistsStore {
         protected void onPostExecute(Void result) {
             isInitialized = true;
             initTask = null;
-
-            for (InitListener listener : initListeners)
-                listener.onArtistsDbInitialized();
-
-            initListeners.clear();
+            sendInitCompleteBroadcast(context);
         }
     }
 }

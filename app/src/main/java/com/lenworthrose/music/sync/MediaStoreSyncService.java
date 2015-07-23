@@ -3,8 +3,10 @@ package com.lenworthrose.music.sync;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.os.Handler;
@@ -26,7 +28,7 @@ import fm.last.api.LastFmServerFactory;
  * A {@link Service} that listens for changes to the {@link android.provider.MediaStore} database. It will also perform the first
  * sync with the MediaStore database to build the app's own Artist database.
  */
-public class MediaStoreSyncService extends Service implements ArtistsStore.InitListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MediaStoreSyncService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String ACTION_MEDIA_STORE_SYNC_COMPLETE = "com.lenworthrose.music.sync.MediaStoreSyncService.SYNC_COMPLETE";
     public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.sync.MediaStoreSyncService.SYNC";
     public static final String ACTION_UPDATE_ALBUMS = "com.lenworthrose.music.sync.MediaStoreSyncService.UPDATE_ALBUMS";
@@ -55,6 +57,20 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         if (prefs.getBoolean(Constants.SETTING_LAST_FM_INTEGRATION, false)) lastFm = createLastFmServer();
+
+        BroadcastReceiver initReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+
+                if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, false))
+                    startArtistsSync();
+                else
+                    startObservingMediaStore();
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(initReceiver, new IntentFilter(Constants.ARTISTS_STORE_INITIALIZED));
     }
 
     @Override
@@ -73,17 +89,8 @@ public class MediaStoreSyncService extends Service implements ArtistsStore.InitL
             }
         }
 
-        ArtistsStore.getInstance().init(this, this);
-
+        ArtistsStore.getInstance().init(this);
         return START_STICKY;
-    }
-
-    @Override
-    public void onArtistsDbInitialized() {
-        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SETTING_HAS_COMPLETED_INITIAL_SYNC, false))
-            startArtistsSync();
-        else
-            startObservingMediaStore();
     }
 
     private void startObservingMediaStore() {
