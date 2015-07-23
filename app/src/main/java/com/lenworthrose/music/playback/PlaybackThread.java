@@ -29,6 +29,7 @@ import com.lenworthrose.music.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 public class PlaybackThread extends Thread implements Handler.Callback, MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener,
         MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
@@ -61,6 +62,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     private PlaybackService playbackService;
     private PlaybackState playbackState;
     private Equalizer equalizer;
+    private CountDownLatch latch;
 
     private MediaPlayer.OnPreparedListener nextTrackPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
@@ -69,8 +71,9 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         }
     };
 
-    public PlaybackThread(PlaybackService playbackService) {
+    public PlaybackThread(PlaybackService playbackService, CountDownLatch latch) {
         this.playbackService = playbackService;
+        this.latch = latch;
         playbackState = PlaybackState.STOPPED;
         repeatEnabled = PreferenceManager.getDefaultSharedPreferences(playbackService).getBoolean(Constants.SETTING_REPEAT_MODE, false);
 
@@ -82,6 +85,14 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public void run() {
         Looper.prepare();
         handler = new Handler(Looper.myLooper(), this);
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                latch.countDown();
+                latch = null;
+            }
+        });
 
         handler.post(new Runnable() {
             @Override
@@ -119,13 +130,6 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
                 notifyPlaylistChanged();
                 notifyPlayingItemChanged();
-
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        playbackService.onPlaybackThreadInitialized();
-                    }
-                });
             }
         });
 

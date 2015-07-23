@@ -10,12 +10,14 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.adapter.PlayingNowPlaylistAdapter;
 import com.lenworthrose.music.util.Constants;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * The PlaybackService is responsible for all things playback. It handles scheduling the {@link MediaPlayer}
@@ -34,7 +36,6 @@ public class PlaybackService extends Service {
     private PlaybackThread playbackThread;
     private Handler handler;
     private int activityCount = 0;
-    private int pendingCommand;
 
     public class LocalBinder extends Binder {
         public PlaybackService getService() {
@@ -51,8 +52,16 @@ public class PlaybackService extends Service {
     public void onCreate() {
         super.onCreate();
         handler = new Handler(Looper.getMainLooper());
-        playbackThread = new PlaybackThread(this);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        playbackThread = new PlaybackThread(this, latch);
         playbackThread.start();
+
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+            Log.e("PlaybackService", "InterruptedException occurred awaiting PlaybackThread initialization", ex);
+        }
     }
 
     @Override
@@ -60,32 +69,19 @@ public class PlaybackService extends Service {
         if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
                 case Constants.CMD_PLAY_PAUSE:
-                    if (playbackThread.getHandler() != null)
-                        playbackThread.getHandler().obtainMessage(PlaybackThread.PLAY_PAUSE).sendToTarget();
-                    else
-                        pendingCommand = PlaybackThread.PLAY_PAUSE;
-
+                    playbackThread.getHandler().obtainMessage(PlaybackThread.PLAY_PAUSE).sendToTarget();
                     break;
                 case Constants.CMD_STOP:
-                    if (playbackThread.getHandler() != null)
-                        playbackThread.getHandler().obtainMessage(PlaybackThread.STOP).sendToTarget();
-                    else
-                        pendingCommand = PlaybackThread.STOP;
-
+                    playbackThread.getHandler().obtainMessage(PlaybackThread.STOP).sendToTarget();
                     break;
                 case Constants.CMD_PREVIOUS:
-                    if (playbackThread.getHandler() != null)
-                        playbackThread.getHandler().obtainMessage(PlaybackThread.PREVIOUS).sendToTarget();
-                    else
-                        pendingCommand = PlaybackThread.PREVIOUS;
-
+                    playbackThread.getHandler().obtainMessage(PlaybackThread.PREVIOUS).sendToTarget();
                     break;
                 case Constants.CMD_NEXT:
-                    if (playbackThread.getHandler() != null)
-                        playbackThread.getHandler().obtainMessage(PlaybackThread.NEXT).sendToTarget();
-                    else
-                        pendingCommand = PlaybackThread.NEXT;
-
+                    playbackThread.getHandler().obtainMessage(PlaybackThread.NEXT).sendToTarget();
+                    break;
+                case Constants.CMD_TOGGLE_REPEAT_MODE:
+                    playbackThread.getHandler().obtainMessage(PlaybackThread.TOGGLE_REPEAT_MODE).sendToTarget();
                     break;
                 case Constants.CMD_ACTIVITY_STARTING:
                     activityCount++;
@@ -105,11 +101,6 @@ public class PlaybackService extends Service {
                         }, 750);
 
                     break;
-                case Constants.CMD_TOGGLE_REPEAT_MODE:
-                    if (playbackThread.getHandler() != null)
-                        playbackThread.getHandler().obtainMessage(PlaybackThread.TOGGLE_REPEAT_MODE).sendToTarget();
-                    else
-                        pendingCommand = PlaybackThread.TOGGLE_REPEAT_MODE;
                 case CMD_SHUTDOWN:
                     stopSelf();
                     break;
@@ -219,9 +210,5 @@ public class PlaybackService extends Service {
 
     public Equalizer getEqualizer() {
         return playbackThread.getEqualizer();
-    }
-
-    void onPlaybackThreadInitialized() {
-        if (pendingCommand != 0) playbackThread.getHandler().obtainMessage(pendingCommand).sendToTarget();
     }
 }
