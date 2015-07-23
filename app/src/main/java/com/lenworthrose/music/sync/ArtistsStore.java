@@ -136,8 +136,8 @@ public class ArtistsStore {
             isInitialized = true;
             initTask = null;
 
-            for (int i = initListeners.size() - 1; i >= 0; i--)
-                initListeners.get(i).onArtistsDbInitialized();
+            for (InitListener listener : initListeners)
+                listener.onArtistsDbInitialized();
 
             initListeners.clear();
         }
