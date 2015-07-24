@@ -312,6 +312,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         if (!isActivityTransitionDone) {
             startEnterTransition();
             isActivityTransitionDone = true;
+            setOverlaysVisible(true);
         }
 
         coverArt.setAlpha(.1f);
