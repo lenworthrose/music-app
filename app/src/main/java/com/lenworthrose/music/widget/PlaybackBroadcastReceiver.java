@@ -29,35 +29,35 @@ class PlaybackBroadcastReceiver extends BroadcastReceiver {
                 String title = intent.getStringExtra(Constants.EXTRA_TITLE);
                 if (TextUtils.isEmpty(title)) title = context.getString(R.string.app_name);
 
-                for (int appWidgetId : appWidgetIds) {
-                    RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_view);
-                    rv.setTextViewText(R.id.widget_title, title);
-                    rv.setTextViewText(R.id.widget_subtitle, artist);
-                    rv.setViewVisibility(R.id.widget_subtitle, TextUtils.isEmpty(artist) ? View.GONE : View.VISIBLE);
-                    WidgetProvider.setOnClickIntents(context, rv);
+                RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_view);
+                rv.setTextViewText(R.id.widget_title, title);
+                rv.setTextViewText(R.id.widget_subtitle, artist);
+                rv.setViewVisibility(R.id.widget_subtitle, TextUtils.isEmpty(artist) ? View.GONE : View.VISIBLE);
+                WidgetProvider.setOnClickIntents(context, rv);
+
+                for (int appWidgetId : appWidgetIds)
                     appMan.partiallyUpdateAppWidget(appWidgetId, rv);
 
-                    Glide.with(context).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().fallback(R.drawable.logo)
-                            .error(R.drawable.logo).into(new AppWidgetTarget(context, rv, R.id.widget_image, appWidgetIds));
-                }
+                Glide.with(context).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().fallback(R.drawable.logo)
+                        .error(R.drawable.logo).into(new AppWidgetTarget(context, rv, R.id.widget_image, appWidgetIds));
 
                 break;
             case Constants.PLAYBACK_STATE_CHANGED:
                 Constants.PlaybackState state = (Constants.PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
-                RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_view);
-                WidgetProvider.setOnClickIntents(context, rv);
+                RemoteViews rv2 = new RemoteViews(context.getPackageName(), R.layout.widget_view);
+                WidgetProvider.setOnClickIntents(context, rv2);
 
                 switch (state) {
                     case PLAYING:
-                        rv.setImageViewResource(R.id.widget_play_pause, R.drawable.pause);
+                        rv2.setImageViewResource(R.id.widget_play_pause, R.drawable.pause);
                         break;
                     default:
-                        rv.setImageViewResource(R.id.widget_play_pause, R.drawable.play);
+                        rv2.setImageViewResource(R.id.widget_play_pause, R.drawable.play);
                         break;
                 }
 
                 for (int appWidgetId : appWidgetIds)
-                    appMan.partiallyUpdateAppWidget(appWidgetId, rv);
+                    appMan.partiallyUpdateAppWidget(appWidgetId, rv2);
 
                 break;
         }
