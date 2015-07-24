@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -19,7 +21,7 @@ import com.lenworthrose.music.util.Constants;
  */
 class PlaybackBroadcastReceiver extends BroadcastReceiver {
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         final AppWidgetManager appMan = AppWidgetManager.getInstance(context);
         final int[] appWidgetIds = appMan.getAppWidgetIds(new ComponentName(context, WidgetProvider.class));
 
@@ -39,7 +41,20 @@ class PlaybackBroadcastReceiver extends BroadcastReceiver {
                     appMan.partiallyUpdateAppWidget(appWidgetId, rv);
 
                 Glide.with(context).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().fallback(R.drawable.logo)
-                        .error(R.drawable.logo).into(new AppWidgetTarget(context, rv, R.id.widget_image, appWidgetIds));
+                        .error(R.drawable.logo).into(new AppWidgetTarget(context, rv, R.id.widget_image, appWidgetIds) {
+                    @Override
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        super.onLoadFailed(e, errorDrawable); //Currently, super doesn't do anything.
+
+                        if (errorDrawable instanceof BitmapDrawable) {
+                            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_view);
+                            rv.setImageViewBitmap(R.id.widget_image, ((BitmapDrawable)errorDrawable).getBitmap());
+
+                            for (int appWidgetId : appWidgetIds)
+                                appMan.partiallyUpdateAppWidget(appWidgetId, rv);
+                        }
+                    }
+                });
 
                 break;
             case Constants.PLAYBACK_STATE_CHANGED:
