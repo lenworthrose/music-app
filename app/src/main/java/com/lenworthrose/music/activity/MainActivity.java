@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -245,23 +246,21 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        IdType type = null;
+        Fragment toShow = null;
 
         switch ((int)id) {
             case 0:
-                type = IdType.ARTIST;
+                toShow = LibraryFragment.createRootInstance(IdType.ARTIST);
                 break;
             case 1:
-                type = IdType.ALBUM;
+                toShow = LibraryFragment.createRootInstance(IdType.ALBUM);
                 break;
             case 2:
-                type = IdType.SONG;
+                toShow = LibraryFragment.createRootInstance(IdType.SONG);
                 break;
             case 3:
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                getSupportFragmentManager().beginTransaction().replace(R.id.root_container, new SearchFragment()).commit();
-                drawerLayout.closeDrawers();
-                return;
+                toShow = new SearchFragment();
+                break;
             case 4:
                 postCloseDrawer();
                 startActivity(new Intent(this, PlayingNowActivity.class));
@@ -274,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
         selectedDrawerPosition = position;
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance(type)).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, toShow).commit();
         drawerLayout.closeDrawers();
     }
 
