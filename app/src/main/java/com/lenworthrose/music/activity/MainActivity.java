@@ -211,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
             getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id)).commit();
         } else {
             getSupportFragmentManager().popBackStack();
-            onNavigate(type, id);
+            getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id))
+                    .addToBackStack(String.valueOf(id)).commit();
         }
     }
 
