@@ -1,8 +1,8 @@
 <resources>
-    <dimen name="pn_subtitle_text_size">15sp</dimen>
-    <dimen name="pn_title_text_size">18sp</dimen>
-    <dimen name="pn_footer_text_size">13sp</dimen>
-    <dimen name="pn_time_view_width">52dp</dimen>
+    <dimen name="playing_now_subtitle_text_size">15sp</dimen>
+    <dimen name="playing_now_title_text_size">18sp</dimen>
+    <dimen name="playing_now_footer_text_size">13sp</dimen>
+    <dimen name="playing_now_time_view_width">52dp</dimen>
     <dimen name="playing_now_playback_control_margin">20dp</dimen>
     <dimen name="playing_now_control_size">@dimen/abc_action_button_min_width_material</dimen>
 
@@ -14,7 +14,7 @@
     <dimen name="widget_image_size">82dp</dimen>
     <dimen name="widget_button_size">40dp</dimen>
 
-    <dimen name="drag_handle_size">50dp</dimen>
+    <dimen name="list_item_drag_handle_size">50dp</dimen>
     <dimen name="list_item_image_size">40dp</dimen>
     <dimen name="list_item_title_text_size">16sp</dimen>
     <dimen name="list_item_subtitle_text_size">14sp</dimen>

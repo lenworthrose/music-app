@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/list_item_drag_handle"
-        android:layout_width="@dimen/drag_handle_size"
-        android:layout_height="@dimen/drag_handle_size"
+        android:layout_width="@dimen/list_item_drag_handle_size"
+        android:layout_height="@dimen/list_item_drag_handle_size"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="2dp"
         android:src="@drawable/drag"

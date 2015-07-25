@@ -29,14 +29,16 @@
             style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textSize="@dimen/playing_now_title_text_size" />
 
         <TextView
             android:id="@+id/np_subtitle"
             style="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textSize="@dimen/playing_now_subtitle_text_size" />
     </LinearLayout>
 
     <LinearLayout
