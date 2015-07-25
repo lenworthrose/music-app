@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 if (!isRecreated && !isFinishing() && !isDestroyed()) {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                     selectedDrawerPosition = Integer.parseInt(prefs.getString(Constants.SETTING_START_LOCATION, "0"));
+                    drawerListView.setItemChecked(selectedDrawerPosition, true);
                     onItemClick(drawerListView, null, selectedDrawerPosition, selectedDrawerPosition);
                 }
             }
@@ -272,8 +273,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         }
 
         selectedDrawerPosition = position;
-        drawerListView.setItemChecked(selectedDrawerPosition, true);
-
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createRootInstance(type)).commit();
         drawerLayout.closeDrawers();
