@@ -394,7 +394,7 @@ public class Utils {
     }
 
     public static String buildAlbumArtUrl(long albumId) {
-        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
+        Uri albumArtUri = Uri.parse(Constants.EXTERNAL_ALBUM_ART_URL);
         albumArtUri = ContentUris.withAppendedId(albumArtUri, albumId);
         return albumArtUri.toString();
     }

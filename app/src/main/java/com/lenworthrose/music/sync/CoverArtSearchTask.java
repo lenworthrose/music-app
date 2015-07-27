@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Utils;
 
 import java.io.File;
@@ -70,8 +71,7 @@ public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.Audio.Albums.ALBUM_ID, albumId);
                     values.put(MediaStore.Audio.Media.DATA, biggestArt.getAbsolutePath());
-
-                    context.getContentResolver().insert(Uri.parse(Utils.buildAlbumArtUrl(albumId)), values);
+                    context.getContentResolver().insert(Uri.parse(Constants.EXTERNAL_ALBUM_ART_URL), values);
                 }
             } while (albumsMissingArt.moveToNext());
         }

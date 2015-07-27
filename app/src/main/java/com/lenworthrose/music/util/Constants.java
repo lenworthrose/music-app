@@ -53,6 +53,8 @@ public class Constants {
 
     public static final long ALL = Long.MIN_VALUE;
 
+    public static final String EXTERNAL_ALBUM_ART_URL = "content://media/external/audio/albumart";
+
     public enum PlaybackState {
         STOPPED,
         PAUSED,
