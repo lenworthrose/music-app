@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.lenworthrose.music.util.Constants;
-import com.lenworthrose.music.util.Utils;
 
 import java.io.File;
 import java.io.FilenameFilter;
