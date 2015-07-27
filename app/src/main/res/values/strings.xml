@@ -84,8 +84,8 @@
     <string name="start_location">Start Location</string>
     <string name="last_fm_integration_desc">Retrieve artist information from Last.fm</string>
     <string name="last_fm_integration">Enable Last.fm integration</string>
-    <string name="search_for_art_desc">Scan folders of albums without art for cover art</string>
-    <string name="search_for_art">Cover Art Search</string>
+    <string name="search_for_art_desc">Scan folders of albums without art for images and set the largest image as the album art</string>
+    <string name="search_for_art">Search For Missing Art</string>
 
     <!-- About -->
     <string name="about">About</string>
