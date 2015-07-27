@@ -771,7 +771,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         return getUriForMedia(cursor.getLong(2)); //TODO: undo hardcode!
     }
 
-    private Uri getUriForMedia(long id) {
-        return ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+    private Uri getUriForMedia(long songId) {
+        return ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songId);
     }
 }
