@@ -13,6 +13,7 @@ import java.net.URL;
 
 import fm.last.api.Artist;
 import fm.last.api.LastFmServer;
+import fm.last.api.WSError;
 
 /**
  * Helper class to perform Last.fm related tasks.
@@ -50,6 +51,8 @@ class LastFmHelper {
             if (megaImgUrl != null) artistImageUrl = retrieveArt(megaImgUrl, musicBrainzId);
         } catch (IOException ex) {
             Log.e("LastFmHelper", "IOException occurred attempting to get info from Last.fm", ex);
+        } catch (WSError ex) {
+            Log.w("LastFmHelper", "WSError occurred attemping to get info from Last.fm", ex);
         }
     }
 
