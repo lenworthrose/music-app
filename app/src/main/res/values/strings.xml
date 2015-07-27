@@ -73,7 +73,7 @@
     <string name="save">Save</string>
 
     <!-- Preferences -->
-    <string name="library_refresh">Library Refresh</string>
+    <string name="database_tasks">Database Tasks</string>
     <string name="refresh_artists">Refresh Artists</string>
     <string name="refresh_artists_desc">Search for new artists in the media store</string>
     <string name="refresh_albums">Refresh Albums</string>
@@ -84,6 +84,8 @@
     <string name="start_location">Start Location</string>
     <string name="last_fm_integration_desc">Retrieve artist information from Last.fm</string>
     <string name="last_fm_integration">Enable Last.fm integration</string>
+    <string name="search_for_art_desc">Scan folders of albums without art for cover art</string>
+    <string name="search_for_art">Cover Art Search</string>
 
     <!-- About -->
     <string name="about">About</string>

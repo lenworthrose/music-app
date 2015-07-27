@@ -18,7 +18,7 @@
             android:summary="@string/last_fm_integration_desc"
             android:title="@string/last_fm_integration" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/library_refresh">
+    <PreferenceCategory android:title="@string/database_tasks">
         <Preference
             android:key="refresh_artists"
             android:summary="@string/refresh_artists_desc"
@@ -27,6 +27,10 @@
             android:key="refresh_albums"
             android:summary="@string/refresh_albums_desc"
             android:title="@string/refresh_albums" />
+        <Preference
+            android:key="search_for_art"
+            android:summary="@string/search_for_art_desc"
+            android:title="@string/search_for_art" />
         <Preference
             android:dependency="last_fm_integration"
             android:key="last_fm_update"

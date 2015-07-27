@@ -33,6 +33,7 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
     public static final String ACTION_SYNC_WITH_MEDIA_STORE = "com.lenworthrose.music.sync.MediaStoreSyncService.SYNC";
     public static final String ACTION_UPDATE_ALBUMS = "com.lenworthrose.music.sync.MediaStoreSyncService.UPDATE_ALBUMS";
     public static final String ACTION_LAST_FM_FETCH = "com.lenworthrose.music.sync.MediaStoreSyncService.LAST_FM_FETCH";
+    public static final String ACTION_SEARCH_FOR_ART = "com.lenworthrose.music.sync.MediaStoreSyncService.SEARCH_FOR_ART";
 
     private static final int NOTIFICATION_ID = 36663;
     private static final String SETTING_HAS_COMPLETED_INITIAL_SYNC = "HasCompletedInitialSync";
@@ -86,6 +87,9 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
                 case ACTION_LAST_FM_FETCH:
                     startLastFmUpdate();
                     return START_STICKY;
+                case ACTION_SEARCH_FOR_ART:
+                    startSearchForArt();
+                    break;
             }
         }
 
@@ -229,6 +233,22 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
 
             task.execute();
         }
+    }
+
+    private void startSearchForArt() {
+        CoverArtSearchTask task = new CoverArtSearchTask() {
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+//                notificationBuilder.setProgress(values[1], values[0], false);
+//                notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+
+            }
+        };
+        task.execute(this);
     }
 
     @Override

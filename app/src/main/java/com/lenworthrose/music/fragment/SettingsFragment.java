@@ -18,6 +18,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private final String REFRESH_ARTISTS = "refresh_artists";
     private final String REFRESH_ALBUMS = "refresh_albums";
     private final String LAST_FM_UPDATE = "last_fm_update";
+    private final String SEARCH_FOR_ART = "search_for_art";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         findPreference(REFRESH_ARTISTS).setOnPreferenceClickListener(this);
         findPreference(REFRESH_ALBUMS).setOnPreferenceClickListener(this);
         findPreference(LAST_FM_UPDATE).setOnPreferenceClickListener(this);
+        findPreference(SEARCH_FOR_ART).setOnPreferenceClickListener(this);
         updateListPreferenceSummary(Constants.SETTING_START_LOCATION, R.array.start_locations_ids, R.array.start_locations, "0");
     }
 
@@ -43,6 +45,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 break;
             case LAST_FM_UPDATE:
                 action = MediaStoreSyncService.ACTION_LAST_FM_FETCH;
+                break;
+            case SEARCH_FOR_ART:
+                action = MediaStoreSyncService.ACTION_SEARCH_FOR_ART;
                 break;
         }
 
