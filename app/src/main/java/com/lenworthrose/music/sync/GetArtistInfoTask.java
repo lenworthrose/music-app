@@ -15,7 +15,7 @@ import fm.last.api.LastFmServer;
 /**
  * Responsible for fetching Artist info and image from Last.fm, as well as querying the Albums DB for cover art.
  */
-public class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
+class GetArtistInfoTask extends AsyncTask<Void, Integer, Void> {
     private Context context;
     private SQLiteDatabase db;
     private LastFmServer lastFm;

@@ -3,6 +3,7 @@ package com.lenworthrose.music.sync;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -10,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.util.Utils;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -18,11 +20,17 @@ import java.util.Locale;
 /**
  * {@link AsyncTask} that will search for cover art in the folder that contains the album.
  */
-public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
-    @Override
-    protected Void doInBackground(Context... params) {
-        Context context = params[0];
+class CoverArtSearchTask extends AsyncTask<Void, Integer, Void> {
+    private Context context;
+    private SQLiteDatabase db;
 
+    public CoverArtSearchTask(Context context, SQLiteDatabase db) {
+        this.context = context;
+        this.db = db;
+    }
+
+    @Override
+    protected Void doInBackground(Void... params) {
         Cursor albumsMissingArt = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 new String[] { MediaStore.Audio.Albums._ID, MediaStore.Audio.Media.ARTIST_ID },
                 MediaStore.Audio.Albums.ALBUM_ART + " IS NULL",
@@ -31,6 +39,7 @@ public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
 
         if (albumsMissingArt.moveToFirst()) {
             int current = 0, total = albumsMissingArt.getCount();
+            long artistId = albumsMissingArt.getLong(1);
 
             do {
                 publishProgress(current++, total);
@@ -43,12 +52,16 @@ public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
                     values.put(MediaStore.Audio.Albums.ALBUM_ID, albumId);
                     values.put(MediaStore.Audio.Media.DATA, artPath);
                     context.getContentResolver().insert(Uri.parse(Constants.EXTERNAL_ALBUM_ART_URL), values);
+
+                    if (artistId != albumsMissingArt.getLong(1))
+                        updateArtistAlbumArt(artistId, Utils.getAlbumArtUrls(context, artistId));
                 }
             } while (albumsMissingArt.moveToNext());
+
+            updateArtistAlbumArt(artistId, Utils.getAlbumArtUrls(context, artistId));
         }
 
         albumsMissingArt.close();
-
         return null;
     }
 
@@ -89,6 +102,19 @@ public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
                 biggestArt = images[i];
 
         return biggestArt.getAbsolutePath();
+    }
+
+    private void updateArtistAlbumArt(long id, String... albumArtUris) {
+        ContentValues values = new ContentValues();
+
+        if (albumArtUris != null) {
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1, albumArtUris[0]);
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2, albumArtUris[1]);
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
+            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
+        }
+
+        db.update(ArtistsStore.TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
     }
 
     private static final class ImageFilenameFilter implements FilenameFilter {

@@ -13,7 +13,7 @@ import com.lenworthrose.music.util.Utils;
  * {@link AsyncTask} that updates the cover art for all artists in the DB. Will also remove any artists
  * entries if there are no albums for the artist.
  */
-public class UpdateCoverArtTask extends AsyncTask<Void, Integer, Void> {
+class UpdateCoverArtTask extends AsyncTask<Void, Integer, Void> {
     private Context context;
     private SQLiteDatabase db;
 

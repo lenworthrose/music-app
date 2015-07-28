@@ -236,7 +236,7 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
     }
 
     private void startSearchForArt() {
-        CoverArtSearchTask task = new CoverArtSearchTask() {
+        CoverArtSearchTask task = new CoverArtSearchTask(this, ArtistsStore.getInstance().getDatabase()) {
             @Override
             protected void onProgressUpdate(Integer... values) {
 //                notificationBuilder.setProgress(values[1], values[0], false);
@@ -248,7 +248,7 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
 
             }
         };
-        task.execute(this);
+        task.execute();
     }
 
     @Override
