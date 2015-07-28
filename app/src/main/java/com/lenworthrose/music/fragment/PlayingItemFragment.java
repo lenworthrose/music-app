@@ -36,6 +36,7 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.activity.SearchActivity;
 import com.lenworthrose.music.playback.PlaybackService;
+import com.lenworthrose.music.util.BitmapUtils;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Constants.PlaybackState;
 import com.lenworthrose.music.util.Utils;
@@ -447,7 +448,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection, 
     private class CoverArtTarget extends SimpleTarget<Bitmap> {
         @Override
         public void onResourceReady(Bitmap art, GlideAnimation<? super Bitmap> glideAnimation) {
-            Utils.createDropShadowBitmap(art, new Utils.BitmapCallback() {
+            BitmapUtils.createDropShadowBitmap(art, new BitmapUtils.BitmapCallback() {
                 @Override
                 public void onBitmapReady(Bitmap bitmap) {
                     coverArt.setImageBitmap(bitmap);
@@ -473,7 +474,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection, 
             });
 
             if (getActivity() instanceof PlayingNowActivity)
-                Utils.createBlurredBitmap(art, new Utils.BitmapCallback() {
+                BitmapUtils.createBlurredBitmap(art, new BitmapUtils.BitmapCallback() {
                     @Override
                     public void onBitmapReady(Bitmap bitmap) {
                         ((PlayingNowActivity)getActivity()).setBackgroundImage(bitmap);

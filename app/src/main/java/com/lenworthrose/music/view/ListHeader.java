@@ -24,7 +24,7 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.LastFmInfoActivity;
 import com.lenworthrose.music.adapter.AlbumsAdapter;
 import com.lenworthrose.music.sync.ArtistsStore;
-import com.lenworthrose.music.util.Utils;
+import com.lenworthrose.music.util.BitmapUtils;
 
 /**
  * A {@link View} that is meant to be added as the header to a list. Contains information about the list (e.g.
@@ -125,7 +125,7 @@ public class ListHeader extends FrameLayout implements Loader.OnLoadCompleteList
             public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                 coverArt.setImageBitmap(resource);
 
-                Utils.createBlurredBitmap(resource, new Utils.BitmapCallback() {
+                BitmapUtils.createBlurredBitmap(resource, new BitmapUtils.BitmapCallback() {
                     @Override
                     public void onBitmapReady(Bitmap bitmap) {
                         background.setImageBitmap(bitmap);
