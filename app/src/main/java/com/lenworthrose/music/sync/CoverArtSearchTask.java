@@ -56,8 +56,10 @@ class CoverArtSearchTask extends AsyncTask<Void, Integer, Boolean> {
                     values.put(MediaStore.Audio.Media.DATA, artPath);
                     context.getContentResolver().insert(Uri.parse(Constants.EXTERNAL_ALBUM_ART_URL), values);
 
-                    if (artistId != albumsMissingArt.getLong(1))
+                    if (artistId != albumsMissingArt.getLong(1)) {
                         UpdateCoverArtTask.updateArtistAlbumArt(db, artistId, Utils.getAlbumArtUrls(context, artistId));
+                        artistId = albumsMissingArt.getLong(1);
+                    }
 
                     retVal = true;
                 }
