@@ -307,13 +307,21 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
     }
 
     private class AlbumsContentObserver extends ContentObserver {
+        private static final int INTERVAL = 3600000; //One hour
+
+        private long lastUpdateTime;
+
         public AlbumsContentObserver() {
             super(new Handler());
         }
 
         @Override
         public void onChange(boolean selfChange) {
-            Log.d("MediaStoreSyncService", "Change detected in Albums table! isActive()=" + isTaskActive);
+            boolean hasIntervalLapsed = (lastUpdateTime + INTERVAL) >= System.currentTimeMillis();
+            Log.d("MediaStoreSyncService", "Change detected in Albums table! isActive=" + isTaskActive + " hasIntervalLapsed=" + hasIntervalLapsed);
+            if (!hasIntervalLapsed) return;
+
+            lastUpdateTime = System.currentTimeMillis();
 
             if (!isTaskActive) {
                 startUpdatingAlbums(false);
