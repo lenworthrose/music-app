@@ -54,11 +54,11 @@ class CoverArtSearchTask extends AsyncTask<Void, Integer, Void> {
                     context.getContentResolver().insert(Uri.parse(Constants.EXTERNAL_ALBUM_ART_URL), values);
 
                     if (artistId != albumsMissingArt.getLong(1))
-                        updateArtistAlbumArt(artistId, Utils.getAlbumArtUrls(context, artistId));
+                        UpdateCoverArtTask.updateArtistAlbumArt(db, artistId, Utils.getAlbumArtUrls(context, artistId));
                 }
             } while (albumsMissingArt.moveToNext());
 
-            updateArtistAlbumArt(artistId, Utils.getAlbumArtUrls(context, artistId));
+            UpdateCoverArtTask.updateArtistAlbumArt(db, artistId, Utils.getAlbumArtUrls(context, artistId));
         }
 
         albumsMissingArt.close();
@@ -102,19 +102,6 @@ class CoverArtSearchTask extends AsyncTask<Void, Integer, Void> {
                 biggestArt = images[i];
 
         return biggestArt.getAbsolutePath();
-    }
-
-    private void updateArtistAlbumArt(long id, String... albumArtUris) {
-        ContentValues values = new ContentValues();
-
-        if (albumArtUris != null) {
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_1, albumArtUris[0]);
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_2, albumArtUris[1]);
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_3, albumArtUris[2]);
-            values.put(ArtistsStoreContract.ArtistEntry.COLUMN_ALBUM_ART_FILE_URL_4, albumArtUris[3]);
-        }
-
-        db.update(ArtistsStore.TABLE_NAME, values, ArtistsStoreContract.ArtistEntry._ID + "=?", new String[] { String.valueOf(id) });
     }
 
     private static final class ImageFilenameFilter implements FilenameFilter {
