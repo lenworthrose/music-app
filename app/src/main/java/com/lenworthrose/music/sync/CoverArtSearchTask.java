@@ -24,7 +24,7 @@ public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
         Context context = params[0];
 
         Cursor albumsMissingArt = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                new String[] { MediaStore.Audio.Albums._ID },
+                new String[] { MediaStore.Audio.Albums._ID, MediaStore.Audio.Media.ARTIST_ID },
                 MediaStore.Audio.Albums.ALBUM_ART + " IS NULL",
                 null,
                 null);
@@ -35,41 +35,13 @@ public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
             do {
                 publishProgress(current++, total);
                 long albumId = albumsMissingArt.getLong(0);
+                File albumDir = getAlbumDirectory(context, albumId);
+                String artPath = getLargestImagePath(albumDir);
 
-                Cursor songs = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        new String[] { MediaStore.Audio.Media.DATA },
-                        MediaStore.Audio.Media.ALBUM_ID + "=?",
-                        new String[] { String.valueOf(albumId) },
-                        MediaStore.Audio.Media.TRACK);
-
-                if (!songs.moveToFirst()) continue;
-
-                File file = new File(songs.getString(0));
-
-                if (!file.exists()) {
-                    Log.w("CoverArtSearchTask", "Path for song in MediaStore does not exist?? path=" + songs.getString(0));
-                    continue;
-                }
-
-                songs.close();
-                String parentStr = file.getParent();
-                if (TextUtils.isEmpty(parentStr)) continue;
-
-                File parentDir = new File(parentStr);
-                if (!parentDir.exists()) continue;
-
-                File[] images = parentDir.listFiles(new ImageFilenameFilter());
-
-                if (images != null && images.length > 0) {
-                    File biggestArt = images[0];
-
-                    for (int i = 1; i < images.length; i++)
-                        if (biggestArt.length() < images[i].length())
-                            biggestArt = images[i];
-
+                if (artPath != null) {
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.Audio.Albums.ALBUM_ID, albumId);
-                    values.put(MediaStore.Audio.Media.DATA, biggestArt.getAbsolutePath());
+                    values.put(MediaStore.Audio.Media.DATA, artPath);
                     context.getContentResolver().insert(Uri.parse(Constants.EXTERNAL_ALBUM_ART_URL), values);
                 }
             } while (albumsMissingArt.moveToNext());
@@ -78,6 +50,45 @@ public class CoverArtSearchTask extends AsyncTask<Context, Integer, Void> {
         albumsMissingArt.close();
 
         return null;
+    }
+
+    private static File getAlbumDirectory(Context context, long albumId) {
+        Cursor songs = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[] { MediaStore.Audio.Media.DATA },
+                MediaStore.Audio.Media.ALBUM_ID + "=?",
+                new String[] { String.valueOf(albumId) },
+                MediaStore.Audio.Media.TRACK);
+
+        if (!songs.moveToFirst()) return null;
+
+        File file = new File(songs.getString(0));
+
+        if (!file.exists()) {
+            Log.w("CoverArtSearchTask", "Path for song in MediaStore does not exist?? path=" + songs.getString(0));
+            return null;
+        }
+
+        songs.close();
+        String parentStr = file.getParent();
+        if (TextUtils.isEmpty(parentStr)) return null;
+
+        File parentDir = new File(parentStr);
+        return parentDir.exists() ? parentDir : null;
+    }
+
+    private static String getLargestImagePath(File albumDir) {
+        if (albumDir == null) return null;
+
+        File[] images = albumDir.listFiles(new ImageFilenameFilter());
+        if (images == null || images.length == 0) return null;
+
+        File biggestArt = images[0];
+
+        for (int i = 1; i < images.length; i++)
+            if (biggestArt.length() < images[i].length())
+                biggestArt = images[i];
+
+        return biggestArt.getAbsolutePath();
     }
 
     private static final class ImageFilenameFilter implements FilenameFilter {
