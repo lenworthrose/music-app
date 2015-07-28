@@ -19,8 +19,10 @@ import java.util.Locale;
 
 /**
  * {@link AsyncTask} that will search for cover art in the folder that contains the album.
+ *
+ * doInBackground() will return true if new art was found, otherwise false.
  */
-class CoverArtSearchTask extends AsyncTask<Void, Integer, Void> {
+class CoverArtSearchTask extends AsyncTask<Void, Integer, Boolean> {
     private Context context;
     private SQLiteDatabase db;
 
@@ -30,7 +32,8 @@ class CoverArtSearchTask extends AsyncTask<Void, Integer, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Boolean doInBackground(Void... params) {
+        boolean retVal = false;
         Cursor albumsMissingArt = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 new String[] { MediaStore.Audio.Albums._ID, MediaStore.Audio.Media.ARTIST_ID },
                 MediaStore.Audio.Albums.ALBUM_ART + " IS NULL",
@@ -55,6 +58,8 @@ class CoverArtSearchTask extends AsyncTask<Void, Integer, Void> {
 
                     if (artistId != albumsMissingArt.getLong(1))
                         UpdateCoverArtTask.updateArtistAlbumArt(db, artistId, Utils.getAlbumArtUrls(context, artistId));
+
+                    retVal = true;
                 }
             } while (albumsMissingArt.moveToNext());
 
@@ -62,7 +67,7 @@ class CoverArtSearchTask extends AsyncTask<Void, Integer, Void> {
         }
 
         albumsMissingArt.close();
-        return null;
+        return retVal;
     }
 
     private static File getAlbumDirectory(Context context, long albumId) {

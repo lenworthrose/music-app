@@ -199,7 +199,6 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
                     broadcastMediaStoreSyncComplete();
                     if (showNotification) stopForeground(true);
                     isTaskActive = false;
-
                     startPendingTasks();
                 }
             };
@@ -236,19 +235,29 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
     }
 
     private void startSearchForArt() {
-        CoverArtSearchTask task = new CoverArtSearchTask(this, ArtistsStore.getInstance().getDatabase()) {
-            @Override
-            protected void onProgressUpdate(Integer... values) {
-//                notificationBuilder.setProgress(values[1], values[0], false);
-//                notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
-            }
+        if (!isTaskActive) {
+            String text = getString(R.string.searching_for_album_art);
+            notificationBuilder.setTicker(text).setContentTitle(text);
+            startForeground(NOTIFICATION_ID, notificationBuilder.build());
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
+            CoverArtSearchTask task = new CoverArtSearchTask(this, ArtistsStore.getInstance().getDatabase()) {
+                @Override
+                protected void onProgressUpdate(Integer... values) {
+                    notificationBuilder.setProgress(values[1], values[0], false);
+                    notifyMan.notify(NOTIFICATION_ID, notificationBuilder.build());
+                }
 
-            }
-        };
-        task.execute();
+                @Override
+                protected void onPostExecute(Boolean newArt) {
+                    if (newArt) broadcastMediaStoreSyncComplete();
+                    stopForeground(true);
+                    isTaskActive = false;
+                    startPendingTasks();
+                }
+            };
+
+            task.execute();
+        }
     }
 
     @Override

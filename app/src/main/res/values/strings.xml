@@ -51,6 +51,7 @@
     <string name="syncing_with_media_store">Syncing with media store…</string>
     <string name="fetching_artist_info">Retrieving artist info…</string>
     <string name="updating_artist_albums">Updating album info…</string>
+    <string name="searching_for_album_art">Searching for cover art…</string>
 
     <!-- Repeat Modes -->
     <string name="off">Off</string>
