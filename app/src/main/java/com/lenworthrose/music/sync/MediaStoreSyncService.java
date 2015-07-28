@@ -249,6 +249,7 @@ public class MediaStoreSyncService extends Service implements SharedPreferences.
 
                 @Override
                 protected void onPostExecute(Boolean newArt) {
+                    Log.d("MediaStoreSyncService", "Finished album art search");
                     if (newArt) broadcastMediaStoreSyncComplete();
                     stopForeground(true);
                     isTaskActive = false;
