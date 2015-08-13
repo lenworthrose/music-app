@@ -7,3 +7,5 @@
 /captures
 drag-sort-listview/build/
 lastFmAPI/build/
+.idea/
+*.iml
