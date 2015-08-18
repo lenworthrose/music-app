@@ -555,6 +555,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         Log.i("PlaybackThread", "Playback complete!");
 
         if (!isEndOfPlaylist() || repeatEnabled) {
+            stopListeningOn(currentTrack);
             currentTrack.reset();
 
             playlistPosition = isEndOfPlaylist() ? 0 : playlistPosition + 1; //Repeat must be enabled; start at 0!
@@ -600,7 +601,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     public void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                if (isPlaying()) currentTrack.setVolume(1.0f, 1.0f);
+                if (isPlayingOrPaused()) currentTrack.setVolume(1.0f, 1.0f);
                 // Do nothing...?
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
@@ -621,6 +622,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         } catch (IllegalStateException | IllegalArgumentException ex) { /* Ignore */ }
 
         try {
+            stopListeningOn(nextTrack);
             nextTrack.reset();
         } catch (IllegalStateException ex) { /* Ignore */ }
     }
@@ -630,10 +632,17 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
      */
     private void releaseMediaPlayers(boolean shouldUnregisterRemote) {
         try {
+            stopListeningOn(nextTrack);
             nextTrack.reset();
+        } catch (IllegalStateException ex) {
+            Log.w("PlaybackThread", "IllegalStateException occurred attempting to reset nextTrack");
+        }
+
+        try {
+            stopListeningOn(nextTrack);
             currentTrack.reset();
         } catch (IllegalStateException ex) {
-            Log.w("PlaybackThread", "IllegalStateException occurred attempting to reset MediaPlayers");
+            Log.w("PlaybackThread", "IllegalStateException occurred attempting to reset currentTrack");
         }
 
         if (shouldUnregisterRemote) {
@@ -673,6 +682,14 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         player.setOnErrorListener(this);
         player.setOnInfoListener(this);
         player.setOnSeekCompleteListener(this);
+    }
+
+    private void stopListeningOn(MediaPlayer player) {
+        player.setOnPreparedListener(null);
+        player.setOnCompletionListener(null);
+        player.setOnErrorListener(null);
+        player.setOnInfoListener(null);
+        player.setOnSeekCompleteListener(null);
     }
 
     protected int getStoredPlaylistPosition() {
