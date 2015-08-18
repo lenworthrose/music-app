@@ -552,14 +552,13 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Log.i("PlaybackThread", "Playback complete!");
-
         if (!isEndOfPlaylist() || repeatEnabled) {
             stopListeningOn(currentTrack);
             currentTrack.reset();
 
             playlistPosition = isEndOfPlaylist() ? 0 : playlistPosition + 1; //Repeat must be enabled; start at 0!
             storePlaylistPosition();
+            Log.i("PlaybackThread", "Track finished! Scheduling next track " + playlistPosition);
 
             MediaPlayer temp = currentTrack;
             currentTrack = nextTrack;
@@ -571,6 +570,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
             scheduleNextTrack();
         } else {
+            Log.i("PlaybackThread", "Playback complete!");
             releaseMediaPlayers(true);
         }
     }
