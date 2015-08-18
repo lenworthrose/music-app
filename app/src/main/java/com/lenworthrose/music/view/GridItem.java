@@ -61,14 +61,6 @@ public class GridItem extends CheckableFrameLayout {
         return imgView4;
     }
 
-    public void resetImages() {
-        big.setImageResource(android.R.color.transparent);
-        imgView1.setImageResource(android.R.color.transparent);
-        imgView2.setImageResource(android.R.color.transparent);
-        imgView3.setImageResource(android.R.color.transparent);
-        imgView4.setImageResource(android.R.color.transparent);
-    }
-
     @Override
     protected void drawableStateChanged() {
         super.drawableStateChanged();

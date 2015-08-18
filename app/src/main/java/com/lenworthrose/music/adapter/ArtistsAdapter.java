@@ -50,11 +50,15 @@ public class ArtistsAdapter extends BaseSwitchableAdapter {
     @Override
     protected void updateGridItem(GridItem view, Context context, Cursor cursor) {
         view.setText(cursor.getString(1));
-        view.resetImages();
 
         if (TextUtils.isEmpty(cursor.getString(7))) {
             Glide.with(getContext()).load(cursor.getString(4)).fallback(R.drawable.logo).error(R.drawable.logo).into(view.getBigImageView());
+            Glide.with(getContext()).load(android.R.color.transparent).into(view.getImageView1());
+            Glide.with(getContext()).load(android.R.color.transparent).into(view.getImageView2());
+            Glide.with(getContext()).load(android.R.color.transparent).into(view.getImageView3());
+            Glide.with(getContext()).load(android.R.color.transparent).into(view.getImageView4());
         } else {
+            Glide.with(getContext()).load(android.R.color.transparent).into(view.getBigImageView());
             Glide.with(getContext()).load(cursor.getString(4)).into(view.getImageView1());
             Glide.with(getContext()).load(cursor.getString(5)).into(view.getImageView2());
             Glide.with(getContext()).load(cursor.getString(6)).into(view.getImageView3());
