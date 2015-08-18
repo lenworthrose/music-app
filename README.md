@@ -9,8 +9,9 @@ the Playing Now playlist, using a combination of drag-and-drop and swipe to dele
 
 ## Installation
 
-muZak was developed in Android Studio, and includes the project files required to open it. Generating an APK should
-be as easy and downloading the code, opening the project in Android Studio, and running the "assemble" gradle task.
+muZak was developed in Android Studio, and uses the Gradle build system. You shouldn't have any difficulty importing
+this project into Android Studio. Generating an APK should be as easy and downloading the code, importing the project
+in Android Studio, and running the "assemble" Gradle task.
 
 ## What It Does
 
