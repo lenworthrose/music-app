@@ -148,6 +148,8 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                         Log.w("PlaybackThread", "IllegalStateException occurred attempting to release MediaPlayers in quit()");
                     }
 
+                    playlistStore.close();
+
                     Looper.myLooper().quit();
 
                     synchronized (lock) {
@@ -174,6 +176,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 break;
             case STOP:
                 stopPlayback();
+                playbackService.stopSelf();
                 break;
             case NEXT:
                 next();
@@ -539,6 +542,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
         if (playbackState != PlaybackState.STOPPED) {
             releaseMediaPlayers(true);
+            playbackService.stopSelf();
             //TODO: Show an error message/dialog/toast
         }
 
@@ -567,6 +571,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         } else {
             Log.i("PlaybackThread", "Playback complete!");
             releaseMediaPlayers(true);
+            playbackService.stopSelf();
         }
     }
 

@@ -28,11 +28,13 @@ public class WidgetService extends Service implements ServiceConnection {
     @Override
     public void onCreate() {
         super.onCreate();
-        receiver = new PlaybackBroadcastReceiver();
 
+        receiver = new PlaybackBroadcastReceiver();
         IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_CHANGED);
         filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+
+        bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
     }
 
     @Override

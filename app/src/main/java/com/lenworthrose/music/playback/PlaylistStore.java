@@ -211,6 +211,10 @@ public class PlaylistStore {
         return retVal;
     }
 
+    public void close() {
+        db.close();
+    }
+
     private ContentValues createContentValuesFromSongsCursor(Cursor cur, int sequence) {
         ContentValues values = new ContentValues();
         values.put(PlaylistEntry.COLUMN_SEQUENCE, sequence);

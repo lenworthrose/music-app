@@ -45,6 +45,7 @@ public class PlaybackService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("PlaybackService", "PlaybackService created");
 
         CountDownLatch latch = new CountDownLatch(1);
         playbackThread = new PlaybackThread(this, latch);
@@ -84,6 +85,7 @@ public class PlaybackService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.d("PlaybackService", "PlaybackService destroyed");
         playbackThread.quit();
         super.onDestroy();
     }
