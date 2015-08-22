@@ -275,11 +275,10 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 666 && resultCode == RESULT_OK && data != null) {
-            if (data.hasExtra(Constants.EXTRA_ARTIST_ID)) {
+            if (data.hasExtra(Constants.EXTRA_ARTIST_ID))
                 onNavigate(IdType.ARTIST, data.getLongExtra(Constants.EXTRA_ARTIST_ID, -1));
-            } else {
+            else
                 onNavigate(IdType.ALBUM, data.getLongExtra(Constants.EXTRA_ALBUM_ID, -1));
-            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.lenworthrose.music.playback;
 
 import android.database.Cursor;
+import android.util.Log;
 
 /**
  * A wrapper around {@link PlaybackService}'s database {@link Cursor}, retrieving relevant
@@ -17,15 +18,19 @@ public class PlayingItem {
         playlistPosition = position + 1;
         if (cursor == null || cursor.getCount() == 0) return;
 
-        cursor.moveToPosition(position);
-        artist = cursor.getString(3);
-        album = cursor.getString(4);
-        title = cursor.getString(5);
-        duration = cursor.getLong(7);
-        artUrl = cursor.getString(8);
-        trackNum = cursor.getInt(6);
-        artistId = cursor.getLong(10);
-        albumId = cursor.getLong(9);
+        try {
+            cursor.moveToPosition(position);
+            artist = cursor.getString(3);
+            album = cursor.getString(4);
+            title = cursor.getString(5);
+            duration = cursor.getLong(7);
+            artUrl = cursor.getString(8);
+            trackNum = cursor.getInt(6);
+            artistId = cursor.getLong(10);
+            albumId = cursor.getLong(9);
+        } catch (IllegalArgumentException ex) {
+            Log.e("PlayingItem", "IllegalArgumentException occurred attempting to populate PlayingItem", ex);
+        }
     }
 
     public String getArtist() {
