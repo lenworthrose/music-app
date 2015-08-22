@@ -1,5 +1,6 @@
 package com.lenworthrose.music.fragment;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -44,7 +45,7 @@ import com.lenworthrose.music.view.GradientDrawable;
  * This Fragment displays information about the currently playing track (Artist, Album, Title, Cover
  * Art, etc). It also provides playback controls (Play/Pause, Next, Previous, Stop).
  */
-public class PlayingItemFragment extends Fragment implements ServiceConnection {
+public class PlayingItemFragment extends Fragment implements ServiceConnection, View.OnLongClickListener {
     private SeekBar positionBar;
     private TextView artist, album, title, playlistPosition, playlistTracks, positionDisplay, durationDisplay;
     private ImageView coverArt, playPause;
@@ -158,8 +159,11 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
 
         topDetailContainer = view.findViewById(R.id.pn_top_detail_container);
         artistAlbumContainer = topDetailContainer.findViewById(R.id.pn_artist_album_container);
+
         artist = (TextView)artistAlbumContainer.findViewById(R.id.pn_artist);
+        artist.setOnLongClickListener(this);
         album = (TextView)artistAlbumContainer.findViewById(R.id.pn_album);
+        album.setOnLongClickListener(this);
         title = (TextView)topDetailContainer.findViewById(R.id.pn_name);
         bottomDetailContainer = view.findViewById(R.id.pn_bottom_detail_container);
         playlistPosition = (TextView)bottomDetailContainer.findViewById(R.id.pn_playlist_position);
@@ -171,6 +175,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         positionBar.setEnabled(false);
         coverArt = (ImageView)view.findViewById(R.id.pn_coverArt);
         coverArt.setOnClickListener(coverArtClickListener);
+        coverArt.setOnLongClickListener(this);
         View playbackControlContainer = view.findViewById(R.id.pn_playback_control_container);
         playPause = (ImageView)playbackControlContainer.findViewById(R.id.pn_play_pause);
         playPause.setOnClickListener(playbackButtonClickListener);
@@ -223,8 +228,11 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         if (autoHideOverlays && isActivityTransitionDone) setOverlaysVisible(true);
 
         artist.setText(intent.getStringExtra(Constants.EXTRA_ARTIST));
+        artist.setTag(intent.getLongExtra(Constants.EXTRA_ARTIST_ID, -1));
         album.setText(intent.getStringExtra(Constants.EXTRA_ALBUM));
+        album.setTag(intent.getLongExtra(Constants.EXTRA_ALBUM_ID, -1));
         title.setText(intent.getStringExtra(Constants.EXTRA_TITLE));
+        coverArt.setTag(intent.getLongExtra(Constants.EXTRA_ALBUM_ID, -1));
 
         if (!playbackService.isPlaylistEmpty()) {
             playlistPosition.setText(String.valueOf(intent.getIntExtra(Constants.EXTRA_PLAYLIST_POSITION, 0)));
@@ -389,6 +397,20 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection {
         bottomAnimator.start();
 
         areOverlaysVisible = visible;
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        long id = (Long)v.getTag();
+        if (id == -1) return true;
+
+        String key = v == artist ? Constants.EXTRA_ARTIST_ID : Constants.EXTRA_ALBUM_ID;
+        Intent intent = new Intent();
+        intent.putExtra(key, id);
+        getActivity().setResult(Activity.RESULT_OK, intent);
+        getActivity().finish();
+
+        return true;
     }
 
     private static class SetVisibilityRunnable implements Runnable {

@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
                 break;
             case 4:
                 postCloseDrawer();
-                startActivity(new Intent(this, PlayingNowActivity.class));
+                showPlayingNow();
                 return;
             case 5:
                 postCloseDrawer();
@@ -268,6 +268,19 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, toShow).commit();
         drawerLayout.closeDrawers();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 666 && resultCode == RESULT_OK && data != null) {
+            if (data.hasExtra(Constants.EXTRA_ARTIST_ID)) {
+                onNavigate(IdType.ARTIST, data.getLongExtra(Constants.EXTRA_ARTIST_ID, -1));
+            } else {
+                onNavigate(IdType.ALBUM, data.getLongExtra(Constants.EXTRA_ALBUM_ID, -1));
+            }
+        }
     }
 
     private void postCloseDrawer() {
@@ -302,6 +315,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, nowPlayingBar.findViewById(R.id.np_cover), "now_playing").toBundle();
 
-        startActivity(new Intent(MainActivity.this, PlayingNowActivity.class), options);
+        startActivityForResult(new Intent(MainActivity.this, PlayingNowActivity.class), 666, options);
     }
 }

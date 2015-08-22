@@ -11,7 +11,7 @@ import android.database.Cursor;
 public class PlayingItem {
     private String artist, album, title, artUrl;
     private int playlistPosition, trackNum;
-    private long duration = -1;
+    private long duration = -1, artistId = -1, albumId = -1;
 
     PlayingItem(Cursor cursor, int position) {
         playlistPosition = position + 1;
@@ -24,6 +24,8 @@ public class PlayingItem {
         duration = cursor.getLong(7);
         artUrl = cursor.getString(8);
         trackNum = cursor.getInt(6);
+        artistId = cursor.getLong(10);
+        albumId = cursor.getLong(9);
     }
 
     public String getArtist() {
@@ -52,5 +54,13 @@ public class PlayingItem {
 
     public int getTrackNum() {
         return trackNum;
+    }
+
+    public long getArtistId() {
+        return artistId;
+    }
+
+    public long getAlbumId() {
+        return albumId;
     }
 }

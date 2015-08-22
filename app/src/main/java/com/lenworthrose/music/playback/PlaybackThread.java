@@ -714,10 +714,12 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         intent.putExtra(Constants.EXTRA_ALBUM, item.getAlbum());
         intent.putExtra(Constants.EXTRA_TITLE, item.getTitle());
         intent.putExtra(Constants.EXTRA_TRACK_NUM, item.getTrackNum());
-        intent.putExtra(Constants.EXTRA_PLAYLIST_POSITION, playlistPosition + 1);
+        intent.putExtra(Constants.EXTRA_PLAYLIST_POSITION, item.getPlaylistPosition());
         intent.putExtra(Constants.EXTRA_PLAYLIST_TOTAL_TRACKS, getPlaylistSize());
         intent.putExtra(Constants.EXTRA_ALBUM_ART_URL, item.getAlbumArtUrl());
         intent.putExtra(Constants.EXTRA_DURATION, item.getDuration());
+        intent.putExtra(Constants.EXTRA_ARTIST_ID, item.getArtistId());
+        intent.putExtra(Constants.EXTRA_ALBUM_ID, item.getAlbumId());
 
         return intent;
     }
