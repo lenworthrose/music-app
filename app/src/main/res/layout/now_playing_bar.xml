@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="?actionBarSize"
     android:background="?colorPrimary"
-    android:gravity="center_vertical"
-    android:padding="1dp">
+    android:gravity="center_vertical">
 
     <ImageView
         android:id="@+id/np_cover"
