@@ -30,7 +30,9 @@ public final class PlaylistStoreContract {
                 PlaylistEntry.COLUMN_DURATION + INTEGER_TYPE + COMMA_SEP +
                 PlaylistEntry.COLUMN_TRACK_NUM + INTEGER_TYPE + COMMA_SEP +
                 PlaylistEntry.COLUMN_FILE_URL + TEXT_TYPE + COMMA_SEP +
-                PlaylistEntry.COLUMN_ALBUM_ART_URL + TEXT_TYPE + ")";
+                PlaylistEntry.COLUMN_ALBUM_ART_URL + TEXT_TYPE + COMMA_SEP +
+                PlaylistEntry.COLUMN_ARTIST_ID + INTEGER_TYPE + COMMA_SEP +
+                PlaylistEntry.COLUMN_ALBUM_ID + INTEGER_TYPE + ")";
     }
 
     public static abstract class PlaylistEntry implements BaseColumns {
@@ -43,5 +45,7 @@ public final class PlaylistStoreContract {
         public static final String COLUMN_TRACK_NUM = "tracknum";
         public static final String COLUMN_FILE_URL = "fileurl";
         public static final String COLUMN_ALBUM_ART_URL = "arturl";
+        public static final String COLUMN_ARTIST_ID = "artistid";
+        public static final String COLUMN_ALBUM_ID = "albumid";
     }
 }

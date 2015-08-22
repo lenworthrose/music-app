@@ -44,7 +44,9 @@ public class PlaylistStore {
                 PlaylistEntry.COLUMN_NAME,
                 PlaylistEntry.COLUMN_TRACK_NUM,
                 PlaylistEntry.COLUMN_DURATION,
-                PlaylistEntry.COLUMN_ALBUM_ART_URL
+                PlaylistEntry.COLUMN_ALBUM_ART_URL,
+                PlaylistEntry.COLUMN_ALBUM_ID,
+                PlaylistEntry.COLUMN_ARTIST_ID
         };
 
         return db.query(TABLE_NAME, projection, null, null, null, null, PlaylistEntry.COLUMN_SEQUENCE + " ASC");
@@ -225,7 +227,8 @@ public class PlaylistStore {
         values.put(PlaylistEntry.COLUMN_ARTIST, cur.getString(4));
         values.put(PlaylistEntry.COLUMN_ALBUM, cur.getString(5));
         values.put(PlaylistEntry.COLUMN_ALBUM_ART_URL, Utils.buildAlbumArtUrl(cur.getLong(6)));
-
+        values.put(PlaylistEntry.COLUMN_ALBUM_ID, cur.getLong(6));
+        values.put(PlaylistEntry.COLUMN_ARTIST_ID, cur.getLong(7));
         return values;
     }
 
@@ -239,6 +242,8 @@ public class PlaylistStore {
         values.put(PlaylistEntry.COLUMN_TRACK_NUM, cur.getLong(6));
         values.put(PlaylistEntry.COLUMN_DURATION, cur.getLong(7));
         values.put(PlaylistEntry.COLUMN_ALBUM_ART_URL, cur.getString(8));
+        values.put(PlaylistEntry.COLUMN_ALBUM_ID, cur.getLong(9));
+        values.put(PlaylistEntry.COLUMN_ARTIST_ID, cur.getLong(10));
         return values;
     }
 
@@ -251,7 +256,9 @@ public class PlaylistStore {
                 PlaylistEntry.COLUMN_NAME + "," +
                 PlaylistEntry.COLUMN_DURATION + "," +
                 PlaylistEntry.COLUMN_TRACK_NUM + "," +
-                PlaylistEntry.COLUMN_ALBUM_ART_URL + ")"
+                PlaylistEntry.COLUMN_ALBUM_ART_URL + "," +
+                PlaylistEntry.COLUMN_ALBUM_ID + "," +
+                PlaylistEntry.COLUMN_ARTIST_ID + ")"
                 + " SELECT " +
                 PlaylistEntry.COLUMN_SEQUENCE + "," +
                 PlaylistEntry.COLUMN_SONG_ID + "," +
@@ -260,7 +267,9 @@ public class PlaylistStore {
                 PlaylistEntry.COLUMN_NAME + "," +
                 PlaylistEntry.COLUMN_DURATION + "," +
                 PlaylistEntry.COLUMN_TRACK_NUM + "," +
-                PlaylistEntry.COLUMN_ALBUM_ART_URL
+                PlaylistEntry.COLUMN_ALBUM_ART_URL + "," +
+                PlaylistEntry.COLUMN_ALBUM_ID + "," +
+                PlaylistEntry.COLUMN_ARTIST_ID
                 + " FROM " + tempTableName;
     }
 }

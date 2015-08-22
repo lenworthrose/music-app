@@ -29,7 +29,8 @@ public class SongsAdapter extends BaseSwitchableAdapter {
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.ALBUM_ID
+            MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.ARTIST_ID
     };
 
     private long parentId;
