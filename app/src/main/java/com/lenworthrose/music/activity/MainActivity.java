@@ -104,10 +104,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer);
         drawerListView.setOnItemClickListener(this);
 
-        Intent intent = new Intent(this, PlaybackService.class);
-        intent.setAction(Constants.CMD_ACTIVITY_STARTING);
-        startService(intent);
-
         final boolean isRecreated = savedInstanceState != null;
 
         BroadcastReceiver artistsStoreInitReceiver = new BroadcastReceiver() {
@@ -160,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     @Override
     protected void onStart() {
         super.onStart();
-        bindService(new Intent(this, PlaybackService.class), this, 0);
+        bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
     }
 
     @Override
@@ -183,14 +179,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         playbackService = null;
         nowPlayingBar.setPlaybackService(null);
         super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        Intent intent = new Intent(this, PlaybackService.class);
-        intent.setAction(Constants.CMD_ACTIVITY_CLOSING);
-        startService(intent);
-        super.onDestroy();
     }
 
     @Override

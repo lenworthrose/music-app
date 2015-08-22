@@ -25,7 +25,6 @@ import com.lenworthrose.music.R;
 import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
 import com.lenworthrose.music.fragment.ShuffleDialogFragment;
-import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
 
 /**
@@ -46,10 +45,6 @@ public class PlayingNowActivity extends AppCompatActivity {
         setContentView(R.layout.activity_playing_now);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) postponeEnterTransition();
-
-        Intent intent = new Intent(this, PlaybackService.class);
-        intent.setAction(Constants.CMD_ACTIVITY_STARTING);
-        startService(intent);
 
         background = (ImageView)findViewById(R.id.pn_background_image);
         ViewPager pager = (ViewPager)findViewById(R.id.pn_root_container);
@@ -95,14 +90,6 @@ public class PlayingNowActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        Intent intent = new Intent(this, PlaybackService.class);
-        intent.setAction(Constants.CMD_ACTIVITY_CLOSING);
-        startService(intent);
-        super.onDestroy();
     }
 
     public void setBackgroundImage(Bitmap bitmap) {

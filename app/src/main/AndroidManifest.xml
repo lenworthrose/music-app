@@ -56,7 +56,8 @@
             android:parentActivityName=".activity.PlayingNowActivity" />
 
         <service
-            android:name=".playback.PlaybackService" />
+            android:name=".playback.PlaybackService"
+            android:stopWithTask="true" />
 
         <service
             android:name=".sync.MediaStoreSyncService" />

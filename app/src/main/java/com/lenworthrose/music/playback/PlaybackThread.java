@@ -118,11 +118,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
                 equalizer.setEnabled(prefs.getBoolean(Constants.SETTING_EQUALIZER_ENABLED, false));
 
-                mediaSessionManager = new MediaSessionManager(playbackService, handler);
-                IntentFilter intentFilter = new IntentFilter(Constants.PLAYBACK_STATE_CHANGED);
-                intentFilter.addAction(Constants.PLAYING_NOW_CHANGED);
-                broadcastMan.registerReceiver(mediaSessionManager, intentFilter);
-
+                mediaSessionManager = new MediaSessionManager(playbackService);
                 playlistStore = new PlaylistStore(playbackService);
                 playlistCursor = playlistStore.read();
                 playlistPosition = getStoredPlaylistPosition();
@@ -144,7 +140,6 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
                 @Override
                 public void run() {
                     releaseMediaPlayers(true);
-                    broadcastMan.unregisterReceiver(mediaSessionManager);
 
                     try {
                         currentTrack.release();
@@ -294,6 +289,7 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
         playlistCursor.moveToPosition(playlistPosition);
         Uri mediaUri = getUriFromCursor(playlistCursor);
         storePlaylistPosition();
+        notifyPlayingItemChanged();
 
         try {
             if (audioMan.requestAudioFocus(PlaybackThread.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -306,12 +302,11 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
                 registerNoisyReceiver();
                 if (mediaSessionManager != null) mediaSessionManager.register();
+                playbackService.startService(new Intent(playbackService, PlaybackService.class));
             } else {
                 Log.e("PlaybackThread", "Unable to start device playback - AudioManager wouldn't allow us focus!");
                 //TODO: Show some sort of error dialog/toast
             }
-
-            notifyPlayingItemChanged();
         } catch (IOException ex) {
             Log.e("PlaybackThread", "IOException attempting to start playback.", ex);
         }
@@ -701,7 +696,9 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void notifyPlayingItemChanged() {
-        broadcastMan.sendBroadcast(getPlayingItemIntent());
+        Intent intent = getPlayingItemIntent();
+        mediaSessionManager.onPlayingItemChanged(intent);
+        broadcastMan.sendBroadcast(intent);
     }
 
     public Intent getPlayingItemIntent() {
@@ -742,7 +739,9 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
     private void notifyStateChanged(PlaybackState state) {
         playbackState = state;
-        broadcastMan.sendBroadcast(getPlaybackStateIntent());
+        Intent intent = getPlaybackStateIntent();
+        mediaSessionManager.onPlaybackStateChanged(intent);
+        broadcastMan.sendBroadcast(intent);
     }
 
     private void notifyPlaybackModificationComplete(int which) {

@@ -8,11 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.media.RemoteControlClient;
 import android.media.session.MediaSession;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -20,9 +21,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
 import com.lenworthrose.music.util.Constants;
@@ -34,12 +32,11 @@ import com.lenworthrose.music.util.Utils;
  * also contains {@link com.lenworthrose.music.playback.MediaSessionManager.MediaKeyReceiver},
  * which is responsible for listening on media key presses.
  */
-public class MediaSessionManager extends BroadcastReceiver {
+public class MediaSessionManager {
     private static final int NOTIFICATION_ID = 666;
 
     private MediaSessionCompat mediaSession;
     private PlaybackService playbackService;
-    private Handler bgHandler;
 
     public static class MediaKeyReceiver extends BroadcastReceiver {
         @Override
@@ -147,15 +144,34 @@ public class MediaSessionManager extends BroadcastReceiver {
         }
     };
 
-    public MediaSessionManager(PlaybackService playbackService, Handler bgHandler) {
+    public MediaSessionManager(PlaybackService playbackService) {
         this.playbackService = playbackService;
-        this.bgHandler = bgHandler;
     }
-    
-    @SuppressWarnings("deprecation")
-    public void onStateChanged(Intent intent) {
-        if (mediaSession == null) return;
 
+    private void updateMetadata(Intent intent, Bitmap art) {
+        MediaMetadataCompat.Builder b = new MediaMetadataCompat.Builder();
+        b.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, intent.getStringExtra(Constants.EXTRA_ARTIST));
+        b.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, intent.getStringExtra(Constants.EXTRA_ARTIST));
+        b.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, intent.getStringExtra(Constants.EXTRA_ALBUM));
+        b.putString(MediaMetadataCompat.METADATA_KEY_TITLE, intent.getStringExtra(Constants.EXTRA_TITLE));
+        b.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
+        b.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, intent.getLongExtra(Constants.EXTRA_DURATION, 0));
+
+        int trackNum = intent.getIntExtra(Constants.EXTRA_TRACK_NUM, -1);
+
+        if (trackNum != -1) { b.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNum); }
+
+        try {
+            mediaSession.setMetadata(b.build());
+            mediaSession.setActive(true);
+        } catch (Exception ex) {
+            Log.e("MediaSessionManager", ex.getClass().getName() + " occurred in onPlayingItemChanged: " + ex.getMessage(), ex);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    void onPlaybackStateChanged(Intent intent) {
+        if (mediaSession == null) return;
         Constants.PlaybackState newState = (Constants.PlaybackState)intent.getSerializableExtra(Constants.EXTRA_STATE);
 
         if (newState == Constants.PlaybackState.STOPPED) {
@@ -209,94 +225,31 @@ public class MediaSessionManager extends BroadcastReceiver {
         } catch (Exception ex) {
             Log.e("MediaSessionManager", ex.getClass().getName() + " occurred in onStateChanged: " + ex.getMessage(), ex);
         }
+
+        if (!playbackService.isPlaylistEmpty()) {
+            Intent playingItemIntent = playbackService.getPlayingItemIntent();
+            Bitmap art = getCoverArtOrDefault(playingItemIntent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL));
+            updateNotification(playingItemIntent, art); //Update the Notification, esp. to switch Play/Pause icons
+        }
     }
 
-    private void updateMetadata(Intent intent, Bitmap art) {
-        MediaMetadataCompat.Builder b = new MediaMetadataCompat.Builder();
-        b.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, intent.getStringExtra(Constants.EXTRA_ARTIST));
-        b.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, intent.getStringExtra(Constants.EXTRA_ARTIST));
-        b.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, intent.getStringExtra(Constants.EXTRA_ALBUM));
-        b.putString(MediaMetadataCompat.METADATA_KEY_TITLE, intent.getStringExtra(Constants.EXTRA_TITLE));
-        b.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, art);
-        b.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, intent.getLongExtra(Constants.EXTRA_DURATION, 0));
+    void onPlayingItemChanged(Intent intent) {
+        if (mediaSession == null) return;
+        Bitmap art = getCoverArtOrDefault(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL));
+        updateMetadata(playbackService.getPlayingItemIntent(), art);
+        updateNotification(playbackService.getPlayingItemIntent(), art);
+    }
 
-        int trackNum = intent.getIntExtra(Constants.EXTRA_TRACK_NUM, -1);
-
-        if (trackNum != -1) { b.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, trackNum); }
-
+    private Bitmap getCoverArtOrDefault(String artUrl) {
         try {
-            mediaSession.setMetadata(b.build());
-            mediaSession.setActive(true);
+            ParcelFileDescriptor pfd = playbackService.getContentResolver().openFileDescriptor(Uri.parse(artUrl), "r");
+            Bitmap retVal = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
+            if (retVal != null) return retVal;
         } catch (Exception ex) {
-            Log.e("MediaSessionManager", ex.getClass().getName() + " occurred in onPlayingItemChanged: " + ex.getMessage(), ex);
+            //Ignore
         }
-    }
 
-    @Override
-    public void onReceive(Context context, final Intent intent) {
-        switch (intent.getAction()) {
-            case Constants.PLAYBACK_STATE_CHANGED:
-                bgHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onStateChanged(intent);
-                    }
-                });
-
-                if (!playbackService.isPlaylistEmpty()) { //Update the Notification, esp. to switch Play/Pause icons
-                    Glide.with(playbackService).load(playbackService.getPlayingItemIntent()
-                            .getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                            bgHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (mediaSession == null) return;
-                                    updateNotification(playbackService.getPlayingItemIntent(),
-                                            BitmapFactory.decodeResource(playbackService.getResources(), R.drawable.logo));
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            bgHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (mediaSession == null) return;
-                                    updateNotification(playbackService.getPlayingItemIntent(), resource);
-                                }
-                            });
-                        }
-                    });
-                }
-
-                break;
-            case Constants.PLAYING_NOW_CHANGED:
-                Glide.with(playbackService).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                        Bitmap fallback = BitmapFactory.decodeResource(playbackService.getResources(), R.drawable.audio);
-                        if (mediaSession == null) return;
-                        updateMetadata(playbackService.getPlayingItemIntent(), fallback);
-                        updateNotification(playbackService.getPlayingItemIntent(), fallback);
-                    }
-
-                    @Override
-                    public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        bgHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mediaSession == null) return;
-                                updateMetadata(playbackService.getPlayingItemIntent(), resource);
-                                updateNotification(playbackService.getPlayingItemIntent(), resource);
-                            }
-                        });
-                    }
-                });
-
-                break;
-        }
+        return BitmapFactory.decodeResource(playbackService.getResources(), R.drawable.logo);
     }
 
     public void register() {

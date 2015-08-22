@@ -6,9 +6,7 @@ import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.audiofx.Equalizer;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -30,12 +28,8 @@ import java.util.concurrent.CountDownLatch;
  * See {@link Constants} for the action strings used.
  */
 public class PlaybackService extends Service {
-    private static final String CMD_SHUTDOWN = "com.lenworthrose.music.playback.PlaybackService.Shutdown";
-
     private final IBinder binder = new LocalBinder();
     private PlaybackThread playbackThread;
-    private Handler handler;
-    private int activityCount = 0;
 
     public class LocalBinder extends Binder {
         public PlaybackService getService() {
@@ -51,7 +45,6 @@ public class PlaybackService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        handler = new Handler(Looper.getMainLooper());
 
         CountDownLatch latch = new CountDownLatch(1);
         playbackThread = new PlaybackThread(this, latch);
@@ -83,31 +76,10 @@ public class PlaybackService extends Service {
                 case Constants.CMD_TOGGLE_REPEAT_MODE:
                     playbackThread.getHandler().obtainMessage(PlaybackThread.TOGGLE_REPEAT_MODE).sendToTarget();
                     break;
-                case Constants.CMD_ACTIVITY_STARTING:
-                    activityCount++;
-                    handler.removeCallbacksAndMessages(null);
-                    break;
-                case Constants.CMD_ACTIVITY_CLOSING:
-                    activityCount--;
-
-                    if (activityCount <= 0)
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent intent = new Intent(PlaybackService.this, PlaybackService.class);
-                                intent.setAction(CMD_SHUTDOWN);
-                                startService(intent);
-                            }
-                        }, 750);
-
-                    break;
-                case CMD_SHUTDOWN:
-                    stopSelf();
-                    break;
             }
         }
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
