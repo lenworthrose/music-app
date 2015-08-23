@@ -51,8 +51,7 @@ import java.util.ArrayList;
  * The main Activity for the application. Implements {@link NavigationListener} so it can handle navigation
  * events. Manages the {@link LibraryFragment}s that display the media library.
  * <p/>
- * Responsible for starting and stopping the {@link PlaybackService}. Also binds to the Service so it can
- * modify the Playing Now playlist.
+ * Binds to the {@link PlaybackService} so it can handle actions that modify the Playing Now playlist.
  * <p/>
  * Responsible for starting the {@link MediaStoreSyncService}.
  */
