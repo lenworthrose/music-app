@@ -2,7 +2,6 @@ package com.lenworthrose.music.activity;
 
 import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -169,16 +167,10 @@ public class MainActivity extends NavigationActivity implements AdapterView.OnIt
     }
 
     @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        super.onServiceConnected(name, service);
-        nowPlayingBar.setPlaybackService(playbackService);
-        nowPlayingBar.onResume();
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        super.onServiceDisconnected(name);
-        nowPlayingBar.setPlaybackService(null);
+    protected void setPlaybackService(PlaybackService service) {
+        super.setPlaybackService(service);
+        nowPlayingBar.setPlaybackService(service);
+        if (service != null) nowPlayingBar.onResume();
     }
 
     @Override

@@ -42,7 +42,7 @@ public class NavigationActivity extends AppCompatActivity implements NavigationL
     @Override
     protected void onStop() {
         unbindService(this);
-        playbackService = null;
+        setPlaybackService(null);
         super.onStop();
     }
 
@@ -85,11 +85,15 @@ public class NavigationActivity extends AppCompatActivity implements NavigationL
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        playbackService = ((PlaybackService.LocalBinder)service).getService();
+        setPlaybackService(((PlaybackService.LocalBinder)service).getService());
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        playbackService = null;
+        setPlaybackService(null);
+    }
+
+    protected void setPlaybackService(PlaybackService service) {
+        playbackService = service;
     }
 }
