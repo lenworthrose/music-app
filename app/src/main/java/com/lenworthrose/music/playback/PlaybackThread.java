@@ -329,10 +329,15 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     }
 
     private void play(IdType type, ArrayList<Long> ids) {
-        playlistStore.setPlaylist(SongsAdapter.createSongsCursor(playbackService, type, ids.get(0)));
+        Cursor cursor = SongsAdapter.createSongsCursor(playbackService, type, ids.get(0));
+        playlistStore.setPlaylist(cursor);
+        cursor.close();
 
-        for (int i = 1; i < ids.size(); i++)
-            playlistStore.add(SongsAdapter.createSongsCursor(playbackService, type, ids.get(i)));
+        for (int i = 1; i < ids.size(); i++) {
+            cursor = SongsAdapter.createSongsCursor(playbackService, type, ids.get(i));
+            playlistStore.add(cursor);
+            cursor.close();
+        }
 
         if (playlistCursor != null) playlistCursor.close();
         playlistCursor = playlistStore.read();
@@ -344,8 +349,11 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
     private void add(final IdType type, final ArrayList<Long> ids) {
         boolean isNextTrackScheduleRequired = isEndOfPlaylist();
 
-        for (Long id : ids)
-            playlistStore.add(SongsAdapter.createSongsCursor(playbackService, type, id));
+        for (Long id : ids) {
+            Cursor cursor = SongsAdapter.createSongsCursor(playbackService, type, id);
+            playlistStore.add(cursor);
+            cursor.close();
+        }
 
         if (playlistCursor != null) playlistCursor.close();
         playlistCursor = playlistStore.read();
@@ -367,7 +375,9 @@ public class PlaybackThread extends Thread implements Handler.Callback, MediaPla
 
         for (int i = ids.size() - 1; i >= 0; i--) {
             long id = ids.get(i);
-            playlistStore.addAfter(playlistPosition + 1, SongsAdapter.createSongsCursor(playbackService, type, id));
+            Cursor cursor = SongsAdapter.createSongsCursor(playbackService, type, id);
+            playlistStore.addAfter(playlistPosition + 1, cursor);
+            cursor.close();
         }
 
         if (playlistCursor != null) playlistCursor.close();
