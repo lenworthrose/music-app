@@ -1,6 +1,5 @@
 package com.lenworthrose.music.fragment;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -35,6 +34,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.activity.PlayingNowActivity;
+import com.lenworthrose.music.activity.SearchActivity;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Constants.PlaybackState;
@@ -404,12 +404,17 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection, 
         long id = (Long)v.getTag();
         if (id == -1) return true;
 
-        String key = v == artist ? Constants.EXTRA_ARTIST_ID : Constants.EXTRA_ALBUM_ID;
-        Intent intent = new Intent();
+        String key = v == artist ? Constants.EXTRA_ARTIST_ID : Constants.EXTRA_ALBUM_ID, title;
+        Intent intent = new Intent(getActivity(), SearchActivity.class);
         intent.putExtra(key, id);
-        getActivity().setResult(Activity.RESULT_OK, intent);
-        getActivity().finish();
 
+        if (v instanceof TextView)
+            title = ((TextView)v).getText().toString();
+        else
+            title = album.getText().toString();
+
+        intent.putExtra(Constants.EXTRA_TITLE, title);
+        startActivity(intent);
         return true;
     }
 

@@ -55,15 +55,17 @@
             android:label="@string/equalizer"
             android:parentActivityName=".activity.PlayingNowActivity" />
 
+        <activity
+            android:name=".activity.SearchActivity"
+            android:parentActivityName=".activity.PlayingNowActivity" />
+
         <service
             android:name=".playback.PlaybackService"
             android:stopWithTask="true" />
 
-        <service
-            android:name=".sync.MediaStoreSyncService" />
+        <service android:name=".sync.MediaStoreSyncService" />
 
-        <service
-            android:name=".widget.WidgetService" />
+        <service android:name=".widget.WidgetService" />
 
         <receiver android:name=".playback.MediaSessionManager$MediaKeyReceiver">
             <intent-filter>

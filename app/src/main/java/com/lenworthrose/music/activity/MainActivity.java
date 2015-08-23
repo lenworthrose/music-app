@@ -7,11 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,12 +17,10 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,21 +37,17 @@ import com.lenworthrose.music.fragment.SearchFragment;
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.sync.MediaStoreSyncService;
 import com.lenworthrose.music.util.Constants;
-import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.view.NowPlayingBar;
 
-import java.util.ArrayList;
-
 /**
- * The main Activity for the application. Implements {@link NavigationListener} so it can handle navigation
- * events. Manages the {@link LibraryFragment}s that display the media library.
+ * The main Activity for the application. Extends {@link NavigationActivity} so it can handle navigation
+ * events. Manages {@link LibraryFragment}s that display the media library.
  * <p/>
  * Binds to the {@link PlaybackService} so it can handle actions that modify the Playing Now playlist.
  * <p/>
  * Responsible for starting the {@link MediaStoreSyncService}.
  */
-public class MainActivity extends AppCompatActivity implements NavigationListener, ServiceConnection, AdapterView.OnItemClickListener {
-    private PlaybackService playbackService;
+public class MainActivity extends NavigationActivity implements AdapterView.OnItemClickListener {
     private NowPlayingBar nowPlayingBar;
     private ListView drawerListView;
     private ActionBarDrawerToggle drawerToggle;
@@ -84,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         nowPlayingBar = (NowPlayingBar)findViewById(R.id.main_now_playing_bar);
         nowPlayingBar.setOnClickListener(new View.OnClickListener() {
@@ -153,12 +143,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(modificationReceiver, new IntentFilter(Constants.PLAYBACK_MODIFICATION_COMPLETE));
@@ -174,8 +158,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
 
     @Override
     protected void onStop() {
-        unbindService(this);
-        playbackService = null;
         nowPlayingBar.setPlaybackService(null);
         super.onStop();
     }
@@ -187,52 +169,15 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
     }
 
     @Override
-    public void onNavigate(IdType type, long id) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id))
-                .addToBackStack(String.valueOf(id)).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).commit();
-    }
-
-    @Override
-    public void onViewModeToggled(IdType type, long id) {
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id)).commit();
-        } else {
-            getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().beginTransaction().replace(R.id.root_container, LibraryFragment.createInstance(type, id))
-                    .addToBackStack(String.valueOf(id)).commit();
-        }
-    }
-
-    @Override
-    public void playSongs(Cursor songsCursor, int from) {
-        playbackService.play(songsCursor, from);
-    }
-
-    @Override
-    public void play(IdType type, ArrayList<Long> ids) {
-        playbackService.play(type, ids);
-    }
-
-    @Override
-    public void add(IdType type, ArrayList<Long> ids) {
-        playbackService.add(type, ids);
-    }
-
-    @Override
-    public void addAsNext(IdType type, ArrayList<Long> ids) {
-        playbackService.addAsNext(type, ids);
-    }
-
-    @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        playbackService = ((PlaybackService.LocalBinder)service).getService();
+        super.onServiceConnected(name, service);
         nowPlayingBar.setPlaybackService(playbackService);
         nowPlayingBar.onResume();
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        playbackService = null;
+        super.onServiceDisconnected(name);
         nowPlayingBar.setPlaybackService(null);
     }
 
@@ -267,18 +212,6 @@ public class MainActivity extends AppCompatActivity implements NavigationListene
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(R.id.root_container, toShow).commit();
         drawerLayout.closeDrawers();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 666 && resultCode == RESULT_OK && data != null) {
-            if (data.hasExtra(Constants.EXTRA_ARTIST_ID))
-                onNavigate(IdType.ARTIST, data.getLongExtra(Constants.EXTRA_ARTIST_ID, -1));
-            else
-                onNavigate(IdType.ALBUM, data.getLongExtra(Constants.EXTRA_ALBUM_ID, -1));
-        }
     }
 
     private void postCloseDrawer() {
