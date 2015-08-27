@@ -26,6 +26,7 @@ import com.lenworthrose.music.fragment.PlayingItemFragment;
 import com.lenworthrose.music.fragment.PlayingNowPlaylistFragment;
 import com.lenworthrose.music.fragment.ShuffleDialogFragment;
 import com.lenworthrose.music.util.Constants;
+import com.lenworthrose.music.widget.WidgetService;
 
 /**
  * The Playing Now page for the application. Displays the {@link PlayingItemFragment} and {@link PlayingNowPlaylistFragment}.
@@ -66,6 +67,10 @@ public class PlayingNowActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        Intent intent = new Intent(this, WidgetService.class);
+        intent.setAction(WidgetService.ACTION_REFRESH);
+        this.startService(intent);
     }
 
     @Override

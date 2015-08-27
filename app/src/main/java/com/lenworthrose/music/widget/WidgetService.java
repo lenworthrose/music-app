@@ -1,8 +1,10 @@
 package com.lenworthrose.music.widget;
 
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -29,16 +31,23 @@ public class WidgetService extends Service implements ServiceConnection {
     public void onCreate() {
         super.onCreate();
 
-        receiver = new PlaybackBroadcastReceiver();
-        IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_CHANGED);
-        filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+        if (isWidgetPresent(this)) {
+            receiver = new PlaybackBroadcastReceiver();
+            IntentFilter filter = new IntentFilter(Constants.PLAYING_NOW_CHANGED);
+            filter.addAction(Constants.PLAYBACK_STATE_CHANGED);
+            LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
 
-        bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
+            bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
+        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!isWidgetPresent(this)) {
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
         if (intent != null && ACTION_REFRESH.equals(intent.getAction()))
             bindService(new Intent(this, PlaybackService.class), this, BIND_AUTO_CREATE);
 
@@ -47,7 +56,7 @@ public class WidgetService extends Service implements ServiceConnection {
 
     @Override
     public void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        if (receiver != null) LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onDestroy();
     }
 
@@ -61,4 +70,10 @@ public class WidgetService extends Service implements ServiceConnection {
 
     @Override
     public void onServiceDisconnected(ComponentName name) { }
+
+    private static boolean isWidgetPresent(Context context) {
+        AppWidgetManager appMan = AppWidgetManager.getInstance(context);
+        int[] appWidgetIds = appMan.getAppWidgetIds(new ComponentName(context, WidgetProvider.class));
+        return appWidgetIds != null && appWidgetIds.length > 0;
+    }
 }
