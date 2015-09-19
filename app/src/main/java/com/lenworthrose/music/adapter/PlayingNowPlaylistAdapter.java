@@ -45,6 +45,8 @@ public class PlayingNowPlaylistAdapter extends DragSortCursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        if (cursor.isClosed()) return;
+
         ListItem item = (ListItem)view;
         item.setTitle((getListPosition(cursor.getPosition()) + 1) + ". " + cursor.getString(5));
         item.setSubtitle(cursor.getString(3));
