@@ -40,7 +40,7 @@ class PlaybackBroadcastReceiver extends BroadcastReceiver {
                 for (int appWidgetId : appWidgetIds)
                     appMan.partiallyUpdateAppWidget(appWidgetId, rv);
 
-                Glide.with(context).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().fallback(R.drawable.logo)
+                Glide.with(context).load(intent.getStringExtra(Constants.EXTRA_ALBUM_ART_URL)).asBitmap().override(500, 500).fallback(R.drawable.logo)
                         .error(R.drawable.logo).into(new AppWidgetTarget(context, rv, R.id.widget_image, appWidgetIds) {
                     @Override
                     public void onLoadFailed(Exception e, Drawable errorDrawable) {
