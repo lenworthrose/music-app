@@ -477,7 +477,7 @@ public class PlayingItemFragment extends Fragment implements ServiceConnection, 
                 BitmapUtils.createBlurredBitmap(art, new BitmapUtils.BitmapCallback() {
                     @Override
                     public void onBitmapReady(Bitmap bitmap) {
-                        ((PlayingNowActivity)getActivity()).setBackgroundImage(bitmap);
+                        if (getActivity() != null) ((PlayingNowActivity)getActivity()).setBackgroundImage(bitmap);
                     }
                 });
         }
