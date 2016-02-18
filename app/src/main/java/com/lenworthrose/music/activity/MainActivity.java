@@ -91,23 +91,28 @@ public class MainActivity extends NavigationActivity implements AdapterView.OnIt
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer);
         drawerListView.setOnItemClickListener(this);
 
-        final boolean isRecreated = savedInstanceState != null;
+        if (savedInstanceState == null) {
+            BroadcastReceiver artistsStoreInitReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
 
-        BroadcastReceiver artistsStoreInitReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
-
-                if (!isRecreated && !isFinishing() && !isDestroyed()) {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                    selectedDrawerPosition = Integer.parseInt(prefs.getString(Constants.SETTING_START_LOCATION, "0"));
-                    drawerListView.setItemChecked(selectedDrawerPosition, true);
-                    onItemClick(drawerListView, null, selectedDrawerPosition, selectedDrawerPosition);
+                    if (!isFinishing() && !isDestroyed()) {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                        selectedDrawerPosition = Integer.parseInt(prefs.getString(Constants.SETTING_START_LOCATION, "0"));
+                        drawerListView.setItemChecked(selectedDrawerPosition, true);
+                        drawerListView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                onItemClick(drawerListView, null, selectedDrawerPosition, selectedDrawerPosition);
+                            }
+                        });
+                    }
                 }
-            }
-        };
+            };
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(artistsStoreInitReceiver, new IntentFilter(Constants.ARTISTS_STORE_INITIALIZED));
+            LocalBroadcastManager.getInstance(this).registerReceiver(artistsStoreInitReceiver, new IntentFilter(Constants.ARTISTS_STORE_INITIALIZED));
+        }
 
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("FIRST_LAUNCH", true))
             showWelcomeDialog();
