@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -17,6 +15,9 @@ import com.lenworthrose.music.view.GridItem;
 import com.lenworthrose.music.view.ListItem;
 
 import java.util.ArrayList;
+
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 /**
  * A {@link BaseSwitchableAdapter} that manages lists of Songs.

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 

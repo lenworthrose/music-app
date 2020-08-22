@@ -7,8 +7,6 @@ import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 
 import com.lenworthrose.music.IdType;
 import com.lenworthrose.music.R;
@@ -17,6 +15,9 @@ import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.NavigationListener;
 
 import java.util.ArrayList;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 /**
  * An Activity that implements {@link AppCompatActivity} in order to handle navigation events.

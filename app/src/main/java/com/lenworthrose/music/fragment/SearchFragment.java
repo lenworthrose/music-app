@@ -3,9 +3,6 @@ package com.lenworthrose.music.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +13,10 @@ import android.view.ViewGroup;
 import com.lenworthrose.music.R;
 import com.lenworthrose.music.adapter.SearchAdapter;
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersGridView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
 
 /**
  * Fragment for performing a search of the media library.

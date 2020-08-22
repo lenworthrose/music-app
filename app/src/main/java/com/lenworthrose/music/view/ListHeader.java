@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -25,6 +23,9 @@ import com.lenworthrose.music.activity.LastFmInfoActivity;
 import com.lenworthrose.music.adapter.AlbumsAdapter;
 import com.lenworthrose.music.sync.ArtistsStore;
 import com.lenworthrose.music.util.BitmapUtils;
+
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 /**
  * A {@link View} that is meant to be added as the header to a list. Contains information about the list (e.g.

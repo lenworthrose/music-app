@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.lenworthrose.music.R;
@@ -21,6 +20,7 @@ import com.lenworthrose.music.util.Constants;
 
 import java.util.List;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import fm.last.api.LastFmServer;
 import fm.last.api.LastFmServerFactory;
 

@@ -2,9 +2,9 @@ package com.lenworthrose.music.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.cursoradapter.widget.CursorAdapter;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;

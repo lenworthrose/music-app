@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.lenworthrose.music.util.Constants;
+
+import androidx.loader.content.CursorLoader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * Manages the Artists database.

@@ -9,10 +9,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * Service responsible for updating Widgets.
@@ -62,14 +63,15 @@ public class WidgetService extends Service implements ServiceConnection {
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        PlaybackService playbackService = ((PlaybackService.LocalBinder)service).getService();
+        PlaybackService playbackService = ((PlaybackService.LocalBinder) service).getService();
         receiver.onReceive(this, playbackService.getPlayingItemIntent());
         receiver.onReceive(this, playbackService.getPlaybackStateIntent());
         unbindService(this);
     }
 
     @Override
-    public void onServiceDisconnected(ComponentName name) { }
+    public void onServiceDisconnected(ComponentName name) {
+    }
 
     private static boolean isWidgetPresent(Context context) {
         AppWidgetManager appMan = AppWidgetManager.getInstance(context);

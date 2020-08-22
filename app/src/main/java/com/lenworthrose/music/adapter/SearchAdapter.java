@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +25,10 @@ import com.lenworthrose.music.view.GridItem;
 import com.tonicartos.widget.stickygridheaders.StickyGridHeadersSimpleAdapter;
 
 import java.util.ArrayList;
+
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 /**
  * Adapter for use in the {@link com.lenworthrose.music.fragment.SearchFragment}.

@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +19,9 @@ import com.lenworthrose.music.playback.PlaybackService;
 import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.Utils;
 import com.mobeta.android.dslv.DragSortListView;
+
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * This Fragment displays the current Playing Now Playlist.

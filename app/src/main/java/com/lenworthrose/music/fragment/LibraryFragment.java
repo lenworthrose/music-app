@@ -7,10 +7,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +26,11 @@ import com.lenworthrose.music.util.Constants;
 import com.lenworthrose.music.util.NavigationListener;
 import com.lenworthrose.music.view.HeaderGridView;
 import com.lenworthrose.music.view.ListHeader;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * This Fragment handles the display of information from the media library. It can be configured
